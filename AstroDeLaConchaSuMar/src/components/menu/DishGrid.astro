@@ -1,0 +1,75 @@
+---
+import DishCard from './DishCard.astro';
+
+const dishes = [
+  {
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db76?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 45.00',
+    title: 'Ceviche\nClásico',
+    description: 'Pescado del día marinado en leche de tigre con ají limo y cilantro.',
+    tags: ['Popular', 'Fresco'],
+    tagColors: ['#007791', '#973307']
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1619454016518-697bc23143cd?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 32.00',
+    title: 'Causa Limeña',
+    description: 'Papa amarilla infusionada con ají amarillo, rellena de pollo y palta.',
+    tags: ['Favorito'],
+    tagColors: ['#007791']
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 58.00',
+    title: 'Lomo\nSaltado',
+    description: 'Cortes de fino lomo saltados al wok con cebolla, tomate y papas fritas.',
+    tags: ['Especialidad'],
+    tagColors: ['#973307']
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1563233434-2e2126296766?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 48.00',
+    title: 'Tiradito al\nAjí Amarillo',
+    description: 'Finos cortes de pescado fresco bañados en crema de ají amarillo.',
+    tags: ['Fresco'],
+    tagColors: ['#973307']
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 38.00',
+    title: 'Arroz con\nMariscos',
+    description: 'Arroz criollo con mixtura de mariscos y aroma de pimentón.',
+    tags: ['Popular'],
+    tagColors: ['#007791']
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1562607349-590eb551ad35?auto=format&fit=crop&w=600&q=80',
+    price: 'S/ 52.00',
+    title: 'Pulpo a la\nParrilla',
+    description: 'Tentáculos de pulpo marinados en salsa anticuchera al carbón.',
+    tags: ['Gourmet'],
+    tagColors: ['#007791']
+  }
+];
+---
+
+<div class="dish-grid">
+  {dishes.map((dish) => (
+    <DishCard {...dish} />
+  ))}
+</div>
+
+<style>
+  .dish-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+  }
+
+  @media (min-width: 1440px) {
+    .dish-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

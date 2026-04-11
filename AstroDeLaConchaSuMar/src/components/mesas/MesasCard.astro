@@ -1,0 +1,98 @@
+---
+interface Props {
+    name: string;
+    state: string;
+    number: number;
+    chairs: number;
+}
+
+const { name, chairs, state, number } = Astro.props;
+const color = "var(--color-green)";
+
+const stateColors: Record<string, string[]> = {
+    libre: ["var(--color-white)", "var(--color-brand-cyan)"],
+    ocupada: ["var(--color-brand-cyan)", "var(--color-white)"],
+    cuenta: ["var(--color-yellow)", "var(--color-white)"],
+};
+---
+
+<div
+    class="mesa-card"
+    style={`background-color: ${stateColors[state][0]}; color: ${stateColors[state][1]}`}
+>
+    <div class="mesa-number">
+        <span style={`color: ${stateColors[state][1]}`}
+            >{String(number).padStart(2, "0")}</span
+        >
+    </div>
+    <div
+        class="mesa-badge"
+        style={`background-color: ${stateColors[state][1]}; `}
+    >
+        <span style={`color: ${stateColors[state][0]}`}>{state}</span>
+    </div>
+    <div class="mesa-content">
+        <h2 style={`color: ${stateColors[state][1]}`}>{name}</h2>
+        <span style={`color: ${stateColors[state][1]}`}>{chairs} personas</span>
+    </div>
+</div>
+
+<style>
+    .mesa-card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #6464644d;
+        display: flex;
+        flex-direction: column;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        height: 100%;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mesa-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: scale(1.05);
+    }
+
+    .mesa-number {
+        padding: 16px;
+        display: flex;
+        font-size: 3.5rem;
+        font-weight: 700;
+    }
+
+    .mesa-content {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mesa-content span {
+        font-size: 14px;
+    }
+    .mesa-content h2 {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .mesa-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        backdrop-filter: blur(3.5px);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+</style>

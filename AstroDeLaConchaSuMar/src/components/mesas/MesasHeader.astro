@@ -1,0 +1,99 @@
+---
+---
+
+<div class="mesas-header">
+  <div class="legend-container">
+    <div class="legend-item">
+      <div class="dot disponible"></div>
+      <span>Disponible</span>
+    </div>
+    <div class="legend-item">
+      <div class="dot ocupada"></div>
+      <span>Ocupada</span>
+    </div>
+    <div class="legend-item">
+      <div class="dot cuenta"></div>
+      <span>Cuenta Pendiente</span>
+    </div>
+  </div>
+
+  <button class="open-mesa-btn">
+    <div class="icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 0V14M0 7H14" stroke="white" stroke-width="2"/>
+      </svg>
+    </div>
+    <span>Abrir Mesa</span>
+  </button>
+</div>
+
+<style>
+  .mesas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    width: 100%;
+  }
+
+  .legend-container {
+    display: flex;
+    gap: 32px;
+    background-color: #edf5fc;
+    padding: 16px 32px;
+    border-radius: 16px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-item span {
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #151d22;
+    opacity: 0.8;
+    letter-spacing: 0.6px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+  }
+
+  .dot.disponible { background-color: #ffff; border: 1px solid #000000; }
+  .dot.ocupada { background-color: #005d72; }
+  .dot.cuenta { background-color: #eab308; }
+
+  .open-mesa-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #005d72;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(0, 93, 114, 0.2), 0 2px 4px -1px rgba(0, 93, 114, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .open-mesa-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 93, 114, 0.2);
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

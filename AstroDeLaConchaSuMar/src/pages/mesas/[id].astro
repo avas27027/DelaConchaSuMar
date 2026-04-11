@@ -1,0 +1,9 @@
+---
+import Layout from "../../layouts/Layout.astro";
+const { id } = Astro.params;
+---
+
+<Layout title={`Page ${id} - De la Concha su Mar`}>
+    <h1>Page for ID: {id}</h1>
+    <p>This is a dynamic page for the ID {id}.</p>
+</Layout>

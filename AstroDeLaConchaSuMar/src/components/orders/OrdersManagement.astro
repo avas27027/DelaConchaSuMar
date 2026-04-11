@@ -1,0 +1,87 @@
+---
+import OrdersHeader from './OrdersHeader.astro';
+import OrdersFilters from './OrdersFilters.astro';
+import OrdersTable from './OrdersTable.astro';
+---
+
+<div class="orders-management">
+  <OrdersHeader />
+  <OrdersFilters />
+  <OrdersTable />
+  
+  <button class="floating-action-btn">
+    <div class="icon-bg">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 13H5V11H11V5H13V11H19V13H13V19H11V13Z" fill="white" />
+      </svg>
+    </div>
+    <div class="btn-text">
+      <span class="label">Nueva Orden</span>
+      <span class="subtext">Generar requerimiento</span>
+    </div>
+  </button>
+</div>
+
+<style>
+  .orders-management {
+    position: relative;
+    padding: 32px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .floating-action-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px 12px 12px;
+    background: rgba(255, 255, 255, 0.64);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(0, 93, 114, 0.04);
+    border-radius: 20px;
+    box-shadow: 0 25px 43px -12px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+  }
+
+  .floating-action-btn:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 30px 50px -12px rgba(0, 0, 0, 0.3);
+  }
+
+  .icon-bg {
+    width: 48px;
+    height: 48px;
+    background-color: #005d72;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #151d22;
+  }
+
+  .subtext {
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3f484c;
+  }
+</style>

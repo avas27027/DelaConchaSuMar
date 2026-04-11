@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./rest-modules
+      dockerfile: Dockerfile
+    container_name: rest-modules-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./rest-modules:/app
+      - /app/node_modules # Evita que los node_modules locales sobreescriban los del contenedor
+    environment:
+      - PORT=3001
+    networks:
+      - dev-network
+
+  frontend:
+    build:
+      context: ./AstroDeLaConchaSuMar
+      dockerfile: Dockerfile
+    container_name: astro-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./AstroDeLaConchaSuMar:/app
+      - /app/node_modules # Evita conflictos de dependencias entre SO
+    environment:
+      - PORT=3000
+      - BACKEND_URL=http://backend:3001
+    networks:
+      - dev-network
+    depends_on:
+      - backend
+
+networks:
+  dev-network:
+    driver: bridge

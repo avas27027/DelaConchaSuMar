@@ -1,0 +1,65 @@
+:root {
+  --color-bg: #f5faff;
+  --color-sidebar: #edf5fc;
+  --color-brand-cyan: #007791;
+  --color-deep-cyan: #005d72;
+  --color-accent-orange: #973307;
+  --color-text-primary: #151d22;
+  --color-text-secondary: #6f797d;
+  --color-text-muted: #6b7280;
+  --color-white: #ffffff;
+
+  --color-yellow: #eab308;
+  
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+  
+  --spacing-sidebar: 256px;
+  --spacing-header: 64px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  display: flex;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bec8cd4d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bec8cd80;
+}

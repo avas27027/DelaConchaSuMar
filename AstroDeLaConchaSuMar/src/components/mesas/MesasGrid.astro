@@ -1,0 +1,31 @@
+---
+import MesasCard from "./MesasCard.astro";
+
+const mesas = [
+    { name: "Terraza sur", chairs: 6, state: "libre", number: 1 },
+    { name: "Sala central", chairs: 4, state: "ocupada", number: 2 },
+    { name: "Jardín", chairs: 8, state: "cuenta", number: 3 },
+    { name: "Balconcillo", chairs: 2, state: "libre", number: 4 }
+]
+---
+
+<div class="mesas-grid">
+  {mesas.map((mesa) => (
+    <MesasCard {...mesa} />
+  ))}
+</div>
+
+<style>
+  .mesas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+  }
+
+  @media (min-width: 1440px) {
+    .mesas-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+</style>

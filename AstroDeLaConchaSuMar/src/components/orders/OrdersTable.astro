@@ -1,0 +1,277 @@
+---
+const orders = [
+  {
+    id: "OC-2024-001",
+    date: "12 Oct 2024",
+    provider: "Distribuidora del Mar",
+    status: "Pendiente",
+    statusColor: "#973307",
+    statusBg: "#9733070d",
+    total: "S/ 1,250.00"
+  },
+  {
+    id: "OC-2024-002",
+    date: "10 Oct 2024",
+    provider: 'Pescaderia "El Puerto"',
+    status: "Recibido",
+    statusColor: "#005d72",
+    statusBg: "#005d720d",
+    total: "S/ 850.00"
+  },
+  {
+    id: "OC-2024-003",
+    date: "08 Oct 2024",
+    provider: "Mariscos & Mas",
+    status: "Recibido",
+    statusColor: "#005d72",
+    statusBg: "#005d720d",
+    total: "S/ 2,100.00"
+  },
+  {
+    id: "OC-2024-004",
+    date: "05 Oct 2024",
+    provider: "Congelados Premium",
+    status: "Cancelado",
+    statusColor: "#3f484c",
+    statusBg: "#3f484c0d",
+    total: "S/ 450.00"
+  }
+];
+---
+
+<div class="table-container">
+  <div class="table-wrapper">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th class="checkbox-cell"><input type="checkbox" /></th>
+          <th>ID ORDEN</th>
+          <th>FECHA DE EMISIÓN</th>
+          <th>PROVEEDOR PRINCIPAL</th>
+          <th>ESTADO</th>
+          <th class="text-right">MONTO TOTAL</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {orders.map((order) => (
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox" /></td>
+            <td class="id-cell">{order.id}</td>
+            <td>{order.date}</td>
+            <td class="provider-cell">
+              <div class="provider-info">
+                <div class="provider-avatar">{order.provider.charAt(0)}</div>
+                <span>{order.provider}</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge" style={`color: ${order.statusColor}; background-color: ${order.statusBg}`}>
+                {order.status}
+              </span>
+            </td>
+            <td class="text-right total-cell">{order.total}</td>
+            <td class="actions-cell">
+              <button class="more-btn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 13c0.55 0 1.02083-0.19583 1.4125-0.5875 0.39167-0.39167 0.5875-0.8625 0.5875-1.4125 0-0.55-0.19583-1.02083-0.5875-1.4125-0.39167-0.39167-0.8625-0.5875-1.4125-0.5875-0.55 0-1.02083 0.19583-1.4125 0.5875-0.39167 0.39167-0.5875 0.8625-0.5875 1.4125 0 0.55 0.19583 1.02083 0.5875 1.4125 0.39167 0.39167 0.8625 0.5875 1.4125 0.5875l0 0m0-6c0.55 0 1.02083-0.19583 1.4125-0.5875 0.39167-0.39167 0.5875-0.8625 0.5875-1.4125 0-0.55-0.19583-1.02083-0.5875-1.4125-0.39167-0.39167-0.8625-0.5875-1.4125-0.5875-0.55 0-1.02083 0.19583-1.4125 0.5875-0.39167 0.39167-0.5875 0.8625-0.5875 1.4125 0 0.55 0.19583 1.02083 0.5875 1.4125 0.39167 0.39167 0.8625 0.5875 1.4125 0.5875l0 0m0 12c0.55 0 1.02083-0.19583 1.4125-0.5875 0.39167-0.39167 0.5875-0.8625 0.5875-1.4125 0-0.55-0.19583-1.02083-0.5875-1.4125-0.39167-0.39167-0.8625-0.5875-1.4125-0.5875-0.55 0-1.02083 0.19583-1.4125 0.5875-0.39167 0.39167-0.5875 0.8625-0.5875 1.4125 0 0.55 0.19583 1.02083 0.5875 1.4125 0.39167 0.39167 0.8625 0.5875 1.4125 0.5875l0 0" fill="#3f484c" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="pagination-footer">
+    <div class="results-info">
+      Mostrando {orders.length} de 128 órdenes
+    </div>
+    <div class="pagination-controls">
+      <button class="page-btn nav-btn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15L7 10l5-5 1.4 1.4-3.6 3.6 3.6 3.6L12 15z" fill="currentColor" />
+        </svg>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn nav-btn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5l5 5-5 5-1.4-1.4 3.6-3.6-3.6-3.6L8 5z" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .table-container {
+    background-color: #edf5fc;
+    border-radius: 24px;
+    padding: 4px;
+    border: 1px solid rgba(190, 200, 205, 0.2);
+  }
+
+  .table-wrapper {
+    background-color: white;
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .orders-table th {
+    text-align: left;
+    padding: 24px 16px;
+    background-color: rgba(225, 233, 240, 0.09);
+    color: #005d72;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #edf5fc;
+  }
+
+  .orders-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #151d22;
+    border-bottom: 1px solid #edf5fc;
+    vertical-align: middle;
+  }
+
+  .orders-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .checkbox-cell {
+    width: 68px;
+    text-align: center !important;
+  }
+
+  .checkbox-cell input {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid #bec8cd;
+    cursor: pointer;
+  }
+
+  .id-cell {
+    font-weight: 700;
+    color: #005d72;
+  }
+
+  .provider-cell {
+    min-width: 200px;
+  }
+
+  .provider-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .provider-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #f0f7ff;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    color: #005d72;
+    font-size: 14px;
+  }
+
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .text-right {
+    text-align: right !important;
+  }
+
+  .total-cell {
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .actions-cell {
+    width: 60px;
+    text-align: center;
+  }
+
+  .more-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #3f484c;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+  }
+
+  .more-btn:hover {
+    background-color: #f0f7ff;
+  }
+
+  .pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+  }
+
+  .results-info {
+    font-size: 14px;
+    color: #3f484c;
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .page-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 1px solid rgba(190, 200, 205, 0.1);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #151d22;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .page-btn.active {
+    background-color: #005d72;
+    color: white;
+    font-weight: 700;
+  }
+
+  .page-btn:hover:not(.active) {
+    background-color: #f0f7ff;
+  }
+
+  .nav-btn {
+    color: #151d22;
+  }
+</style>

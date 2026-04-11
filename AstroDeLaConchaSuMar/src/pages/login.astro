@@ -1,0 +1,83 @@
+<form id="login-form">
+    <input type="email" id="email" name="email" placeholder="Correo" required />
+    <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+    />
+    <button type="submit">Ingresar</button>
+    <button type="button" id="google-btn">Ingresar con Google</button>
+</form>
+
+<script>
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider,
+    } from "firebase/auth";
+    import app from "../controller/firebase";
+
+    const auth = getAuth(app);
+    const form = document.getElementById("login-form") as HTMLFormElement | null;
+
+    if (!form) {
+        throw new Error("No se encontró el formulario de login.");
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const email = formData.get("email");
+        const password = formData.get("password");
+
+        if (typeof email !== "string" || typeof password !== "string") {
+            alert("Ingresa correo y contraseña válidos.");
+            return;
+        }
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password,
+            );
+            await createSession(userCredential.user);
+        } catch (error) {
+            alert("Error al iniciar sesión.");
+            console.error(error);
+        }
+    });
+
+    const googleBtn = document.getElementById("google-btn");
+    googleBtn!.addEventListener("click", async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            console.log("Usuario autenticado con Google:", result.user);
+            await createSession(result.user);
+        } catch (error) {
+            alert("Error al iniciar sesión con Google.");
+            console.error(error);
+        }
+    });
+
+    async function createSession(user: any) {
+        console.log("Usuario autenticado:",await user.getIdToken());
+        const idToken = await user.getIdToken();
+        const res = await fetch("http://localhost:3000/api/auth/session", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${idToken}`,
+            },
+        });
+
+        if (res.ok) {
+            window.location.assign("/mesas");
+        } else {
+            alert("No se pudo crear la sesión. Intenta de nuevo.");
+        }
+    }
+</script>

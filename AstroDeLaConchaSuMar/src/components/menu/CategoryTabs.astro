@@ -1,0 +1,63 @@
+---
+const categories = [
+  { name: 'Entradas', active: true },
+  { name: 'Platos de Fondo', active: false },
+  { name: 'Ceviches & Tiraditos', active: false },
+  { name: 'Postres', active: false },
+  { name: 'Bebidas', active: false }
+];
+---
+
+<div class="category-tabs-wrapper">
+  <div class="category-tabs">
+    {categories.map((cat) => (
+      <button class={`category-tab ${cat.active ? 'active' : ''}`}>
+        {cat.name}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .category-tabs-wrapper {
+    width: 100%;
+    margin-bottom: 32px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .category-tabs-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 4px; /* Space for shadow if any */
+  }
+
+  .category-tab {
+    padding: 10px 24px;
+    border-radius: 9999px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    background-color: var(--color-white);
+    color: var(--color-brand-cyan);
+  }
+
+  .category-tab:hover {
+    background-color: #0077910d;
+  }
+
+  .category-tab.active {
+    background-color: var(--color-brand-cyan);
+    color: var(--color-white);
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(0, 93, 114, 0.2), 0 2px 4px -1px rgba(0, 93, 114, 0.1);
+  }
+</style>

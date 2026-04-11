@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Backend API - NestJS (Production)
+  rest-modules:
+    build:
+      context: ./rest-modules
+      dockerfile: Dockerfile
+      target: production
+    container_name: astro_rest_api_prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - astro_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend - Astro (Production)
+  astro-app:
+    build:
+      context: ./AstroDeLaConchaSuMar
+      dockerfile: Dockerfile
+      target: production
+    container_name: astro_frontend_prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - astro_network
+    depends_on:
+      - rest-modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  astro_network:
+    driver: bridge
