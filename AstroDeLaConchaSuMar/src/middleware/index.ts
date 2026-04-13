@@ -1,5 +1,4 @@
 import { defineMiddleware } from "astro:middleware";
-import { auth } from '../controller/firebaseAdmin';
 
 export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, next) => {
     // Solo proteger rutas que empiecen con /admin
@@ -11,16 +10,16 @@ export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, nex
         }
 
         try {
-            //const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-            const res = await fetch("http://localhost:3001/authentication/verifyToken", {
+            const backendUrl = process.env.BACKEND_URL ?? "http://backend:3001";
+            const endpoint = new URL("/authentication/verifyToken", backendUrl).toString();
+            const res = await fetch(endpoint, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${sessionCookie}`,
                 },
-            });
+            }).then(res => res).then(res => res.json());
 
-            console.log("Respuesta del backend:", res);
-            const data = await res.json();
+            const data = await res;
             if (!data.success) {
                 return redirect("/login");
             }

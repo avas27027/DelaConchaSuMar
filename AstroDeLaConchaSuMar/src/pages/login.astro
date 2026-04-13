@@ -1,87 +1,422 @@
-<form id="login-form">
-    <input type="email" id="email" name="email" placeholder="Correo" required />
-    <input
-        type="password"
-        id="password"
-        name="password"
-        placeholder="Contraseña"
-        required
-    />
-    <button type="submit">Ingresar</button>
-    <button type="button" id="google-btn">Ingresar con Google</button>
-</form>
+---
+import "../styles/global.css";
+---
 
-<script>
-    import {
-        getAuth,
-        signInWithEmailAndPassword,
-        signInWithPopup,
-        GoogleAuthProvider,
-    } from "firebase/auth";
-    import app from "../controller/firebase";
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <title>Login - De la Concha su Mar</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <main class="login-viewport">
+            <!-- Background Image -->
+            <div class="bg-layer">
+                <div class="bg-image"></div>
+                <div class="bg-overlay"></div>
+            </div>
 
-    const auth = getAuth(app);
-    const form = document.getElementById(
-        "login-form",
-    ) as HTMLFormElement | null;
+            <!-- Login Container -->
+            <div class="login-container">
+                <div class="login-box">
+                    <!-- Brand Section -->
+                    <div class="brand-section">
+                        <h1>De la Concha su Mar</h1>
+                    </div>
 
-    if (!form) {
-        throw new Error("No se encontró el formulario de login.");
-    }
+                    <!-- Messaging Section -->
+                    <div class="messaging-section">
+                        <h2>¡Hola de nuevo!</h2>
+                        <p>Ingresa tus credenciales para continuar</p>
+                    </div>
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const formData = new FormData(form);
-        const email = formData.get("email");
-        const password = formData.get("password");
+                    <!-- Form Section -->
+                    <form id="login-form" class="login-form">
+                        <div class="field-group">
+                            <label for="email">USUARIO O CORREO ELECTRÓNICO</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                </span>
+                                <input type="email" id="email" name="email" placeholder="tu@correo.com" required />
+                            </div>
+                        </div>
 
-        if (typeof email !== "string" || typeof password !== "string") {
-            alert("Ingresa correo y contraseña válidos.");
-            return;
-        }
+                        <div class="field-group">
+                            <label for="password">CONTRASEÑA</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </span>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required />
+                            </div>
+                        </div>
 
-        try {
-            const userCredential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password,
-            );
-            await createSession(userCredential.user);
-        } catch (error) {
-            alert("Error al iniciar sesión.");
-            console.error(error);
-        }
-    });
+                        <div class="forgot-password">
+                            <a href="#">¿Olvidaste tu contraseña?</a>
+                        </div>
 
-    const googleBtn = document.getElementById("google-btn");
-    googleBtn!.addEventListener("click", async () => {
-        try {
-            const provider = new GoogleAuthProvider();
-            const result = await signInWithPopup(auth, provider);
-            console.log("Usuario autenticado con Google:", result.user);
-            await createSession(result.user);
-        } catch (error) {
-            alert("Error al iniciar sesión con Google.");
-            console.error(error);
-        }
-    });
+                        <button type="submit" class="submit-btn">
+                            Iniciar Sesión
+                        </button>
 
-    async function createSession(user: any) {
-        console.log("Usuario autenticado:", await user.getIdToken());
-        const idToken = await user.getIdToken();
-        const res = await fetch("http://localhost:3001/authentication/token", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${idToken}`,
-            },
-        });
-        
-        if (res.ok) {
-            const token = await res.json()
-            document.cookie = `session=${token.data}; path=/; ${import.meta.env.PROD ? 'secure;' : ''} samesite=lax`;
-            window.location.assign("/mesas");
-        } else {
-            alert("No se pudo crear la sesión. Intenta de nuevo.");
-        }
-    }
-</script>
+                        <div class="separator">
+                            <span>o</span>
+                        </div>
+
+                        <button type="button" id="google-btn" class="google-btn">
+                            <svg class="google-icon" width="20" height="20" viewBox="0 0 24 24">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.25.81-.59z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Continuar con Google
+                        </button>
+                    </form>
+
+                    <!-- Help Link -->
+                    <div class="help-section">
+                        <p>¿Necesitas ayuda? <a href="#">Contactar soporte</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer-shell">
+                <p>© 2024 De la Concha su Mar. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacidad</a>
+                    <a href="#">Términos</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </footer>
+        </main>
+
+        <style>
+            .login-viewport {
+                position: relative;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+
+            .bg-layer {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+            }
+
+            .bg-image {
+                width: 100%;
+                height: 100%;
+                background-image: url('https://images.unsplash.com/photo-1590483734748-361bcb073507?auto=format&fit=crop&q=80&w=2070');
+                background-size: cover;
+                background-position: center;
+            }
+
+            .bg-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #005d720a;
+            }
+
+            .login-container {
+                width: 100%;
+                max-width: 480px;
+                padding: 0 24px;
+            }
+
+            .login-box {
+                background: #f5faffb8;
+                backdrop-filter: blur(26px);
+                border-radius: 12px;
+                padding: 48px;
+                box-shadow: 0 10px 26px #005d7226;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                text-align: center;
+            }
+
+            .brand-section h1 {
+                font-family: var(--font-heading);
+                font-size: 30px;
+                font-weight: 700;
+                color: var(--color-deep-cyan);
+                margin-bottom: 32px;
+                letter-spacing: -0.75px;
+            }
+
+            .messaging-section {
+                margin-bottom: 40px;
+            }
+
+            .messaging-section h2 {
+                font-size: 24px;
+                color: var(--color-text-primary);
+                margin-bottom: 8px;
+            }
+
+            .messaging-section p {
+                color: var(--color-text-secondary);
+                font-size: 14px;
+            }
+
+            .login-form {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                text-align: left;
+            }
+
+            .field-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .field-group label {
+                font-size: 12px;
+                font-weight: 700;
+                color: #3f484c;
+                letter-spacing: 1.2px;
+            }
+
+            .input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .input-icon {
+                position: absolute;
+                left: 16px;
+                color: var(--color-text-secondary);
+            }
+
+            .input-wrapper input {
+                width: 100%;
+                padding: 17px 16px 17px 48px;
+                border-radius: 8px;
+                border: 1px solid #bec8cd5c;
+                background-color: #dbe4eaff;
+                font-family: var(--font-body);
+                font-size: 14px;
+                color: var(--color-text-primary);
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            .input-wrapper input:focus {
+                border-color: var(--color-brand-cyan);
+            }
+
+            .forgot-password {
+                text-align: right;
+            }
+
+            .forgot-password a {
+                font-size: 12px;
+                color: var(--color-brand-cyan);
+                font-weight: 600;
+            }
+
+            .submit-btn {
+                width: 100%;
+                padding: 16px;
+                border-radius: 8px;
+                border: none;
+                background: linear-gradient(180deg, #005d72 0%, #007791 100%);
+                color: white;
+                font-family: var(--font-heading);
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 4px 5px #0000001a;
+                transition: opacity 0.2s;
+            }
+
+            .submit-btn:hover {
+                opacity: 0.9;
+            }
+
+            .separator {
+                position: relative;
+                text-align: center;
+                margin: 8px 0;
+            }
+
+            .separator::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background-color: #bec8cd4d;
+                z-index: 1;
+            }
+
+            .separator span {
+                position: relative;
+                background-color: transparent;
+                padding: 0 10px;
+                color: var(--color-text-secondary);
+                font-size: 14px;
+                z-index: 2;
+            }
+
+            .google-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                width: 100%;
+                padding: 16px;
+                border-radius: 8px;
+                border: 1px solid #bec8cd5c;
+                background-color: white;
+                color: #151d22;
+                font-family: var(--font-heading);
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 1px 2px #0000000d;
+                transition: background-color 0.2s;
+            }
+
+            .google-btn:hover {
+                background-color: #f9fbfc;
+            }
+
+            .help-section {
+                margin-top: 40px;
+                padding-top: 32px;
+                border-top: 1px solid #bec8cd17;
+                font-size: 14px;
+                color: var(--color-text-secondary);
+            }
+
+            .help-section a {
+                color: var(--color-brand-cyan);
+                font-weight: 600;
+            }
+
+            .footer-shell {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                padding: 24px 32px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+                color: #ffffff5c;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: 24px;
+            }
+
+            @media (max-width: 640px) {
+                .footer-shell {
+                    flex-direction: column;
+                    gap: 16px;
+                    text-align: center;
+                    position: relative;
+                    background: rgba(0,0,0,0.2);
+                }
+            }
+        </style>
+
+        <script>
+            import {
+                getAuth,
+                signInWithEmailAndPassword,
+                signInWithPopup,
+                GoogleAuthProvider,
+            } from "firebase/auth";
+            import app from "../controller/firebase";
+
+            const auth = getAuth(app);
+            const form = document.getElementById(
+                "login-form",
+            ) as HTMLFormElement | null;
+
+            if (!form) {
+                throw new Error("No se encontró el formulario de login.");
+            }
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const formData = new FormData(form);
+                const email = formData.get("email");
+                const password = formData.get("password");
+
+                if (typeof email !== "string" || typeof password !== "string") {
+                    alert("Ingresa correo y contraseña válidos.");
+                    return;
+                }
+
+                try {
+                    const userCredential = await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password,
+                    );
+                    await createSession(userCredential.user);
+                } catch (error) {
+                    alert("Error al iniciar sesión.");
+                    console.error(error);
+                }
+            });
+
+            const googleBtn = document.getElementById("google-btn");
+            googleBtn!.addEventListener("click", async () => {
+                try {
+                    const provider = new GoogleAuthProvider();
+                    const result = await signInWithPopup(auth, provider);
+                    await createSession(result.user);
+                } catch (error) {
+                    alert("Error al iniciar sesión con Google.");
+                    console.error(error);
+                }
+            });
+
+            async function createSession(user: any) {
+                const idToken = await user.getIdToken();
+                const res = await fetch("http://localhost:3001/authentication/token", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${idToken}`,
+                    },
+                });
+                
+                if (res.ok) {
+                    const token = await res.json()
+                    document.cookie = `session=${token.data}; path=/; ${import.meta.env.PROD ? 'secure;' : ''} samesite=lax`;
+                    window.location.assign("/mesas");
+                } else {
+                    alert("No se pudo crear la sesión. Intenta de nuevo.");
+                }
+            }
+        </script>
+    </body>
+</html>

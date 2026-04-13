@@ -29,6 +29,7 @@ services:
     environment:
       - PORT=3000
       - BACKEND_URL=http://backend:3001
+      - PUBLIC_BACKEND_URL=http://backend:3001
     networks:
       - dev-network
     depends_on:

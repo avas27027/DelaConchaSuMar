@@ -5,9 +5,9 @@ import { getFirestore } from "firebase-admin/firestore";
 
 @Injectable()
 export class FirebaseService {
-  private projectId = process.env.FIREBASE_PROJECT_ID;
-  private clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  private privateKey = process.env.FIREBASE_PRIVATE_KEY!.replaceAll("\\n", "\n");
+  private readonly projectId = process.env.FIREBASE_PROJECT_ID;
+  private readonly clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  private readonly privateKey = process.env.FIREBASE_PRIVATE_KEY!.replaceAll("\\n", "\n");
 
   constructor() {
     const credential = {
