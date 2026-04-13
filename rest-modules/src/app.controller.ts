@@ -20,10 +20,5 @@ export class AppController {
     };
   }
 
-  @Post()
-  postData(@Req() request: Request): any {
-    const authHeader = request.headers['authorization'];
-    const token = authHeader?.replace('Bearer ', '');
-    return { token };
-  }
+  
 }

@@ -21,7 +21,9 @@
     import app from "../controller/firebase";
 
     const auth = getAuth(app);
-    const form = document.getElementById("login-form") as HTMLFormElement | null;
+    const form = document.getElementById(
+        "login-form",
+    ) as HTMLFormElement | null;
 
     if (!form) {
         throw new Error("No se encontró el formulario de login.");
@@ -65,16 +67,18 @@
     });
 
     async function createSession(user: any) {
-        console.log("Usuario autenticado:",await user.getIdToken());
+        console.log("Usuario autenticado:", await user.getIdToken());
         const idToken = await user.getIdToken();
-        const res = await fetch("http://localhost:3000/api/auth/session", {
+        const res = await fetch("http://localhost:3001/authentication/token", {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${idToken}`,
             },
         });
-
+        
         if (res.ok) {
+            const token = await res.json()
+            document.cookie = `session=${token.data}; path=/; ${import.meta.env.PROD ? 'secure;' : ''} samesite=lax`;
             window.location.assign("/mesas");
         } else {
             alert("No se pudo crear la sesión. Intenta de nuevo.");

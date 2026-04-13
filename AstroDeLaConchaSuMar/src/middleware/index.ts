@@ -3,7 +3,7 @@ import { auth } from '../controller/firebaseAdmin';
 
 export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, next) => {
     // Solo proteger rutas que empiecen con /admin
-    if (url.pathname.startsWith("/admin")) {
+    if (!url.pathname.startsWith("/login")) {
         const sessionCookie = cookies.get("session")?.value;
 
         if (!sessionCookie) {
@@ -11,12 +11,20 @@ export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, nex
         }
 
         try {
-            const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+            //const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+            const res = await fetch("http://localhost:3001/authentication/verifyToken", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${sessionCookie}`,
+                },
+            });
 
-            // Validar el Rol
-            if (decodedClaims.role !== "admin") {
-                return redirect("/403"); // No autorizado
+            console.log("Respuesta del backend:", res);
+            const data = await res.json();
+            if (!data.success) {
+                return redirect("/login");
             }
+
         } catch (error: any) {
             console.error("Error verifying session cookie:", error);
             return redirect("/login");
