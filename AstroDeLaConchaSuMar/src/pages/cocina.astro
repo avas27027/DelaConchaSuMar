@@ -1,10 +1,110 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import KitchenGrid from "../components/kitchen/KitchenGrid.astro";
 ---
 
 <Layout title="Cocina - De la Concha su Mar">
-    <h1 class="page-title">Cocina</h1>
-    <p class="page-description">
-        Aquí se muestra el proceso de preparación de los platos,
-    </p>
+    <div class="cocina-page">
+        <div class="page-header">
+            <div class="header-actions">
+                <div class="status-summary">
+                    <span class="status-item">
+                        <span class="status-dot high"></span>
+                        <strong>2</strong> Alta Prioridad
+                    </span>
+                    <span class="status-item">
+                        <span class="status-dot in-progress"></span>
+                        <strong>5</strong> En Proceso
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <KitchenGrid />
+    </div>
 </Layout>
+
+<style>
+    .cocina-page {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+        letter-spacing: -0.7px;
+        margin-bottom: 4px;
+    }
+
+    .page-description {
+        color: var(--color-text-secondary);
+        font-size: 14px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .status-summary {
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 93, 114, 0.05);
+        border: 1px solid #e7eff6;
+    }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--color-text-primary);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .status-dot.high {
+        background-color: #ba1a1a;
+        box-shadow: 0 0 0 4px #ffdad6;
+    }
+
+    .status-dot.in-progress {
+        background-color: #005d72;
+        box-shadow: 0 0 0 4px #dbe4ea;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .header-actions {
+            width: 100%;
+        }
+        
+        .status-summary {
+            width: 100%;
+            justify-content: space-around;
+        }
+    }
+</style>
