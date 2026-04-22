@@ -1,62 +1,65 @@
 ---
-import DishCard from './DishCard.astro';
+import DishCard from "./DishCard.astro";
 
 const dishes = [
   {
-    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db76?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 45.00',
-    title: 'Ceviche\nClásico',
-    description: 'Pescado del día marinado en leche de tigre con ají limo y cilantro.',
-    tags: ['Popular', 'Fresco'],
-    tagColors: ['#007791', '#973307']
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1706341841097-87336026a22b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjkzNjF8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "45",
+    title: "Ceviche\nClásico",
+    description:
+      "Pescado del día marinado en leche de tigre con ají limo y cilantro.",
   },
   {
-    image: 'https://images.unsplash.com/photo-1619454016518-697bc23143cd?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 32.00',
-    title: 'Causa Limeña',
-    description: 'Papa amarilla infusionada con ají amarillo, rellena de pollo y palta.',
-    tags: ['Favorito'],
-    tagColors: ['#007791']
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1613585269383-3e68182bdb23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjk3NjF8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "32",
+    title: "Causa Limeña",
+    description:
+      "Papa amarilla infusionada con ají amarillo, rellena de pollo y palta.",
   },
   {
-    image: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 58.00',
-    title: 'Lomo\nSaltado',
-    description: 'Cortes de fino lomo saltados al wok con cebolla, tomate y papas fritas.',
-    tags: ['Especialidad'],
-    tagColors: ['#973307']
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1645740718252-f753fb9d714e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjk3NjJ8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "58",
+    title: "Lomo\nSaltado",
+    description:
+      "Cortes de fino lomo saltados al wok con cebolla, tomate y papas fritas.",
   },
   {
-    image: 'https://images.unsplash.com/photo-1563233434-2e2126296766?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 48.00',
-    title: 'Tiradito al\nAjí Amarillo',
-    description: 'Finos cortes de pescado fresco bañados en crema de ají amarillo.',
-    tags: ['Fresco'],
-    tagColors: ['#973307']
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1769434087375-4108031e7c9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjk3NjJ8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "48",
+    title: "Tiradito al\nAjí Amarillo",
+    description:
+      "Finos cortes de pescado fresco bañados en crema de ají amarillo.",
   },
   {
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 38.00',
-    title: 'Arroz con\nMariscos',
-    description: 'Arroz criollo con mixtura de mariscos y aroma de pimentón.',
-    tags: ['Popular'],
-    tagColors: ['#007791']
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1743297907354-15385f7be4ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjk3NjN8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "38",
+    title: "Arroz con\nMariscos",
+    description: "Arroz criollo con mixtura de mariscos y aroma de pimentón.",
   },
   {
-    image: 'https://images.unsplash.com/photo-1562607349-590eb551ad35?auto=format&fit=crop&w=600&q=80',
-    price: 'S/ 52.00',
-    title: 'Pulpo a la\nParrilla',
-    description: 'Tentáculos de pulpo marinados en salsa anticuchera al carbón.',
-    tags: ['Gourmet'],
-    tagColors: ['#007791']
-  }
+    id: "1",
+    image:
+      "https://images.unsplash.com/photo-1737171329207-ab95a6e5f586?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzYzNjk3NjR8&ixlib=rb-4.1.0&q=80&w=1080",
+    price: "52",
+    title: "Pulpo a la\nParrilla",
+    description:
+      "Tentáculos de pulpo marinados en salsa anticuchera al carbón.",
+  },
 ];
 ---
 
 <div class="dish-grid">
-  {dishes.map((dish) => (
-    <DishCard {...dish} />
-  ))}
+  {dishes.map((dish) => <DishCard {...dish} />)}
 </div>
 
 <style>
@@ -64,7 +67,7 @@ const dishes = [
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
-    padding-bottom: 40px;
+    padding: 0 20px 40px 20px;
   }
 
   @media (min-width: 1440px) {

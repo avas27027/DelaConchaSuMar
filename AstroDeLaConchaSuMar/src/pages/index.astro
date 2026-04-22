@@ -2,10 +2,31 @@
 import Layout from "../layouts/Layout.astro";
 import CategoryTabs from "../components/menu/CategoryTabs.astro";
 import DishGrid from "../components/menu/DishGrid.astro";
+import CurrentOrder from "../components/menu/CurrentOrder.astro";
 ---
 
 <Layout title="De la Concha su Mar - Menú">
-	<CategoryTabs />
-	<DishGrid />
+	<div class="menu-page-layout">
+		<div class="menu-section">
+			<CategoryTabs />
+			<DishGrid />
+		</div>
+		<CurrentOrder />
+	</div>
 </Layout>
 
+<style>
+	.menu-page-layout {
+		display: flex;
+		height: 100%;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	.menu-section {
+		flex-grow: 1;
+		padding: 32px;
+		overflow-y: auto;
+		background-color: #f5faff;
+	}
+</style>

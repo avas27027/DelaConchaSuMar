@@ -4,32 +4,22 @@ interface Props {
   price: string;
   title: string;
   description: string;
-  tags?: string[];
-  tagColors?: string[];
 }
 
-const { image, price, title, description, tags = [], tagColors = [] } = Astro.props;
+const { image, price, title, description } = Astro.props;
 ---
 
 <div class="dish-card">
   <div class="image-container">
     <img src={image} alt={title} class="dish-image" />
     <div class="price-badge">
-      <span>{price}</span>
+      <span>S/ {price}</span>
     </div>
   </div>
   
   <div class="dish-info">
     <h3 class="dish-title">{title}</h3>
     <p class="dish-description">{description}</p>
-    
-    <div class="tags-container">
-      {tags.map((tag, index) => (
-        <span class="tag" style={`color: ${tagColors[index] || 'var(--color-brand-cyan)'}; background-color: ${tagColors[index] ? tagColors[index] + '0D' : 'rgba(0, 119, 145, 0.05)'}`}>
-          {tag}
-        </span>
-      ))}
-    </div>
   </div>
 </div>
 
@@ -43,6 +33,7 @@ const { image, price, title, description, tags = [], tagColors = [] } = Astro.pr
     flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     height: 100%;
+    cursor: pointer;
   }
 
   .dish-card:hover {

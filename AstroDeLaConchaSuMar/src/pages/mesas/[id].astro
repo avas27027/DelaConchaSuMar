@@ -1,9 +1,26 @@
 ---
+import CurrentOrder from "../../components/menu/CurrentOrder.astro";
+import DishGrid from "../../components/menu/DishGrid.astro";
 import Layout from "../../layouts/Layout.astro";
 const { id } = Astro.params;
+
+const orders = [
+    {name: 'Ceviche Clásico', price: 45, quantity:1},
+    {name: 'Causa Limeña', price: 60, quantity:2}
+]
 ---
 
 <Layout title={`Page ${id} - De la Concha su Mar`}>
     <h1>Page for ID: {id}</h1>
     <p>This is a dynamic page for the ID {id}.</p>
+    <div class="menuDetalle-container">
+        <DishGrid />
+        <CurrentOrder name="Mesa 05" orders={orders} />
+    </div>
 </Layout>
+
+<style>
+    .menuDetalle-container {
+        display: flex;
+    }
+</style>

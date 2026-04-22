@@ -16,9 +16,10 @@ const stateColors: Record<string, string[]> = {
 };
 ---
 
-<div
+<a
     class="mesa-card"
     style={`background-color: ${stateColors[state][0]}; color: ${stateColors[state][1]}`}
+    href={`/mesas/${number}`}
 >
     <div class="mesa-number">
         <span style={`color: ${stateColors[state][1]}`}
@@ -35,7 +36,7 @@ const stateColors: Record<string, string[]> = {
         <h2 style={`color: ${stateColors[state][1]}`}>{name}</h2>
         <span style={`color: ${stateColors[state][1]}`}>{chairs} personas</span>
     </div>
-</div>
+</a>
 
 <style>
     .mesa-card {

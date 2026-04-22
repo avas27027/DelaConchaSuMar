@@ -1,0 +1,253 @@
+---
+interface Props {
+  name: string;
+  orders: Array<{ name: string; price: number; quantity: number }>;
+}
+const { name, orders } = Astro.props;
+const total = () => {
+  let total = 0;
+  orders.forEach((order) => (total += order.price));
+  return total;
+};
+const igv = () => total() * 0.18;
+---
+
+<aside class="current-order">
+  <div class="order-header">
+    <h2>Pedido Actual</h2>
+    <span class="table-badge">Mesa 05</span>
+  </div>
+
+  <div class="order-content">
+    <!-- Placeholder for empty state or items -->
+    <div class="order-items">
+      {
+        orders.map((order) => {
+          return (
+            <div class="order-item">
+              <div class="item-info">
+                <span class="item-qty">{order.quantity}x</span>
+                <span class="item-name">{order.name}</span>
+              </div>
+              <span class="item-price">S/ {order.price}</span>
+              <button class="item-btn-delete">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20px"
+                  height="20px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          );
+        })
+      }
+
+      <div class="order-footer">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>S/ {total}</span>
+        </div>
+        <div class="summary-row">
+          <span>IGV (18%)</span>
+          <span>S/ {igv}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>S/ {total() - igv()}</span>
+        </div>
+
+        <div class="order-buttons">
+          <button class="btn-kitchen"> Enviar a cocina </button>
+          <button class="btn-confirm"> Confirmar Pedido </button>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .current-order {
+        width: 400px;
+        height: 100%;
+        background-color: var(--color-white);
+        border-left: 1px solid #e1e9f0;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+
+      .order-header {
+        padding: 24px;
+        border-bottom: 1px solid #f0f4f8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .order-header h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin: 0;
+      }
+
+      .table-badge {
+        background-color: #f0f7ff;
+        color: var(--color-brand-cyan);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .order-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 24px;
+      }
+
+      .order-items {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .item-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .item-qty {
+        font-weight: 700;
+        color: var(--color-brand-cyan);
+        background-color: #f0f7ff;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .item-name {
+        font-size: 15px;
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      .item-price {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+
+      .order-footer {
+        padding: 24px;
+        background-color: #f8fafc;
+        border-top: 1px solid #e1e9f0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+        color: var(--color-text-secondary);
+      }
+
+      .summary-row.total {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--color-text-primary);
+        margin-top: 4px;
+        padding-top: 12px;
+        border-top: 1px solid #e1e9f0;
+      }
+
+      .btn-confirm {
+        margin-top: 12px;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        border: none;
+        background-color: var(--color-brand-cyan);
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 119, 145, 0.2);
+      }
+
+      .btn-kitchen {
+        margin-top: 12px;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid var(--color-brand-cyan);
+        color: var(--color-brand-cyan);
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 119, 145, 0.2);
+      }
+
+      .item-btn-delete {
+        font-size: 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
+      }
+
+      .item-btn-delete:hover {
+        transform: translateY(-1px);
+      }
+      .item-btn-delete:active {
+        transform: translateY(0);
+      }
+
+      .order-buttons {
+        display: flex;
+        gap: 5px;
+      }
+
+      .btn-confirm:hover {
+        background-color: var(--color-deep-cyan);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 119, 145, 0.3);
+      }
+
+      .btn-confirm:active {
+        transform: translateY(0);
+      }
+
+      .btn-kitchen:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 119, 145, 0.3);
+      }
+
+      .btn-kitchen:active {
+        transform: translateY(0);
+      }
+    </style>
+  </div>
+</aside>

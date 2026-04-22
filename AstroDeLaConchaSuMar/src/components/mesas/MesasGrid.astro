@@ -2,17 +2,21 @@
 import MesasCard from "./MesasCard.astro";
 
 const mesas = [
-    { name: "Terraza sur", chairs: 6, state: "libre", number: 1 },
-    { name: "Sala central", chairs: 4, state: "ocupada", number: 2 },
-    { name: "Jardín", chairs: 8, state: "cuenta", number: 3 },
-    { name: "Balconcillo", chairs: 2, state: "libre", number: 4 }
-]
+  { name: "Terraza sur", chairs: 6, state: "libre", number: 1 },
+  { name: "Sala central", chairs: 4, state: "ocupada", number: 2 },
+  { name: "Jardín", chairs: 8, state: "cuenta", number: 3 },
+  { name: "Balconcillo", chairs: 2, state: "libre", number: 4 },
+];
+
+const res = await fetch(`${process.env.BACKEND_URL}/mesas`, {
+  method: "GET",
+}).then(res => res.json());
+
+console.log(res)
 ---
 
 <div class="mesas-grid">
-  {mesas.map((mesa) => (
-    <MesasCard {...mesa} />
-  ))}
+  {mesas.map((mesa) => <MesasCard {...mesa} />)}
 </div>
 
 <style>

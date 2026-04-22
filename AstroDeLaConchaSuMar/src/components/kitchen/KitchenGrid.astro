@@ -1,11 +1,10 @@
 ---
-import KitchenTicket from "./KitchenTicket.astro";
+import KitchenTicket from "./KitchenTicket.tsx";
 
 const orders = [
     {
         orderNumber: "042",
         customerName: "Mesa 4 - Juan Pérez",
-        urgency: "high" as const,
         time: "20260414173800",
         items: [
             { quantity: 2, name: "Cebiche de Pescado", note: "Sin picante" },
@@ -16,8 +15,7 @@ const orders = [
     {
         orderNumber: "045",
         customerName: "Mesa 12 - Ana García",
-        urgency: "medium" as const,
-        time: "20260414173800",
+        time: "20260414112800",
         items: [
             { quantity: 1, name: "Tiradito en Crema de Rocoto" },
             { quantity: 2, name: "Limonada Jarra" }
@@ -26,8 +24,7 @@ const orders = [
     {
         orderNumber: "048",
         customerName: "Mesa 7 - Carlos Ruiz",
-        urgency: "new" as const,
-        time: "20260414173900",
+        time: "20260414113800",
         items: [
             { quantity: 3, name: "Causa Acevichada" },
             { quantity: 1, name: "Jalea Mixta" }
@@ -36,7 +33,6 @@ const orders = [
     {
         orderNumber: "040",
         customerName: "Mesa 2 - Para Llevar",
-        urgency: "in-progress" as const,
         time: "20260414174000",
         items: [
             { quantity: 1, name: "Chupe de Camarones" },
@@ -48,7 +44,7 @@ const orders = [
 
 <div class="kitchen-grid">
     {orders.map((order) => (
-        <KitchenTicket {...order} />
+        <KitchenTicket {...order} client:load/>
     ))}
     
     <div class="empty-state-filler">
