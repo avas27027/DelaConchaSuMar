@@ -8,6 +8,15 @@ export class FirebaseService {
   private readonly projectId = process.env.FIREBASE_PROJECT_ID;
   private readonly clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   private readonly privateKey = process.env.FIREBASE_PRIVATE_KEY!.replaceAll("\\n", "\n");
+  public readonly collectionNames = {
+    MeassureUnitsService: "meassureUnits",
+    ProductsService: "products",
+    TablesService: "tables",
+    AuthenticationService: "users",
+    MenuService: "menu",
+    SalesOrdersService: "salesOrders",
+    SalesOrders_x_Products: "salesOrders_x_products",
+  }
 
   constructor() {
     const credential = {
@@ -26,5 +35,9 @@ export class FirebaseService {
 
   getFirestore() {
     return getFirestore();
+  }
+
+  getCollectionNames(key: string) {
+    return this.collectionNames[key] ?? ''
   }
 }

@@ -4,9 +4,12 @@ import { AppService } from './app.service';
 import { CommonsModule } from './commons/commons.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { MenuModule } from './menu/menu.module';
+import { TablesModule } from './tables/tables.module';
+import { SalesOrdersModule } from './sales-orders/sales-orders.module';
 
 @Module({
-  imports: [CommonsModule, ConfigModule.forRoot({ isGlobal: true }), AuthenticationModule],
+  imports: [CommonsModule, ConfigModule.forRoot({ isGlobal: true }), AuthenticationModule, MenuModule, TablesModule, SalesOrdersModule],
   controllers: [AppController],
   providers: [AppService],
 })

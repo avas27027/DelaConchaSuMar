@@ -5,12 +5,14 @@ import { Auth } from 'firebase-admin/auth';
 
 @Injectable()
 export class AuthenticationService {
-    private auth: Auth;
-    private firestore: FirebaseFirestore.Firestore;
+    private readonly auth: Auth;
+    private readonly firestore: FirebaseFirestore.Firestore;
+    private readonly collectionName: string;
 
     constructor(private readonly firebase: FirebaseService) {
         this.auth = this.firebase.getAuth();
         this.firestore = this.firebase.getFirestore();
+        this.collectionName = firebase.collectionNames[AuthenticationService.name]
     }
 
     async tokenCreate(token: string): Promise<Response> {
@@ -38,7 +40,7 @@ export class AuthenticationService {
             const decodedClaims = await this.auth.verifySessionCookie(token, true);
             const uid = decodedClaims.uid;
             
-            const usersSnapshot = await this.firestore.collection('users').where('uid', '==', uid).get();
+            const usersSnapshot = await this.firestore.collection(this.collectionName).where('uid', '==', uid).get();
             const userDoc = usersSnapshot.docs[0];
             const userData = userDoc ? userDoc.data() : null;
             
