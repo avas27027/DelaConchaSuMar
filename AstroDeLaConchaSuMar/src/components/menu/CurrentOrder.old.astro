@@ -22,7 +22,7 @@ const igv = () => total() * 0.18;
     <!-- Placeholder for empty state or items -->
     <div class="order-items">
       {
-        orders.map((order) => {
+        orders.map((order, i) => {
           return (
             <div class="order-item">
               <div class="item-info">

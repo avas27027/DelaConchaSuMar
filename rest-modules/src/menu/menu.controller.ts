@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('menu')
 export class MenuController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(private readonly menuService: MenuService) { }
+
+  @Post('/register')
+  @UseInterceptors(FileInterceptor('image'))
+  registerDish(@UploadedFile() image: Express.Multer.File, @Body() CreateMenuDto: CreateMenuDto) {
+    return this.menuService.registerImage(image, CreateMenuDto);
+  }
 
   @Post()
   create(@Body() createMenuDto: CreateMenuDto) {

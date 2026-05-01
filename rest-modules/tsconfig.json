@@ -13,9 +13,17 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "types": ["node"],
+    "types": [
+      "node",
+      "multer"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,

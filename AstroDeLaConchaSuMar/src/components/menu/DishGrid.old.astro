@@ -1,5 +1,6 @@
 ---
-import DishCard from "./DishCard.astro";
+import type { ComponentProps } from "astro/types";
+import DishCard from "./DishCard.old.astro";
 
 const dishes = [
   {
@@ -56,10 +57,36 @@ const dishes = [
       "Tentáculos de pulpo marinados en salsa anticuchera al carbón.",
   },
 ];
+type RestMenuInterface = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  price: number;
+  priceMeassure: any;
+};
+type DishCardInterface = ComponentProps<typeof DishCard>;
+const res = await fetch(
+  `${process.env.BACKEND_URL ?? "http://backend:3001"}/menu`,
+  {
+    method: "GET",
+  },
+)
+  .then((res) => res.json())
+  .catch((error) => {
+    console.error("Error fetching menu:", error);
+    return { data: [] };
+  });
+
+const dishes1: DishCardInterface[] = res.data.map(
+  ({ id, name, imageUrl, description, price }: RestMenuInterface) => {
+    return { image: imageUrl, price, title: name, description };
+  },
+);
 ---
 
 <div class="dish-grid">
-  {dishes.map((dish) => <DishCard {...dish} />)}
+  {dishes1.map((dish) => <DishCard {...dish} />)}
 </div>
 
 <style>
@@ -72,7 +99,7 @@ const dishes = [
 
   @media (min-width: 1440px) {
     .dish-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>

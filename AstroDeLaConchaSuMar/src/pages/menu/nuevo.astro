@@ -1,0 +1,316 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CreateDish from "../../components/menu/CreateDish.tsx";
+---
+
+<Layout title="Nuevo Platillo - De la Concha su Mar">
+    <CreateDish client:only="react" />
+</Layout>
+
+<style>
+    .nuevo-platillo-page {
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 40px;
+    }
+
+    .page-title {
+        font-family: var(--font-heading);
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--color-deep-cyan);
+        letter-spacing: -0.9px;
+        margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+        font-size: 16px;
+        color: var(--color-text-secondary);
+        max-width: 500px;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 32px;
+        align-items: start;
+    }
+
+    .bento-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 10px 26px rgba(0, 93, 114, 0.05);
+        border: 1px solid #bec8cd1a;
+        margin-bottom: 32px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .header-icon {
+        color: var(--color-brand-cyan);
+    }
+
+    .section-header h3 {
+        font-family: var(--font-heading);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+    }
+
+    /* Image Upload Styles */
+    .upload-placeholder {
+        aspect-ratio: 16/9;
+        background-color: #edf5fc;
+        border: 2px dashed #bec8cd4d;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .file-input-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .preview-overlay {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .preview-overlay span {
+        font-weight: 600;
+        color: var(--color-deep-cyan);
+        font-size: 14px;
+    }
+
+    .preview-overlay small {
+        color: var(--color-text-secondary);
+        font-size: 12px;
+    }
+
+    /* Form Styles */
+    .form-details {
+        background-color: #edf5fc;
+        padding: 32px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+        padding-left: 4px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #bec8cd4d;
+        background: white;
+        font-family: var(--font-body);
+        font-size: 14px;
+        color: var(--color-text-primary);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--color-brand-cyan);
+    }
+
+    textarea {
+        height: 120px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .select-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    select {
+        appearance: none;
+    }
+
+    .price-input {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .price-input span {
+        position: absolute;
+        left: 16px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+    }
+
+    .price-input input {
+        padding-left: 40px;
+    }
+
+    /* Ingredients Section */
+    .ingredients-section {
+        margin-bottom: 32px;
+    }
+
+    .header-main {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-grow: 1;
+        color: var(--color-brand-cyan);
+    }
+
+    .add-btn {
+        background-color: rgba(0, 93, 114, 0.05);
+        border: 1px solid rgba(0, 93, 114, 0.1);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--color-deep-cyan);
+        cursor: pointer;
+    }
+
+    .ingredients-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .ingredient-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #edf5fc;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .ingredient-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--color-text-secondary);
+    }
+
+    .ingredient-info span {
+        color: #151d22;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .remove-btn {
+        background: none;
+        border: none;
+        color: #973307;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ingredient-input input {
+        background-color: #edf5fc;
+        border: 2px solid #bec8cd17;
+        box-shadow: none;
+    }
+
+    .ingredient-input input::placeholder {
+        color: #6b7280;
+    }
+
+    /* Sticky Actions */
+    .sticky-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-top: 16px;
+    }
+
+    .btn-save {
+        width: 100%;
+        padding: 16px;
+        background: var(--color-brand-cyan);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-family: var(--font-heading);
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 93, 114, 0.2);
+    }
+
+    .btn-cancel {
+        width: 100%;
+        padding: 16px;
+        background: #dbe4ea;
+        color: #3f484c;
+        border: none;
+        border-radius: 12px;
+        font-family: var(--font-heading);
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    @media (max-width: 992px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

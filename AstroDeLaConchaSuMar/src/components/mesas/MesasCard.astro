@@ -1,13 +1,13 @@
 ---
 interface Props {
+    id: string;
     name: string;
     state: string;
     number: number;
     chairs: number;
 }
 
-const { name, chairs, state, number } = Astro.props;
-const color = "var(--color-green)";
+const { id, name, chairs, state, number } = Astro.props;
 
 const stateColors: Record<string, string[]> = {
     libre: ["var(--color-white)", "var(--color-brand-cyan)"],
@@ -19,7 +19,7 @@ const stateColors: Record<string, string[]> = {
 <a
     class="mesa-card"
     style={`background-color: ${stateColors[state][0]}; color: ${stateColors[state][1]}`}
-    href={`/mesas/${number}`}
+    href={`/mesas/${id}`}
 >
     <div class="mesa-number">
         <span style={`color: ${stateColors[state][1]}`}

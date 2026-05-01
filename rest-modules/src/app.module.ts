@@ -7,9 +7,10 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { MenuModule } from './menu/menu.module';
 import { TablesModule } from './tables/tables.module';
 import { SalesOrdersModule } from './sales-orders/sales-orders.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
 
 @Module({
-  imports: [CommonsModule, ConfigModule.forRoot({ isGlobal: true }), AuthenticationModule, MenuModule, TablesModule, SalesOrdersModule],
+  imports: [CommonsModule, ConfigModule.forRoot({ isGlobal: true }), AuthenticationModule, MenuModule, TablesModule, SalesOrdersModule, IngredientsModule],
   controllers: [AppController],
   providers: [AppService],
 })

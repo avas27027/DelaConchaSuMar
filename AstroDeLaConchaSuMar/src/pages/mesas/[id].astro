@@ -1,26 +1,43 @@
 ---
-import CurrentOrder from "../../components/menu/CurrentOrder.astro";
-import DishGrid from "../../components/menu/DishGrid.astro";
 import Layout from "../../layouts/Layout.astro";
+import MenuDetalle from "../../components/menu/MenuDetalle";
+import type { DishCardProps } from "../../components/menu/DishCard";
+
 const { id } = Astro.params;
 
+type RestMenuInterface = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  price: number;
+  priceMeassure: any;
+};
+
 const orders = [
-    {name: 'Ceviche Clásico', price: 45, quantity:1},
-    {name: 'Causa Limeña', price: 60, quantity:2}
-]
+  { name: "Ceviche Clásico", price: 45, quantity: 1 },
+  { name: "Causa Limeña", price: 60, quantity: 2 },
+];
+
+const res = await fetch(
+  `${process.env.BACKEND_URL ?? "http://localhost:3001"}/menu`,
+  {
+    method: "GET",
+  },
+)
+  .then((res) => res.json())
+  .catch((error) => {
+    console.error("Error fetching menu:", error);
+    return { data: [] };
+  });
+const dishes1: DishCardProps[] =
+  res.data?.map(
+    ({ id, name, imageUrl, description, price }: RestMenuInterface) => {
+      return { id, image: imageUrl, price, title: name, description };
+    },
+  ) || [];
 ---
 
-<Layout title={`Page ${id} - De la Concha su Mar`}>
-    <h1>Page for ID: {id}</h1>
-    <p>This is a dynamic page for the ID {id}.</p>
-    <div class="menuDetalle-container">
-        <DishGrid />
-        <CurrentOrder name="Mesa 05" orders={orders} />
-    </div>
+<Layout title={`Mesa - De la Concha su Mar`}>
+  <MenuDetalle client:load mesaName={`${id}`} initialDishes={dishes1} />
 </Layout>
-
-<style>
-    .menuDetalle-container {
-        display: flex;
-    }
-</style>

@@ -145,7 +145,7 @@ export class SalesOrdersService {
     try {
       products.forEach(({ productId, quantity }) => {
         const newDocRef = collectionRef.doc()
-        const productRef = this.firestore.doc(`${this.firebase.collectionNames.ProductsService}/${productId}`)
+        const productRef = this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`)
         const salesOrderRef = this.firestore.doc(`${this.firebase.collectionNames.SalesOrdersService}/${salesOrderId}`)
 
         batch.set(newDocRef, {

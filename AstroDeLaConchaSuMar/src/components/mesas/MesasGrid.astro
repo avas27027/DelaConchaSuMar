@@ -1,25 +1,80 @@
 ---
+import type { ComponentProps } from "astro/types";
 import MesasCard from "./MesasCard.astro";
+import Modal from "./Modal";
 
 const mesas = [
-  { name: "Terraza sur", chairs: 6, state: "libre", number: 1 },
-  { name: "Sala central", chairs: 4, state: "ocupada", number: 2 },
-  { name: "Jardín", chairs: 8, state: "cuenta", number: 3 },
-  { name: "Balconcillo", chairs: 2, state: "libre", number: 4 },
+  { id: "asd", name: "Terraza sur", chairs: 6, state: "libre", number: 1 },
+  { id: "zxc", name: "Sala central", chairs: 4, state: "ocupada", number: 2 },
+  { id: "zxca", name: "Jardín", chairs: 8, state: "cuenta", number: 3 },
+  { id: "zxcad", name: "Balconcillo", chairs: 2, state: "libre", number: 4 },
 ];
 
-const res = await fetch(`${process.env.BACKEND_URL}/mesas`, {
-  method: "GET",
-}).then(res => res.json());
+const res = await fetch(
+  `${process.env.BACKEND_URL ?? "http://backend:3001"}/tables`,
+  {
+    method: "GET",
+  },
+)
+  .then((res) => res.json())
+  .catch((error) => {
+    console.error("Error fetching menu:", error);
+    return { data: [] };
+  });
 
-console.log(res)
+type restTablesInterface = { id: string; name: string; place: string };
+type MesasCardProps = ComponentProps<typeof MesasCard>;
+const tables: MesasCardProps[] = res.data.map(
+  ({ id, name, place }: restTablesInterface) => {
+    return {
+      id,
+      number: Number.parseInt(name),
+      name: place,
+      chairs: 0,
+      state: "libre",
+    };
+  },
+);
+tables.sort((a, b) => a.number - b.number);
+
+console.log(tables);
 ---
 
 <div class="mesas-grid">
-  {mesas.map((mesa) => <MesasCard {...mesa} />)}
+  {tables ? tables.map((mesa) => <MesasCard {...mesa} />) : ""}
+  <div class="mesa-bone">
+    <Modal
+      {...{ title: "Nueva Mesa", height: "194px", width: "100%" }}
+      client:load
+    >
+      <p slot="button">+</p>
+    </Modal>
+  </div>
 </div>
 
 <style>
+  .mesa-bone {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #6464644d;
+    display: flex;
+    flex-direction: column;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    height: 100%;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-deep-cyan);
+  }
+  .mesa-bone:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+  }
   .mesas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
