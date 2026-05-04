@@ -22,11 +22,9 @@ export default function CurrentOrder({ name, orders, onRemoveOrder }: CurrentOrd
 
     const sendToKitchen = () => {
         const sendJson = {
-            salesId: 'temp-sale',
             tableId: name,
             state: 'toCook',
             observations: observations,
-            userId: 'temp-user',
             products: orders.map((order) => {
                 return {
                     productId: order.id,
@@ -56,11 +54,9 @@ export default function CurrentOrder({ name, orders, onRemoveOrder }: CurrentOrd
 
     const confirmOrder = () => {
         const sendJson = {
-            salesId: 'temp-sale',
             tableId: name,
             state: 'toPay',
             observations: observations,
-            userId: 'temp-user',
             products: orders.map((order) => {
                 return {
                     productId: order.id,

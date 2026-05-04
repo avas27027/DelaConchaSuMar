@@ -19,16 +19,18 @@ export class SalesOrdersService {
     try {
       this.logger.log(`Creando nueva orden para la mesa ID: ${createSalesOrderDto.tableId}`);
 
-      const { tableId, userId, ...orderData } = createSalesOrderDto;
+      const { tableId, userId, salesId, state, observations } = createSalesOrderDto;
 
       // Creamos las referencias a otros documentos
       const tableRef = this.firestore.doc(`${this.firebase.collectionNames.TablesService}/${tableId}`);
       const userRef = this.firestore.doc(`${this.firebase.collectionNames.AuthenticationService}/${userId}`);
 
       const newOrder = {
-        ...orderData,
-        table: tableRef, // Referencia a la mesa
-        user: userRef,   // Referencia al mesero
+        salesId: salesId ?? null,
+        state: state ?? 'PENDING',
+        observations: observations,
+        table: tableId !== '' ? tableRef : null,
+        user: userId !== '' ? userRef : null,
         createdAt: new Date().toISOString(),
       };
 
@@ -37,7 +39,7 @@ export class SalesOrdersService {
 
       return {
         success: true,
-        message: 'Orden enviada a cocina',
+        message: 'Orden creada',
         data: { id: docRef.id, products: resProducts.data ?? {} },
       };
     } catch (error: any) {

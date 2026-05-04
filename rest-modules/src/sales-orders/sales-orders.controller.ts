@@ -5,7 +5,7 @@ import { UpdateSalesOrderDto } from './dto/update-sales-order.dto';
 
 @Controller('sales-orders')
 export class SalesOrdersController {
-  constructor(private readonly salesOrdersService: SalesOrdersService) {}
+  constructor(private readonly salesOrdersService: SalesOrdersService) { }
 
   @Post()
   create(@Body() createSalesOrderDto: CreateSalesOrderDto) {
@@ -24,6 +24,7 @@ export class SalesOrdersController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSalesOrderDto: UpdateSalesOrderDto) {
+    console.log(updateSalesOrderDto);
     return this.salesOrdersService.update(id, updateSalesOrderDto);
   }
 

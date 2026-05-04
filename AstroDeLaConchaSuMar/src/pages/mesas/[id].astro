@@ -39,5 +39,5 @@ const dishes1: DishCardProps[] =
 ---
 
 <Layout title={`Mesa - De la Concha su Mar`}>
-  <MenuDetalle client:load mesaName={`${id}`} initialDishes={dishes1} />
+  <MenuDetalle client:only="react" mesaName={`${id}`} initialDishes={dishes1} />
 </Layout>

@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import KitchenGrid from "../components/kitchen/KitchenGrid.astro";
+import KitchenGrid from "../components/kitchen/KitchenGrid";
 ---
 
 <Layout title="Cocina - De la Concha su Mar">
@@ -10,17 +10,17 @@ import KitchenGrid from "../components/kitchen/KitchenGrid.astro";
                 <div class="status-summary">
                     <span class="status-item">
                         <span class="status-dot high"></span>
-                        <strong>2</strong> Alta Prioridad
+                        Alta Prioridad
                     </span>
                     <span class="status-item">
                         <span class="status-dot in-progress"></span>
-                        <strong>5</strong> En Proceso
+                        En Proceso
                     </span>
                 </div>
             </div>
         </div>
-        
-        <KitchenGrid />
+
+        <KitchenGrid client:only="react" />
     </div>
 </Layout>
 
@@ -29,6 +29,7 @@ import KitchenGrid from "../components/kitchen/KitchenGrid.astro";
         display: flex;
         flex-direction: column;
         gap: 8px;
+        padding: 12px;
     }
 
     .page-header {
@@ -97,11 +98,11 @@ import KitchenGrid from "../components/kitchen/KitchenGrid.astro";
             align-items: flex-start;
             gap: 20px;
         }
-        
+
         .header-actions {
             width: 100%;
         }
-        
+
         .status-summary {
             width: 100%;
             justify-content: space-around;

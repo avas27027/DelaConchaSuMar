@@ -1,8 +1,8 @@
 :root {
   --color-bg: #f5faff;
   --color-sidebar: #edf5fc;
-  --color-brand-cyan: #007791;
-  --color-deep-cyan: #005d72;
+  --color-brand-cyan: #001d91;
+  --color-deep-cyan: #003270;
   --color-accent-orange: #973307;
   --color-text-primary: #151d22;
   --color-text-secondary: #6f797d;
@@ -10,10 +10,10 @@
   --color-white: #ffffff;
 
   --color-yellow: #eab308;
-  
+
   --font-heading: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Manrope', sans-serif;
-  
+
   --spacing-sidebar: 256px;
   --spacing-header: 64px;
 }
@@ -32,7 +32,12 @@ body {
   display: flex;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
 }
 

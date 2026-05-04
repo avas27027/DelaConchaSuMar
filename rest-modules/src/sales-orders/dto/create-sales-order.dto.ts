@@ -1,9 +1,13 @@
+import { IsOptional } from "class-validator"
+
 export class CreateSalesOrderDto {
-    salesId: string = ''
+    @IsOptional()
+    salesId?: string
     tableId: string = ''
     state: string = ''
     observations: string = ''
-    userId: string = ''
+    @IsOptional()
+    userId?: string
     products: {
         productId: string,
         quantity: number

@@ -1,0 +1,18 @@
+.kitchen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding-top: 24px;
+}
+
+.empty-state-filler {
+    border: 2px dashed #bec8cd40;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    background-color: #edf5fc40;
+}

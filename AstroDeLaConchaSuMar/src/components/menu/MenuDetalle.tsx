@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DishGrid from './DishGrid';
 import CurrentOrder, { type OrderItem } from './CurrentOrder';
 import type { DishCardProps } from './DishCard';
 import './MenuDetalle.css';
+import { subscribeToTableOrders } from '../../controller/salesOrders.hook';
 
 interface MenuDetalleProps {
     readonly mesaName: string;
@@ -11,6 +12,15 @@ interface MenuDetalleProps {
 
 export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProps) {
     const [orders, setOrders] = useState<OrderItem[]>([]);
+
+    useEffect(() => {
+        const unsubscribe = subscribeToTableOrders(mesaName, ["pending", "toCook"], (orders) => {
+            console.log(orders);
+        });
+        return () => {
+            unsubscribe();
+        }
+    }, [mesaName]);
 
     const handleDishClick = (dish: DishCardProps) => {
         setOrders(prevOrders => {

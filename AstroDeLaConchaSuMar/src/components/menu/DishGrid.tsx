@@ -1,4 +1,3 @@
-import React from 'react';
 import DishCard, { type DishCardProps } from './DishCard';
 
 interface DishGridProps {

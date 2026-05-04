@@ -5,6 +5,16 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Mesas - De la Concha su Mar">
-    <MesasHeader />
-    <MesasGrid />
+    <div class="tables-page">
+        <MesasHeader />
+        <MesasGrid />
+    </div>
+
+    <style>
+        .tables-page {
+            width: 100%;
+            height: 100%;
+            padding: 12px;
+        }
+    </style>
 </Layout>

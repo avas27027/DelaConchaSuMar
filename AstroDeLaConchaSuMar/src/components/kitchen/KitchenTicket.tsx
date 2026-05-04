@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import './KitchenTicket.css';
 
-interface KitchenTicketProps {
+export interface KitchenTicketProps {
+    readonly id: string;
     readonly orderNumber: string;
     readonly customerName: string;
-    readonly time: string;
+    readonly time: number;
     readonly items: readonly {
         readonly quantity: number;
         readonly name: string;
@@ -12,7 +13,7 @@ interface KitchenTicketProps {
     }[];
 }
 
-export default function KitchenTicket({ orderNumber, customerName, time, items }: KitchenTicketProps) {
+export default function KitchenTicket({ id, orderNumber, customerName, time, items }: KitchenTicketProps) {
     const [tiempo, setTiempo] = useState('');
     const [urgency, setUrgency] = useState('new');
 
@@ -46,20 +47,22 @@ export default function KitchenTicket({ orderNumber, customerName, time, items }
 
     const borderColor = urgencyColors[urgency];
 
-    // Función para convertir YYYYMMDDHHmmSS a milisegundos
-    const parsearFecha = (str: any) => {
-        const y = str.substring(0, 4);
-        const m = str.substring(4, 6) - 1;
-        const d = str.substring(6, 8);
-        const h = str.substring(8, 10);
-        const min = str.substring(10, 12);
-        const s = str.substring(12, 14);
-        return new Date(y, m, d, h, min, s).getTime();
-    };
+    const handleReady = () => {
+        fetch(`http://localhost:3001/sales-orders/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                state: 'cooked',
+            }),
+        }).then(() => {
+            console.log('Order marked as cooked');
+        });
+    }
 
     useEffect(() => {
-        const inicioMs = parsearFecha(time);
-
+        const inicioMs = time;
         const intervalo = setInterval(() => {
             const ahora = Date.now();
             const diferencia = ahora - inicioMs;
@@ -72,11 +75,11 @@ export default function KitchenTicket({ orderNumber, customerName, time, items }
             const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
             const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
 
-            if(minutos >= 10) {
+            if (minutos >= 10) {
                 setUrgency('high');
-            } else if(minutos >= 5) {
+            } else if (minutos >= 5) {
                 setUrgency('medium');
-            } else if(minutos >= 1) {
+            } else if (minutos >= 1) {
                 setUrgency('in-progress');
             } else {
                 setUrgency('new');
@@ -91,11 +94,11 @@ export default function KitchenTicket({ orderNumber, customerName, time, items }
     }, [time]);
 
     return (
-        <div className="kitchen-ticket" style={{ borderColor: borderColor}}>
+        <div className="kitchen-ticket" style={{ borderColor: borderColor }}>
             <div className="ticket-header">
                 <div className="header-left">
                     <h2 className="order-number">Pedido #{orderNumber}</h2>
-                    <p className="customer-name">{customerName}</p>
+                    <p className="customer-name">Mesa 0{customerName} - {id}</p>
                 </div>
                 <div className="header-right">
                     <span className="urgency-tag" style={{ backgroundColor: urgencyTagBg[urgency], color: urgencyTagText[urgency] }}>
@@ -107,7 +110,7 @@ export default function KitchenTicket({ orderNumber, customerName, time, items }
 
             <div className="ticket-items">
                 {items.map((item, i) => (
-                    <div key={`item-${i+1}`} className="ticket-item">
+                    <div key={`item-${i + 1}`} className="ticket-item">
                         <div className="item-quantity">{item.quantity}</div>
                         <div className="item-details">
                             <p className="item-name">{item.name}</p>
@@ -118,7 +121,7 @@ export default function KitchenTicket({ orderNumber, customerName, time, items }
             </div>
 
             <div className="ticket-footer">
-                <button className="btn-ready">Marcar como Listo</button>
+                <button className="btn-ready" onClick={handleReady}>Marcar como Listo</button>
             </div>
         </div>
     );
