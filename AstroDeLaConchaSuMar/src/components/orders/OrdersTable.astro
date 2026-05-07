@@ -14,8 +14,8 @@ const orders = [
     date: "10 Oct 2024",
     provider: 'Pescaderia "El Puerto"',
     status: "Recibido",
-    statusColor: "#005d72",
-    statusBg: "#005d720d",
+    statusColor: "var(--color-sea-cyan)",
+    statusBg: "rgb(var(--color-sea-cyan-rgb) / 5%)",
     total: "S/ 850.00"
   },
   {
@@ -23,8 +23,8 @@ const orders = [
     date: "08 Oct 2024",
     provider: "Mariscos & Mas",
     status: "Recibido",
-    statusColor: "#005d72",
-    statusBg: "#005d720d",
+    statusColor: "var(--color-sea-cyan)",
+    statusBg: "rgb(var(--color-sea-cyan-rgb) / 5%)",
     total: "S/ 2,100.00"
   },
   {
@@ -129,7 +129,7 @@ const orders = [
     text-align: left;
     padding: 24px 16px;
     background-color: rgba(225, 233, 240, 0.09);
-    color: #005d72;
+    color: var(--color-sea-cyan);
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12px;
     font-weight: 800;
@@ -165,7 +165,7 @@ const orders = [
 
   .id-cell {
     font-weight: 700;
-    color: #005d72;
+    color: var(--color-sea-cyan);
   }
 
   .provider-cell {
@@ -187,7 +187,7 @@ const orders = [
     justify-content: center;
     align-items: center;
     font-weight: 700;
-    color: #005d72;
+    color: var(--color-sea-cyan);
     font-size: 14px;
   }
 
@@ -262,7 +262,7 @@ const orders = [
   }
 
   .page-btn.active {
-    background-color: #005d72;
+    background-color: var(--color-sea-cyan);
     color: white;
     font-weight: 700;
   }

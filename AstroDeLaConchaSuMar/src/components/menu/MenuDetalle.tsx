@@ -12,11 +12,28 @@ interface MenuDetalleProps {
 
 export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProps) {
     const [orders, setOrders] = useState<OrderItem[]>([]);
+    const [prevOrders, setPrevOrders] = useState<Array<{ orderId: string, state: string, products: OrderItem[] }>>([])
 
     useEffect(() => {
-        const unsubscribe = subscribeToTableOrders(mesaName, ["pending", "toCook"], (orders) => {
-            console.log(orders);
-        });
+        const unsubscribe = subscribeToTableOrders(["pending", "cooked", "toCook"], (orders) => {
+            setPrevOrders(orders.map((order) => {
+                const products: OrderItem[] = []
+                order.products.forEach(product =>
+                    products.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: product.quantity,
+                        observations: product.observations
+                    })
+                );
+                return {
+                    orderId: order.id,
+                    state: order.state,
+                    products
+                }
+            }));
+        }, mesaName);
         return () => {
             unsubscribe();
         }
@@ -47,7 +64,7 @@ export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProp
     return (
         <div className="menuDetalle-container">
             <DishGrid dishes={initialDishes} onDishClick={handleDishClick} />
-            <CurrentOrder name={mesaName} orders={orders} onRemoveOrder={handleRemoveOrder} />
+            <CurrentOrder name={mesaName} orders={orders} prevOrders={prevOrders} onRemoveOrder={handleRemoveOrder} />
         </div>
     );
 }

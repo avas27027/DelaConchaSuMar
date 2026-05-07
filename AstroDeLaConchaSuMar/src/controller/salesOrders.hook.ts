@@ -1,16 +1,104 @@
 import { db } from "./firebase";
 import { collection, query, where, onSnapshot, doc, getDoc, getDocs } from "firebase/firestore";
 
-export const subscribeToTableOrders = (tableId: string, states: string[], callback: (orders: any[]) => void) => {
-    // 1. Referencia a la mesa específica
-    const tableRef = doc(db, "tables", tableId);
+export interface ProductJSONInterface {
+    createdAt: string;
+    description: string;
+    imageUrl: string;
+    name: string;
+    price: number;
+}
 
-    // 2. Query para buscar órdenes de esa mesa
+export type SalesOrderProductJSONInterface = ProductJSONInterface & {
+    id: string;
+    quantity: number;
+    observations: string;
+};
+
+export interface SalesOrderJSONInterface {
+    createdAt: string;
+    id: string;
+    observations: string;
+    state: string;
+    table: { id: string; name: string; place: string };
+    user: string;
+    products: SalesOrderProductJSONInterface[];
+}
+
+export type TableVisualState = "libre" | "preparacion" | "cocinado";
+export type TableStatesMap = Record<string, TableVisualState>;
+
+function toTableVisualState(orderState: string): TableVisualState {
+    if (orderState === "cooked") {
+        return "cocinado";
+    }
+
+    if (orderState === "pending" || orderState === "toCook") {
+        return "preparacion";
+    }
+
+    return "libre";
+}
+
+function getTableStatePriority(state: TableVisualState): number {
+    if (state === "cocinado") {
+        return 3;
+    }
+
+    if (state === "preparacion") {
+        return 2;
+    }
+
+    return 1;
+}
+
+export const subscribeToTableStates = (states: string[], callback: (tableStates: TableStatesMap) => void) => {
     const q = query(
         collection(db, "salesOrders"),
-        where("table", "==", tableRef),
         where("state", "in", states)
     );
+
+    return onSnapshot(q, (snapshot) => {
+        const tableStates = snapshot.docs.reduce<TableStatesMap>((acc, orderDoc) => {
+            const orderData = orderDoc.data();
+            const tableId = orderData.table?.id;
+
+            if (!tableId) {
+                return acc;
+            }
+
+            const nextState = toTableVisualState(orderData.state);
+            const currentState = acc[tableId] ?? "libre";
+
+            if (getTableStatePriority(nextState) > getTableStatePriority(currentState)) {
+                acc[tableId] = nextState;
+            }
+
+            return acc;
+        }, {});
+
+        callback(tableStates);
+    });
+};
+
+export const subscribeToTableOrders = (states: string[], callback: (orders: SalesOrderJSONInterface[]) => void, tableId?: string) => {
+    let q = null;
+
+    if (tableId) {
+        // 1. Referencia a la mesa específica
+        const tableRef = doc(db, "tables", tableId);
+        q = query(
+            collection(db, "salesOrders"),
+            where("table", "==", tableRef),
+            where("state", "in", states)
+        );
+    } else {
+        q = query(
+            collection(db, "salesOrders"),
+            where("state", "in", states)
+        );
+    }
+    // 2. Query para buscar órdenes de esa mesa
 
     // 3. Listener en tiempo real
     return onSnapshot(q, async (snapshot) => {
@@ -34,16 +122,23 @@ export const subscribeToTableOrders = (tableId: string, states: string[], callba
                     return {
                         id: detailDoc.id,
                         quantity: detailData.quantity,
-                        ...(productSnap.data() || {})
-                    };
+                        observations: detailData.observations ?? '',
+                        ...((productSnap.data() ?? {}) as ProductJSONInterface)
+                    } satisfies SalesOrderProductJSONInterface;
                 })
             );
+
+            const tableSnap = await getDoc(orderData.table);
 
             return {
                 id: orderDoc.id,
                 ...orderData,
+                table: {
+                    id: tableSnap.id,
+                    ...((tableSnap.data() ?? {}) as Record<string, string>)
+                },
                 products
-            };
+            } as SalesOrderJSONInterface;
         });
 
         const fullOrders = await Promise.all(ordersPromises);
@@ -51,7 +146,7 @@ export const subscribeToTableOrders = (tableId: string, states: string[], callba
     });
 };
 
-export const subscribeToOrders = (states: string[], callback: (orders: any[]) => void) => {
+export const subscribeToOrders = (states: string[], callback: (orders: SalesOrderJSONInterface[]) => void) => {
     const q = query(
         collection(db, "salesOrders"),
         where("state", "in", states)
@@ -59,7 +154,7 @@ export const subscribeToOrders = (states: string[], callback: (orders: any[]) =>
 
     const productUnsubscribers: Record<string, () => void> = {};
     // Usamos un Map para que sea más fácil borrar órdenes por ID
-    let currentOrdersMap = new Map<string, any>();
+    let currentOrdersMap = new Map<string, SalesOrderJSONInterface>();
 
     return onSnapshot(q, (snapshot) => {
         // 1. Detectar qué órdenes ya no están en el snapshot (cambiaron de estado)
@@ -92,7 +187,7 @@ export const subscribeToOrders = (states: string[], callback: (orders: any[]) =>
                 // actualizamos solo esos datos sin recrear el listener de productos
                 const existingOrder = currentOrdersMap.get(orderId);
                 if (existingOrder) {
-                    currentOrdersMap.set(orderId, { ...existingOrder, ...orderDoc.data() });
+                    currentOrdersMap.set(orderId, { ...existingOrder, ...orderDoc.data() } as SalesOrderJSONInterface);
                     callback(Array.from(currentOrdersMap.values()));
                 }
                 return;
@@ -114,8 +209,9 @@ export const subscribeToOrders = (states: string[], callback: (orders: any[]) =>
                         return {
                             id: detailDoc.id,
                             quantity: detailData.quantity,
-                            ...(productSnap.data() || {})
-                        };
+                            observations: detailData.observations ?? '',
+                            ...((productSnap.data() ?? {}) as ProductJSONInterface)
+                        } satisfies SalesOrderProductJSONInterface;
                     })
                 );
 
@@ -126,8 +222,11 @@ export const subscribeToOrders = (states: string[], callback: (orders: any[]) =>
                     id: orderId,
                     ...orderData,
                     products,
-                    table: tableSnap.data()
-                });
+                    table: {
+                        id: tableSnap.id,
+                        ...((tableSnap.data() ?? {}) as Record<string, string>)
+                    }
+                } as SalesOrderJSONInterface);
 
                 // Emitir cambios
                 callback(Array.from(currentOrdersMap.values()));

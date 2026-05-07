@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import KitchenTicket, { type KitchenTicketProps } from './KitchenTicket';
 import './KitchenGrid.css';
-import { subscribeToOrders } from '../../controller/salesOrders.hook';
+import { subscribeToOrders, type SalesOrderJSONInterface } from '../../controller/salesOrders.hook';
 
 const orders = [
     {
@@ -43,31 +43,13 @@ const orders = [
     },
 ];
 
-interface salesOrderJSONInterface {
-    createdAt: string;
-    id: string;
-    observations: string,
-    state: string,
-    table: { name: string, place: string },
-    user: string,
-    products: {
-        createdAt: string,
-        description: string,
-        id: string,
-        imageUrl: string,
-        name: string,
-        price: number,
-        quantity: number
-    }[]
-}
-
 export default function KitchenGrid() {
     const [kitchenOrders, setKitchenOrders] = React.useState<KitchenTicketProps[]>([]);
 
     useEffect(() => {
         const unsubscribe = subscribeToOrders(['toCook', 'inProgress'], (orders) => {
             console.log(orders);
-            const kO: KitchenTicketProps[] = orders.map((order: salesOrderJSONInterface, i: number) => ({
+            const kO: KitchenTicketProps[] = orders.map((order: SalesOrderJSONInterface, i: number) => ({
                 id: order.id,
                 orderNumber: `0${i + 1}`,
                 customerName: order.table.name,
@@ -75,7 +57,7 @@ export default function KitchenGrid() {
                 items: order.products.map((p: typeof order.products[number]) => ({
                     quantity: p.quantity,
                     name: p.name,
-                    note: p.description,
+                    note: p.observations,
                 })),
             }));
             setKitchenOrders(kO);

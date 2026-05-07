@@ -19,7 +19,7 @@ export class SalesOrdersService {
     try {
       this.logger.log(`Creando nueva orden para la mesa ID: ${createSalesOrderDto.tableId}`);
 
-      const { tableId, userId, salesId, state, observations } = createSalesOrderDto;
+      const { tableId, userId, salesId, state } = createSalesOrderDto;
 
       // Creamos las referencias a otros documentos
       const tableRef = this.firestore.doc(`${this.firebase.collectionNames.TablesService}/${tableId}`);
@@ -27,8 +27,7 @@ export class SalesOrdersService {
 
       const newOrder = {
         salesId: salesId ?? null,
-        state: state ?? 'PENDING',
-        observations: observations,
+        state: state ?? 'libre',
         table: tableId !== '' ? tableRef : null,
         user: userId !== '' ? userRef : null,
         createdAt: new Date().toISOString(),
@@ -140,12 +139,12 @@ export class SalesOrdersService {
     }
   }
 
-  async createSalesOrderxProducts(salesOrderId: string, products: { productId: string, quantity: number }[]) {
+  async createSalesOrderxProducts(salesOrderId: string, products: CreateSalesOrderDto["products"]) {
     const batch = this.firestore.batch()
     const collectionRef = this.firestore.collection(this.firebase.collectionNames.SalesOrders_x_Products);
 
     try {
-      products.forEach(({ productId, quantity }) => {
+      products.forEach(({ productId, quantity, observations }) => {
         const newDocRef = collectionRef.doc()
         const productRef = this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`)
         const salesOrderRef = this.firestore.doc(`${this.firebase.collectionNames.SalesOrdersService}/${salesOrderId}`)
@@ -154,6 +153,7 @@ export class SalesOrdersService {
           order: salesOrderRef,
           product: productRef,
           quantity,
+          observations: observations ?? '',
           createdAt: new Date().toISOString()
         })
 
@@ -206,7 +206,7 @@ export class SalesOrdersService {
     return response
   }
 
-  async updateSalesOrderxProducts(salesOrderId: string, products: { productId: string, quantity: number }[]) {
+  async updateSalesOrderxProducts(salesOrderId: string, products: CreateSalesOrderDto["products"]) {
     const response = {
       success: true,
       message: 'Productos actualizados correctamente',

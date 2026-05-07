@@ -1,8 +1,10 @@
 :root {
   --color-bg: #f5faff;
   --color-sidebar: #edf5fc;
-  --color-brand-cyan: #001d91;
+  --color-brand-cyan: #1d3596;
   --color-deep-cyan: #003270;
+  --color-sea-cyan: #003972;
+  --color-sea-cyan-rgb: 0 16 114;
   --color-accent-orange: #973307;
   --color-text-primary: #151d22;
   --color-text-secondary: #6f797d;

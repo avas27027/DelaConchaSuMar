@@ -5,11 +5,11 @@ export class CreateSalesOrderDto {
     salesId?: string
     tableId: string = ''
     state: string = ''
-    observations: string = ''
     @IsOptional()
     userId?: string
     products: {
         productId: string,
-        quantity: number
+        quantity: number,
+        observations?: string
     }[] = []
 }

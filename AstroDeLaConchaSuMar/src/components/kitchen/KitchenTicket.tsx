@@ -16,12 +16,13 @@ export interface KitchenTicketProps {
 export default function KitchenTicket({ id, orderNumber, customerName, time, items }: KitchenTicketProps) {
     const [tiempo, setTiempo] = useState('');
     const [urgency, setUrgency] = useState('new');
+    const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
     const urgencyColors: Record<string, string> = {
         'high': '#ba1a1a',
         'medium': '#973307',
         'new': '#007791',
-        'in-progress': '#005d72'
+        'in-progress': 'var(--color-sea-cyan)'
     };
 
     const urgencyTags: Record<string, string> = {
@@ -42,12 +43,29 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
         'high': '#ba1a1a',
         'medium': '#973307',
         'new': '#007791',
-        'in-progress': '#005d72'
+        'in-progress': 'var(--color-sea-cyan)'
     };
 
     const borderColor = urgencyColors[urgency];
+    const allItemsChecked = items.length > 0 && checkedItems.size === items.length;
+
+    const toggleItemCheck = (itemIndex: number) => {
+        setCheckedItems((prev) => {
+            const nextCheckedItems = new Set(prev);
+
+            if (nextCheckedItems.has(itemIndex)) {
+                nextCheckedItems.delete(itemIndex);
+            } else {
+                nextCheckedItems.add(itemIndex);
+            }
+
+            return nextCheckedItems;
+        });
+    };
 
     const handleReady = () => {
+        if (!allItemsChecked) return;
+
         fetch(`http://localhost:3001/sales-orders/${id}`, {
             method: 'PATCH',
             headers: {
@@ -60,6 +78,10 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
             console.log('Order marked as cooked');
         });
     }
+
+    useEffect(() => {
+        setCheckedItems(new Set());
+    }, [id, items]);
 
     useEffect(() => {
         const inicioMs = time;
@@ -111,9 +133,16 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
             <div className="ticket-items">
                 {items.map((item, i) => (
                     <div key={`item-${i + 1}`} className="ticket-item">
+                        <input
+                            type="checkbox"
+                            className="item-check"
+                            checked={checkedItems.has(i)}
+                            onChange={() => toggleItemCheck(i)}
+                            aria-label={`Marcar ${item.name} como preparado`}
+                        />
                         <div className="item-quantity">{item.quantity}</div>
                         <div className="item-details">
-                            <p className="item-name">{item.name}</p>
+                            <p className={`item-name ${checkedItems.has(i) ? 'checked' : ''}`}>{item.name}</p>
                             {item.note && <p className="item-note">{item.note}</p>}
                         </div>
                     </div>
@@ -121,7 +150,7 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
             </div>
 
             <div className="ticket-footer">
-                <button className="btn-ready" onClick={handleReady}>Marcar como Listo</button>
+                <button className="btn-ready" onClick={handleReady} disabled={!allItemsChecked}>Marcar como Listo</button>
             </div>
         </div>
     );

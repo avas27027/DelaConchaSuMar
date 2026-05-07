@@ -150,8 +150,15 @@
 
 .order-item {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-item-main {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 .item-info {
@@ -183,6 +190,61 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--color-text-primary);
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.item-state {
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    white-space: nowrap;
+    background-color: #f0f7ff;
+    color: var(--color-brand-cyan);
+}
+
+.item-state-cooked {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.item-state-toCook,
+.item-state-pending {
+    background-color: #fff1e0;
+    color: #973307;
+}
+
+.item-state-toPay {
+    background-color: #edf5fc;
+    color: var(--color-text-secondary);
+}
+
+.item-observations-text {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.4;
+    margin-left: 44px;
+}
+
+.item-observations-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #bec8cd4d;
+    background: white;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-primary);
+    resize: none;
+    min-height: 44px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.item-observations-input:focus {
+    border-color: var(--color-brand-cyan);
 }
 
 .order-footer {

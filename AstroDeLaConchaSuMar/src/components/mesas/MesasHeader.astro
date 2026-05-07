@@ -66,14 +66,14 @@
   }
 
   .dot.disponible { background-color: #ffff; border: 1px solid #000000; }
-  .dot.ocupada { background-color: #005d72; }
+  .dot.ocupada { background-color: var(--color-sea-cyan); }
   .dot.cuenta { background-color: #eab308; }
 
   .open-mesa-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: #005d72;
+    background-color: var(--color-sea-cyan);
     color: white;
     padding: 12px 24px;
     border-radius: 12px;
@@ -82,13 +82,13 @@
     font-family: 'Manrope', sans-serif;
     font-size: 16px;
     font-weight: 700;
-    box-shadow: 0 4px 6px -1px rgba(0, 93, 114, 0.2), 0 2px 4px -1px rgba(0, 93, 114, 0.1);
+    box-shadow: 0 4px 6px -1px rgb(var(--color-sea-cyan-rgb) / 20%), 0 2px 4px -1px rgb(var(--color-sea-cyan-rgb) / 10%);
     transition: all 0.2s ease;
   }
 
   .open-mesa-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 93, 114, 0.2);
+    box-shadow: 0 10px 15px -3px rgb(var(--color-sea-cyan-rgb) / 20%);
   }
 
   .icon {

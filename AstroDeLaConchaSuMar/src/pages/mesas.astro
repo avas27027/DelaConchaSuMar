@@ -1,5 +1,5 @@
 ---
-import MesasGrid from "../components/mesas/MesasGrid.astro";
+import MesasGrid from "../components/mesas/MesasGrid";
 import MesasHeader from "../components/mesas/MesasHeader.astro";
 import Layout from "../layouts/Layout.astro";
 ---
@@ -7,7 +7,7 @@ import Layout from "../layouts/Layout.astro";
 <Layout title="Mesas - De la Concha su Mar">
     <div class="tables-page">
         <MesasHeader />
-        <MesasGrid />
+        <MesasGrid client:only="react" />
     </div>
 
     <style>

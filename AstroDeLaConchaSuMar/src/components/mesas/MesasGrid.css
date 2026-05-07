@@ -1,0 +1,43 @@
+.mesa-bone {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #6464644d;
+    display: flex;
+    flex-direction: column;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    height: 100%;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-deep-cyan);
+}
+
+.mesa-bone:hover {
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+}
+
+.mesas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+}
+
+.mesas-grid-status {
+    min-height: 194px;
+    display: flex;
+    align-items: center;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+@media (min-width: 1440px) {
+    .mesas-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}

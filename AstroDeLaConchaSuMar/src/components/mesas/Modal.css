@@ -51,7 +51,7 @@
     padding: 16px;
     border-radius: 8px;
     border: none;
-    background: linear-gradient(180deg, #005d72 0%, #007791 100%);
+    background: linear-gradient(180deg, var(--color-sea-cyan) 0%, #007791 100%);
     color: white;
     font-family: var(--font-heading);
     font-weight: 700;
