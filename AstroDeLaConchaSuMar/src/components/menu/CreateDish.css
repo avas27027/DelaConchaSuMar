@@ -292,6 +292,20 @@ select {
     height: 36px;
 }
 
+.ingredient-unit-value {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bec8cd4d;
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
 .ingredient-name {
     font-size: 14px;
     color: var(--color-text-primary);
@@ -324,6 +338,11 @@ select {
     padding: 8px 12px;
     border-radius: 8px;
     border: 2px solid #bec8cd17;
+}
+
+.ingredient-input-row select,
+.ingredient-input-row input {
+    min-height: 36px;
 }
 
 /* Sticky Actions */

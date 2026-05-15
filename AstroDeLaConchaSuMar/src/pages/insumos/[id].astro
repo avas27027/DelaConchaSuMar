@@ -1,0 +1,11 @@
+---
+import IngredientsForm, {
+  type IngredientFormState,
+} from "../../components/ingredients/IngredientsForm";
+import Layout from "../../layouts/Layout.astro";
+const { id } = Astro.params;
+---
+
+<Layout title="De la Concha su Mar">
+  <IngredientsForm client:only="react" id={id ?? "nuevo"} />
+</Layout>

@@ -20,6 +20,32 @@ export class MenuService {
     this.bucket = firebase.getBucket();
   }
 
+  private async uploadMenuImage(file: Express.Multer.File) {
+    const fileName = `menu/${uuidv4()}-${file.originalname}`;
+    const fileUpload = this.bucket.file(fileName);
+
+    await fileUpload.save(file.buffer, {
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
+    await fileUpload.makePublic();
+
+    return `https://storage.googleapis.com/${this.bucket.name}/${encodeURIComponent(fileName)}`;
+  }
+
+  private normalizeIngredients(ingredients: CreateMenuDto['ingredients'] | string | undefined) {
+    if (!ingredients) return [];
+    if (typeof ingredients !== 'string') return ingredients;
+
+    try {
+      return JSON.parse(ingredients);
+    } catch (error: any) {
+      this.logger.error(`Error parsing ingredients: ${error.message}`);
+      return [];
+    }
+  }
+
   async registerImage(file: Express.Multer.File, createMenuDto: CreateMenuDto): Promise<Response> {
     const response: Response = {
       success: true,
@@ -27,21 +53,61 @@ export class MenuService {
       data: {}
     }
 
-    const fileName = `menu/${uuidv4()}-${file.originalname}`;
-    const fileUpload = this.bucket.file(fileName);
-
     try {
-      await fileUpload.save(file.buffer, {
-        metadata: {
-          contentType: file.mimetype,
-        },
-      });
-      await fileUpload.makePublic();
-      const publicUrl = `https://storage.googleapis.com/${this.bucket.name}/${encodeURIComponent(fileName)}`;
+      const publicUrl = file ? await this.uploadMenuImage(file) : createMenuDto.imageUrl;
       const responseDish = await this.create({ ...createMenuDto, imageUrl: publicUrl })
       if (!responseDish.success) throw new Error(responseDish.message);
 
       response.data.id = responseDish.data.id
+    } catch (error: any) {
+      this.logger.error(error);
+      response.success = false
+      response.message = error.message
+    }
+    return response
+  }
+
+  async count() {
+    const snapshot = await this.firestore.collection(this.collectionName).get();
+    return snapshot.size;
+  }
+
+  async getProducts(limit = 10, cursor?: string): Promise<Response> {
+    const response: Response = {
+      success: true,
+      message: 'Successful operation',
+      data: {}
+    }
+    try {
+      let query = this.firestore
+        .collection(this.collectionName)
+        .orderBy('createdAt', 'desc')
+        .limit(limit);
+
+      if (cursor) {
+        const cursorDoc = await this.firestore.collection(this.collectionName).doc(cursor).get();
+
+        if (cursorDoc.exists) {
+          query = query.startAfter(cursorDoc);
+        }
+      }
+
+      const snapshot = await query.get();
+
+      const products = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const lastDoc = snapshot.docs.at(-1);
+
+      this.logger.log(`Finding ${products.length} menus`);
+      response.data = {
+        products,
+        nextCursor: lastDoc ? lastDoc.id : null,
+        hasMore: snapshot.docs.length === limit,
+        total: await this.count()
+      }
     } catch (error: any) {
       this.logger.error(error);
       response.success = false
@@ -57,15 +123,17 @@ export class MenuService {
       data: {}
     }
     try {
-      const { meassureUnitId, ...menuData } = createMenuDto;
-      const meassureRef = this.firestore.doc(`meassureUnits/${meassureUnitId}`);
+      const { meassureUnitId, ingredients, ...menuData } = createMenuDto;
+      const meassureRef = this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/vA5JtuCa5F6aNepR8fbP`);
 
       const docRef = await this.firestore.collection(this.collectionName).add({
         ...menuData,
+        ingredients: this.normalizeIngredients(ingredients),
         priceMeassure: meassureRef, // Guardamos la referencia real
         createdAt: new Date().toISOString(),
       });
 
+      this.logger.log('Dish Created');
       response.success = true
       response.message = 'Successful operation'
       response.data = { id: docRef.id }
@@ -86,7 +154,7 @@ export class MenuService {
     }
     try {
       this.logger.log('Finding all menus');
-      const productsSnapshot = await this.firestore.collection('products').get();
+      const productsSnapshot = await this.firestore.collection(this.collectionName).get();
 
       if (!productsSnapshot.docs) throw error('No success executing call');
 
@@ -114,6 +182,7 @@ export class MenuService {
       data: {}
     };
     try {
+      this.logger.debug(id)
       const docRef = this.firestore.collection(this.collectionName).doc(id);
       const doc = await docRef.get();
       if (!doc.exists) throw new NotFoundException('Menu not found');
@@ -127,7 +196,7 @@ export class MenuService {
     return response;
   }
 
-  async update(id: string, updateMenuDto: UpdateMenuDto): Promise<Response> {
+  async update(id: string, updateMenuDto: UpdateMenuDto, image?: Express.Multer.File): Promise<Response> {
     const response: Response = {
       success: true,
       message: 'Successful operation',
@@ -135,12 +204,20 @@ export class MenuService {
     }
     try {
       const docRef = this.firestore.collection(this.collectionName).doc(id);
+      const meassureRef = this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/vA5JtuCa5F6aNepR8fbP`);
       const doc = await docRef.get();
 
       if (!doc.exists) throw new NotFoundException('Element not found');
 
+      this.logger.debug("update", updateMenuDto)
+      const { ingredients, meassureUnitId, ...restDto } = updateMenuDto;
+      const imageUrl = image ? await this.uploadMenuImage(image) : restDto.imageUrl;
+
       await docRef.update({
-        ...updateMenuDto,
+        ...restDto,
+        priceMeassure: meassureRef,
+        ...(imageUrl ? { imageUrl } : {}),
+        ingredients: this.normalizeIngredients(ingredients),
         updatedAt: new Date().toISOString(),
       });
 

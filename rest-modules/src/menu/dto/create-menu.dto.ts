@@ -15,4 +15,10 @@ export class CreateMenuDto {
   price: number = 0;
 
   meassureUnitId?: string = 'vA5JtuCa5F6aNepR8fbP';
+
+  @IsOptional()
+  ingredients?: {
+    ingredient: string;
+    quantity: number;
+  }[] = [];
 }

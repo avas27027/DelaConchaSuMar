@@ -1,0 +1,242 @@
+---
+import MenuTable from "../../components/menu/MenuTable";
+import Layout from "../../layouts/Layout.astro";
+
+const dishes = [
+  {
+    name: "Ceviche Clásico de Corvina",
+    description: "Corvina fresca, limón, ají limo y culantro.",
+    category: "Ceviches",
+    price: "S/. 48.00",
+    previewImageUrl: "",
+    ingredients: [
+      {
+        name: "Corvina fresca",
+        quantity: 200,
+        unit: "gr",
+      },
+      {
+        name: "Limón",
+        quantity: 2,
+        unit: "und",
+      },
+      {
+        name: "Ají limo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Culantro",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Choclo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Camote",
+        quantity: 1,
+        unit: "und",
+      },
+    ],
+  },
+  {
+    name: "Arroz con Mariscos Meloso",
+    description: "Mixto de mariscos, arroz cremoso y parmesano.",
+    category: "Fondos",
+    price: "S/. 52.00",
+    previewImageUrl: "",
+    ingredients: [
+      {
+        name: "Corvina fresca",
+        quantity: 200,
+        unit: "gr",
+      },
+      {
+        name: "Limón",
+        quantity: 2,
+        unit: "und",
+      },
+      {
+        name: "Ají limo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Culantro",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Choclo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Camote",
+        quantity: 1,
+        unit: "und",
+      },
+    ],
+  },
+  {
+    name: "Tiradito al Ají Amarillo",
+    description: "Corte fino de pescado, salsa de ají amarillo y choclo.",
+    category: "Entradas",
+    price: "S/. 36.00",
+    previewImageUrl: "",
+    ingredients: [
+      {
+        name: "Corvina fresca",
+        quantity: 200,
+        unit: "gr",
+      },
+      {
+        name: "Limón",
+        quantity: 2,
+        unit: "und",
+      },
+      {
+        name: "Ají limo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Culantro",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Choclo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Camote",
+        quantity: 1,
+        unit: "und",
+      },
+    ],
+  },
+  {
+    name: "Parihuela Especial",
+    description: "Sopa concentrada de mariscos y pescado del día.",
+    category: "Sopas",
+    price: "S/. 65.00",
+    previewImageUrl: "",
+    ingredients: [
+      {
+        name: "Corvina fresca",
+        quantity: 200,
+        unit: "gr",
+      },
+      {
+        name: "Limón",
+        quantity: 2,
+        unit: "und",
+      },
+      {
+        name: "Ají limo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Culantro",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Choclo",
+        quantity: 1,
+        unit: "und",
+      },
+      {
+        name: "Camote",
+        quantity: 1,
+        unit: "und",
+      },
+    ],
+  },
+];
+---
+
+<Layout title="De la Concha su Mar">
+  <section class="menu-management-page" aria-labelledby="menu-title">
+    <div class="menu-header">
+      <div>
+        <h2 id="menu-title">GESTIÓN DE MENÚ</h2>
+        <p>Administra la disponibilidad y detalles de la carta maestra.</p>
+      </div>
+
+      <a
+        class="add-dish-button"
+        href="/menu/nuevo"
+        aria-label="Agregar platillo"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"></path>
+        </svg>
+        Agregar Platillo
+      </a>
+    </div>
+  </section>
+  <MenuTable client:only="react" />
+</Layout>
+
+<style>
+  .menu-management-page {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .menu-header h2 {
+    color: var(--color-deep-cyan);
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .menu-header p {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .add-dish-button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    background: var(--color-brand-cyan);
+    color: var(--color-white);
+    padding: 0 18px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 14px rgb(var(--color-sea-cyan-rgb) / 12%);
+  }
+</style>

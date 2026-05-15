@@ -28,8 +28,8 @@ export class SalesOrdersService {
       const newOrder = {
         salesId: salesId ?? null,
         state: state ?? 'libre',
-        table: tableId !== '' ? tableRef : null,
-        user: userId !== '' ? userRef : null,
+        table: tableId === '' ? null : tableRef,
+        user: userId === '' ? null : userRef,
         createdAt: new Date().toISOString(),
       };
 

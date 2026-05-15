@@ -1,0 +1,83 @@
+---
+import IngredientsTable from "../../components/ingredients/IngredientsTable";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="De la Concha su Mar">
+  <section class="supply-management-page" aria-labelledby="supply-title">
+    <div class="supply-header">
+      <div>
+        <h2 id="supply-title">GESTION DE INSUMOS</h2>
+        <p>Administra el stock actual y minimo de tus insumos.</p>
+      </div>
+
+      <a
+        class="add-ingredient-button"
+        href="/insumos/nuevo"
+        aria-label="Agregar insumo"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"></path>
+        </svg>
+        Agregar Insumo
+      </a>
+    </div>
+  </section>
+  <IngredientsTable client:only="react" />
+</Layout>
+
+<style>
+  .supply-management-page {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .supply-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .supply-header h2 {
+    color: var(--color-deep-cyan);
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .supply-header p {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .add-ingredient-button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    background: var(--color-brand-cyan);
+    color: var(--color-white);
+    padding: 0 18px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 14px rgb(var(--color-sea-cyan-rgb) / 12%);
+  }
+</style>

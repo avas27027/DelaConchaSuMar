@@ -1,10 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import CreateDish from "../../components/menu/CreateDish.tsx";
+
+const { id } = Astro.params;
 ---
 
 <Layout title="Nuevo Platillo - De la Concha su Mar">
-    <CreateDish client:only="react" />
+    <CreateDish id={id} client:only="react" />
 </Layout>
 
 <style>

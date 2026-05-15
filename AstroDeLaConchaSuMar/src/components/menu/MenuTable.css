@@ -1,0 +1,204 @@
+.table-footer {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dishes-table-card {
+    overflow: hidden;
+    border: 1px solid #bec8cd4d;
+    border-radius: 12px;
+    background: #edf5fc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.dishes-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    background: var(--color-white);
+}
+
+.dishes-table th {
+    background: #edf5fc;
+    color: var(--color-deep-cyan);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 13px 16px;
+}
+
+.dishes-table td {
+    border-top: 1px solid #e1e9f0;
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+.dishes-table td:first-child,
+.dishes-table th:first-child {
+    width: 94px;
+}
+
+.dishes-table td:nth-child(3),
+.dishes-table th:nth-child(3),
+.dishes-table td:nth-child(4),
+.dishes-table th:nth-child(4),
+.dishes-table td:nth-child(5),
+.dishes-table th:nth-child(5) {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.dish-image {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border: 1px solid #bec8cd80;
+    border-radius: 4px;
+}
+
+.dish-image-placeholder {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #bec8cd80;
+    border-radius: 4px;
+    background-color: #f7fbff;
+    background-image:
+        linear-gradient(45deg, #bec8cd40 25%, transparent 25%),
+        linear-gradient(-45deg, #bec8cd40 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #bec8cd40 75%),
+        linear-gradient(-45deg, transparent 75%, #bec8cd40 75%);
+    background-position:
+        0 0,
+        0 8px,
+        8px -8px,
+        -8px 0;
+    background-size: 16px 16px;
+}
+
+.dishes-table strong {
+    display: block;
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.dishes-table span {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.category-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: #e7eff6;
+    color: var(--color-brand-cyan) !important;
+    font-family: var(--font-heading);
+    font-size: 10px !important;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.category-fondos {
+    background: #eef2ff;
+}
+
+.category-entradas {
+    background: #fff7ed;
+    color: #9a3412 !important;
+}
+
+.category-sopas {
+    background: #f0fdf4;
+    color: #166534 !important;
+}
+
+.price-cell {
+    color: var(--color-deep-cyan);
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.row-actions,
+.pagination {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.icon-button,
+.pagination button {
+    border: 0;
+    background: transparent;
+    color: var(--color-brand-cyan);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+}
+
+.icon-button:hover,
+.pagination button:hover {
+    background: #edf5fc;
+}
+
+.icon-button.danger {
+    color: var(--color-accent-orange);
+}
+
+.pagination button {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    color: var(--color-text-secondary);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.pagination .active {
+    background: var(--color-brand-cyan);
+    color: var(--color-white);
+}
+
+@media (max-width: 760px) {
+    .menu-management-page {
+        padding: 20px 12px;
+    }
+
+    .menu-header,
+    .table-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .menu-header h2 {
+        font-size: 26px;
+    }
+
+    .add-dish-button {
+        width: 100%;
+    }
+}

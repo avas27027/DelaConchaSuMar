@@ -1,8 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./CreateDish.css"
 
-export default function CreateDish() {
+type DishIngredient = {
+    ingredient: string;
+    quantity: number;
+};
 
+type IngredientOption = {
+    id: string;
+    name: string;
+    unit?: {
+        id?: string;
+        name?: string;
+        longName?: string;
+        symbol?: string;
+    } | string | null;
+};
+
+export interface DishProperties {
+    name: string;
+    description: string;
+    category: string;
+    price: number;
+    image: File | null;
+    previewImageUrl: string;
+    ingredients: DishIngredient[];
+}
+
+interface CreateDishProperties {
+    readonly id?: string;
+}
+
+export default function CreateDish(props?: CreateDishProperties) {
+    const { id } = props ?? { id: "nuevo" };
     const [dish, setDish] = useState({
         name: "",
         description: "",
@@ -10,14 +40,39 @@ export default function CreateDish() {
         price: 0,
         image: null as File | null,
         previewImageUrl: "",
-        ingredients: [
-            { name: "Mero Fresco (Corte Cubos)", quantity: 1, unit: "KG" },
-            { name: "Leche de Tigre (Clásica)", quantity: 200, unit: "ML" },
-            { name: "Cebolla Roja Pluma", quantity: 50, unit: "GR" },
-        ],
+        ingredients: [] as DishIngredient[],
     });
 
-    const [newIngredient, setNewIngredient] = useState({ name: "", quantity: 1, unit: "UND" });
+    const [availableIngredients, setAvailableIngredients] = useState<IngredientOption[]>([]);
+    const [newIngredient, setNewIngredient] = useState<DishIngredient>({ ingredient: "", quantity: 1 });
+
+    useEffect(() => {
+        fetch("http://localhost:3001/ingredients")
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    setAvailableIngredients((result.data ?? []).map((ingredient: IngredientOption) => ({
+                        id: ingredient.id,
+                        name: ingredient.name,
+                        unit: ingredient.unit,
+                    })));
+                }
+            })
+            .catch(error => console.error(error));
+    }, []);
+
+    useEffect(() => {
+        if (id === "nuevo") return;
+        fetch(
+            `http://localhost:3001/menu/${id}`
+        ).then(res => res.json()).then(result => {
+            if (result.success) {
+                setDish({ ...result.data, image: null, previewImageUrl: result.data.imageUrl, ingredients: result.data.ingredients ?? [] });
+            }
+        });
+
+    }, [id])
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -28,12 +83,12 @@ export default function CreateDish() {
     };
 
     const addIngredient = () => {
-        if (newIngredient.name.trim()) {
+        if (newIngredient.ingredient) {
             setDish(prev => ({
                 ...prev,
                 ingredients: [...prev.ingredients, { ...newIngredient }]
             }));
-            setNewIngredient({ name: "", quantity: 1, unit: "UND" });
+            setNewIngredient({ ingredient: "", quantity: 1 });
         }
     };
 
@@ -44,7 +99,17 @@ export default function CreateDish() {
         }));
     };
 
-    const handleIngredientChange = (index: number, field: 'name' | 'quantity' | 'unit', value: string | number) => {
+    const getIngredientUnit = (ingredientId: string) => {
+        const ingredient = availableIngredients.find((item) => item.id === ingredientId);
+        const unit = ingredient?.unit;
+
+        if (!unit) return "-";
+        if (typeof unit === "string") return unit;
+
+        return unit.symbol ?? unit.longName ?? unit.name ?? "-";
+    };
+
+    const handleIngredientChange = (index: number, field: 'ingredient' | 'quantity', value: string | number) => {
         const newIngredients = [...dish.ingredients];
         (newIngredients[index] as any)[field] = value;
         setDish(prev => ({ ...prev, ingredients: newIngredients }));
@@ -57,11 +122,20 @@ export default function CreateDish() {
         formData.append('description', dish.description);
         formData.append('category', dish.category);
         formData.append('price', dish.price.toString());
-        formData.append('image', dish.image as File);
-        //formData.append('ingredients', JSON.stringify(dish.ingredients));
+        if (dish.image) {
+            formData.append('image', dish.image);
+        }
+        formData.append('ingredients', JSON.stringify(
+            dish.ingredients.map((ingredient) => ({
+                ingredient: ingredient.ingredient,
+                quantity: ingredient.quantity,
+            }))
+        ));
         try {
-            fetch('http://backend:3001/menu/register', {
-                method: 'POST',
+            const method = id === "nuevo" ? "POST" : "PATCH";
+            const url = id === "nuevo" ? "http://localhost:3001/menu/register" : `http://localhost:3001/menu/${id}`;
+            fetch(url, {
+                method,
                 body: formData,
             }).then(res => res.json()).then(data => console.log(data));
             alert('Platillo guardado correctamente');
@@ -206,29 +280,26 @@ export default function CreateDish() {
 
                         <div className="ingredients-list">
                             {dish.ingredients.map((ing, index) => (
-                                <div key={`${ing.name}-${index}`} className="ingredient-item">
-                                    <input
-                                        type="text"
+                                <div key={`${ing.ingredient}-${index}`} className="ingredient-item">
+                                    <select
                                         className="ingredient-name-input"
-                                        value={ing.name}
-                                        onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                                        placeholder="Ingrediente"
-                                    />
+                                        value={ing.ingredient}
+                                        onChange={(e) => handleIngredientChange(index, 'ingredient', e.target.value)}
+                                        aria-label="Ingrediente"
+                                    >
+                                        <option value="">Seleccionar ingrediente</option>
+                                        {availableIngredients.map((ingredient) => (
+                                            <option key={ingredient.id} value={ingredient.id}>
+                                                {ingredient.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <input
                                         type="number"
                                         value={ing.quantity}
                                         onChange={(e) => handleIngredientChange(index, 'quantity', Number(e.target.value))}
                                     />
-                                    <select
-                                        value={ing.unit}
-                                        onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                                    >
-                                        <option value="UND">UND</option>
-                                        <option value="KG">KG</option>
-                                        <option value="GR">GR</option>
-                                        <option value="ML">ML</option>
-                                        <option value="LT">LT</option>
-                                    </select>
+                                    <span className="ingredient-unit-value">{getIngredientUnit(ing.ingredient)}</span>
                                     <button className="remove-btn" onClick={() => removeIngredient(index)}>
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -239,27 +310,24 @@ export default function CreateDish() {
                             ))}
 
                             <div className="ingredient-input-row">
-                                <input
-                                    type="text"
-                                    placeholder="Nuevo ingrediente..."
-                                    value={newIngredient.name}
-                                    onChange={(e) => setNewIngredient(prev => ({ ...prev, name: e.target.value }))}
-                                />
+                                <select
+                                    value={newIngredient.ingredient}
+                                    onChange={(e) => setNewIngredient(prev => ({ ...prev, ingredient: e.target.value }))}
+                                    aria-label="Nuevo ingrediente"
+                                >
+                                    <option value="">Nuevo ingrediente...</option>
+                                    {availableIngredients.map((ingredient) => (
+                                        <option key={ingredient.id} value={ingredient.id}>
+                                            {ingredient.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <input
                                     type="number"
                                     value={newIngredient.quantity}
                                     onChange={(e) => setNewIngredient(prev => ({ ...prev, quantity: Number(e.target.value) }))}
                                 />
-                                <select
-                                    value={newIngredient.unit}
-                                    onChange={(e) => setNewIngredient(prev => ({ ...prev, unit: e.target.value }))}
-                                >
-                                    <option value="UND">UND</option>
-                                    <option value="KG">KG</option>
-                                    <option value="GR">GR</option>
-                                    <option value="ML">ML</option>
-                                    <option value="LT">LT</option>
-                                </select>
+                                <span className="ingredient-unit-value">{getIngredientUnit(newIngredient.ingredient)}</span>
                                 <span></span>
                             </div>
                         </div>

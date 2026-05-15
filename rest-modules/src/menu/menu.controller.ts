@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -19,6 +19,14 @@ export class MenuController {
     return this.menuService.create(createMenuDto);
   }
 
+  @Get('paginate')
+  getProducts(
+    @Query('limit') limit = '10',
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.menuService.getProducts(Number(limit), cursor);
+  }
+
   @Get()
   findAll() {
     return this.menuService.findAll();
@@ -30,8 +38,13 @@ export class MenuController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMenuDto: UpdateMenuDto) {
-    return this.menuService.update(id, updateMenuDto);
+  @UseInterceptors(FileInterceptor('image'))
+  update(
+    @Param('id') id: string,
+    @UploadedFile() image: Express.Multer.File,
+    @Body() updateMenuDto: UpdateMenuDto,
+  ) {
+    return this.menuService.update(id, updateMenuDto, image);
   }
 
   @Delete(':id')

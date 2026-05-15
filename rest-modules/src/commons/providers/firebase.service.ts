@@ -11,12 +11,13 @@ export class FirebaseService {
   private readonly privateKey = process.env.FIREBASE_PRIVATE_KEY!.replaceAll("\\n", "\n");
   private readonly storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
   public readonly collectionNames = {
-    MeassureUnitsService: "meassureUnits",
+    MeassuresService: "meassureUnits",
     TablesService: "tables",
     AuthenticationService: "users",
     MenuService: "products",
     SalesOrdersService: "salesOrders",
     SalesOrders_x_Products: "salesOrders_x_products",
+    IngredientsService: "ingredients",
   }
 
   constructor() {
