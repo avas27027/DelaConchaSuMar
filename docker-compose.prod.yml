@@ -1,51 +1,58 @@
-version: '3.8'
-
 services:
-  # Backend API - NestJS (Production)
-  rest-modules:
+  backend:
+    image: ${DOCKERHUB_USERNAME:-tu-usuario}/dela-concha-su-mar-backend:${IMAGE_TAG:-latest}
     build:
       context: ./rest-modules
-      dockerfile: Dockerfile
-      target: production
-    container_name: astro_rest_api_prod
-    ports:
-      - "3001:3000"
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
+      dockerfile: Dockerfile.prod
+    container_name: dela-concha-backend
     restart: unless-stopped
-    networks:
-      - astro_network
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health", "||", "exit", "1"]
+      test: ["CMD-SHELL", "node -e \"require('node:http').get('http://127.0.0.1:3001/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
+      start_period: 20s
+    networks:
+      - app-network
 
-  # Frontend - Astro (Production)
-  astro-app:
+  frontend:
+    image: ${DOCKERHUB_USERNAME:-tu-usuario}/dela-concha-su-mar-frontend:${IMAGE_TAG:-latest}
     build:
       context: ./AstroDeLaConchaSuMar
-      dockerfile: Dockerfile
-      target: production
-    container_name: astro_frontend_prod
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - BACKEND_URL=http://rest-modules:3000
-      - PUBLIC_BACKEND_URL=http://rest-modules:3000
+      dockerfile: Dockerfile.prod
+      args:
+        PUBLIC_BACKEND_URL: ${PUBLIC_BACKEND_URL:-http://localhost:3001}
+    container_name: dela-concha-frontend
     restart: unless-stopped
-    networks:
-      - astro_network
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      BACKEND_URL: http://backend:3001
     depends_on:
-      - rest-modules
+      backend:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000", "||", "exit", "1"]
+      test: ["CMD-SHELL", "node -e \"require('node:http').get('http://127.0.0.1:3000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
+      start_period: 20s
+    networks:
+      - app-network
 
 networks:
-  astro_network:
+  app-network:
     driver: bridge
