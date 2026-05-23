@@ -16,30 +16,35 @@ export class SalesOrdersService {
   }
 
   async create(createSalesOrderDto: CreateSalesOrderDto): Promise<Response> {
+    let productsRef: any[] = []
     try {
       this.logger.log(`Creando nueva orden para la mesa ID: ${createSalesOrderDto.tableId}`);
 
-      const { tableId, userId, salesId, state } = createSalesOrderDto;
+      const { tableId, userId, salesId, state, products } = createSalesOrderDto;
 
       // Creamos las referencias a otros documentos
       const tableRef = this.firestore.doc(`${this.firebase.collectionNames.TablesService}/${tableId}`);
       const userRef = this.firestore.doc(`${this.firebase.collectionNames.AuthenticationService}/${userId}`);
+
+      productsRef = products.map(({ productId, quantity, observations }) => {
+        return { quantity, observations, product: this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`) }
+      });
 
       const newOrder = {
         salesId: salesId ?? null,
         state: state ?? 'libre',
         table: tableId === '' ? null : tableRef,
         user: userId === '' ? null : userRef,
+        products: productsRef,
         createdAt: new Date().toISOString(),
       };
 
       const docRef = await this.firestore.collection(this.collectionName).add(newOrder);
-      const resProducts = await this.createSalesOrderxProducts(docRef.id, createSalesOrderDto.products)
 
       return {
         success: true,
         message: 'Orden creada',
-        data: { id: docRef.id, products: resProducts.data ?? {} },
+        data: { id: docRef.id, products: products },
       };
     } catch (error: any) {
       this.logger.error(`Error al crear orden: ${error.message}`);
@@ -89,6 +94,7 @@ export class SalesOrdersService {
   }
 
   async update(id: string, updateSalesOrderDto: UpdateSalesOrderDto): Promise<Response> {
+    let productsRef: any[] = []
     const response = {
       success: true,
       message: 'Estado de orden actualizado',
@@ -99,16 +105,18 @@ export class SalesOrdersService {
       const doc = await docRef.get();
 
       if (!doc.exists) throw new NotFoundException('Orden no encontrada');
+      if (updateSalesOrderDto.products) {
+        productsRef = updateSalesOrderDto.products.map(({ productId, quantity, observations }) => {
+          return { quantity, observations, product: this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`) }
+        });
+      }
 
       await docRef.update({
         ...updateSalesOrderDto,
+        products: productsRef,
         updatedAt: new Date().toISOString(),
       });
 
-      if (updateSalesOrderDto.products) {
-        const resProducts = await this.updateSalesOrderxProducts(id, updateSalesOrderDto.products)
-        response.data = { id, products: resProducts.data ?? {} }
-      }
 
     } catch (error: any) {
       response.success = false
@@ -127,101 +135,15 @@ export class SalesOrdersService {
       }
 
       await docRef.delete();
-      const resProducts = await this.deleteSalesOrderXProducts(id)
 
       return {
         success: true,
         message: `Order ${id} eliminada correctamente`,
-        data: { products: resProducts.data ?? [] },
+        data: { id },
       };
     } catch (error: any) {
       return { success: false, message: error.message, data: {} };
     }
-  }
-
-  async createSalesOrderxProducts(salesOrderId: string, products: CreateSalesOrderDto["products"]) {
-    const batch = this.firestore.batch()
-    const collectionRef = this.firestore.collection(this.firebase.collectionNames.SalesOrders_x_Products);
-
-    try {
-      products.forEach(({ productId, quantity, observations }) => {
-        const newDocRef = collectionRef.doc()
-        const productRef = this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`)
-        const salesOrderRef = this.firestore.doc(`${this.firebase.collectionNames.SalesOrdersService}/${salesOrderId}`)
-
-        batch.set(newDocRef, {
-          order: salesOrderRef,
-          product: productRef,
-          quantity,
-          observations: observations ?? '',
-          createdAt: new Date().toISOString()
-        })
-
-      });
-      await batch.commit();
-      return {
-        success: true,
-        message: 'Productos añadidos correctamente',
-        data: { count: products.length },
-      };
-    } catch (error: any) {
-      this.logger.error(`Error en Batch: ${error.message}`);
-      return { success: false, message: 'Error al insertar productos', data: {} };
-    }
-  }
-
-  async deleteSalesOrderXProducts(orderId: string): Promise<Response> {
-    const batch = this.firestore.batch();
-    const response = {
-      success: true,
-      message: 'Productos eliminados correctamente',
-      data: {}
-    };
-    try {
-      this.logger.log(`Eliminando todos los items de la orden: ${orderId}`);
-      const orderRef = this.firestore.doc(`${this.firebase.collectionNames.SalesOrdersService}/${orderId}`);
-
-      const snapshot = await this.firestore
-        .collection('order-items')
-        .where('orderRef', '==', orderRef)
-        .get();
-
-      if (snapshot.empty) {
-        response.message = 'No había items para eliminar'
-      }
-      else {
-        snapshot.docs.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-        await batch.commit();
-
-        response.data = { deletedCount: snapshot.size }
-      }
-
-    } catch (error: any) {
-      this.logger.error(`Error eliminando items: ${error.message}`);
-      response.success = false
-      response.message = error.message
-    }
-    return response
-  }
-
-  async updateSalesOrderxProducts(salesOrderId: string, products: CreateSalesOrderDto["products"]) {
-    const response = {
-      success: true,
-      message: 'Productos actualizados correctamente',
-      data: {}
-    };
-    try {
-      await this.deleteSalesOrderXProducts(salesOrderId)
-      const resCreate = await this.createSalesOrderxProducts(salesOrderId, products)
-      response.data = resCreate.data ?? {}
-    } catch (error: any) {
-      this.logger.error(`Error eliminando items: ${error.message}`);
-      response.success = false
-      response.message = error.message
-    }
-    return response
   }
 
 

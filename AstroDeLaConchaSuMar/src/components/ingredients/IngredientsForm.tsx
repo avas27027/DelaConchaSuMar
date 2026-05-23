@@ -108,7 +108,7 @@ export default function IngredientsForm(props: { id: string }) {
       body: JSON.stringify(payload),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => {console.log(data); if (data.success) alert("Insumo guardado correctamente")})
       .catch((error) => console.error(error));
 
   };

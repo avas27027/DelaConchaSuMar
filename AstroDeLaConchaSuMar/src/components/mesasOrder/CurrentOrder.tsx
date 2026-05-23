@@ -15,6 +15,8 @@ interface CurrentOrderProps {
     readonly onRemoveOrder: (id: string) => void;
 }
 
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
+
 export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }: CurrentOrderProps) {
     const [productObservations, setProductObservations] = useState<Record<string, string>>({});
 
@@ -55,7 +57,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
         console.log(sendJson);
 
         fetch(
-            `${"http://127.0.0.1:3001"}/sales-orders`,
+            `${backendUrl}/sales-orders`,
             {
                 method: "POST",
                 headers: {
@@ -65,6 +67,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
             },
         )
             .then((res) => res.json())
+            .then((data) => {console.log(data); if (data.success) alert("Pedido enviado a cocina")})
             .catch((error) => {
                 console.error("Error creating sale:", error);
                 return { data: [] };
@@ -76,7 +79,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
 
         prevOrders.forEach(order => {
             if (order.state != 'cooked') return;
-            fetch(`http://localhost:3001/sales-orders/${order.orderId}`, {
+            fetch(`${backendUrl}/sales-orders/${order.orderId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -160,7 +163,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
                         </div>
 
                         <div className="order-buttons">
-                            <button className="btn-kitchen" onClick={sendToKitchen}> Enviar a cocina </button>
+                            <button className="btn-kitchen" onClick={sendToKitchen} disabled={orders.length === 0}> Enviar a cocina </button>
                             <button className="btn-confirm" onClick={confirmOrder}> Confirmar Pedido </button>
                         </div>
                     </div>

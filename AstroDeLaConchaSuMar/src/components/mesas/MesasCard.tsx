@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { TableVisualState } from "../../controller/salesOrders.hook";
 import "./MesasCard.css";
 
@@ -8,6 +9,7 @@ export interface MesasCardProps {
     readonly state: TableVisualState;
     readonly number: number;
     readonly chairs: number;
+    readonly updateAt?: string;
 }
 
 const stateColors: Record<TableVisualState, readonly [string, string]> = {
@@ -22,8 +24,33 @@ export default function MesasCard({
     chairs,
     state,
     number,
+    updateAt,
 }: MesasCardProps) {
     const [backgroundColor, textColor] = stateColors[state];
+    const [tiempo, setTiempo] = useState("");
+
+    useEffect(() => {
+        if(!updateAt) return;
+        const inicioMs = new Date(updateAt).getTime();
+        const intervalo = setInterval(() => {
+            const ahora = Date.now();
+            const diferencia = ahora - inicioMs;
+
+            if (diferencia < 0) {
+                setTiempo("Fecha futura");
+                return;
+            }
+
+            const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+            const fmt = (n: number) => n.toString().padStart(2, '0');
+            setTiempo(`${fmt(minutos)}m ${fmt(segundos)}s`);
+        }, 1000);
+
+        // Limpieza al desmontar el componente
+        return () => clearInterval(intervalo);
+    }, [updateAt]);
 
     return (
         <a
@@ -41,6 +68,7 @@ export default function MesasCard({
                 style={{ backgroundColor: textColor }}
             >
                 <span style={{ color: backgroundColor }}>{state}</span>
+                <span style={{ color: backgroundColor }}>{tiempo}</span>
             </div>
             <div className="mesa-content">
                 <h2 style={{ color: textColor }}>{name}</h2>

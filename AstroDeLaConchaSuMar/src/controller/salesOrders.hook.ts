@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, query, where, onSnapshot, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, getDocs, type WhereFilterOp } from "firebase/firestore";
 
 export interface ProductJSONInterface {
     createdAt: string;
@@ -9,24 +9,33 @@ export interface ProductJSONInterface {
     price: number;
 }
 
-export type SalesOrderProductJSONInterface = ProductJSONInterface & {
-    id: string;
-    quantity: number;
-    observations: string;
-};
-
 export interface SalesOrderJSONInterface {
     createdAt: string;
+    updateAt?: string;
     id: string;
     observations: string;
     state: string;
-    table: { id: string; name: string; place: string };
+    table: string;
     user: string;
-    products: SalesOrderProductJSONInterface[];
+    products: {
+        product: string;
+        quantity: number;
+        observations: string;
+    }[];
+}
+
+interface TableJSONInterface {
+    readonly id: string;
+    readonly name: string;
+    readonly place: string;
 }
 
 export type TableVisualState = "libre" | "preparacion" | "cocinado";
-export type TableStatesMap = Record<string, TableVisualState>;
+export interface TableStateInfo {
+    state: TableVisualState;
+    updateAt?: string;
+}
+export type TableStatesMap = Record<string, TableStateInfo>;
 
 function toTableVisualState(orderState: string): TableVisualState {
     if (orderState === "cooked") {
@@ -68,10 +77,13 @@ export const subscribeToTableStates = (states: string[], callback: (tableStates:
             }
 
             const nextState = toTableVisualState(orderData.state);
-            const currentState = acc[tableId] ?? "libre";
+            const currentState = acc[tableId]?.state ?? "libre";
 
             if (getTableStatePriority(nextState) > getTableStatePriority(currentState)) {
-                acc[tableId] = nextState;
+                acc[tableId] = {
+                    state: nextState,
+                    updateAt: orderData.updatedAt ?? orderData.createdAt ?? null,
+                };
             }
 
             return acc;
@@ -98,35 +110,11 @@ export const subscribeToTableOrders = (states: string[], callback: (orders: Sale
             where("state", "in", states)
         );
     }
-    // 2. Query para buscar órdenes de esa mesa
 
     // 3. Listener en tiempo real
     return onSnapshot(q, async (snapshot) => {
         const ordersPromises = snapshot.docs.map(async (orderDoc) => {
             const orderData = orderDoc.data();
-
-            // 4. Buscar productos vinculados a esta orden
-            const detailsQuery = query(
-                collection(db, "salesOrders_x_products"),
-                where("order", "==", orderDoc.ref)
-            );
-
-            // Nota: onSnapshot no es ideal dentro de un map, 
-            // aquí hacemos un getDoc para simplificar la hidratación
-            const detailsSnapshot = await getDocs(detailsQuery);
-
-            const products = await Promise.all(
-                detailsSnapshot.docs.map(async (detailDoc) => {
-                    const detailData = detailDoc.data();
-                    const productSnap = await getDoc(detailData.product); // Hidratar referencia
-                    return {
-                        id: detailDoc.id,
-                        quantity: detailData.quantity,
-                        observations: detailData.observations ?? '',
-                        ...((productSnap.data() ?? {}) as ProductJSONInterface)
-                    } satisfies SalesOrderProductJSONInterface;
-                })
-            );
 
             const tableSnap = await getDoc(orderData.table);
 
@@ -137,7 +125,6 @@ export const subscribeToTableOrders = (states: string[], callback: (orders: Sale
                     id: tableSnap.id,
                     ...((tableSnap.data() ?? {}) as Record<string, string>)
                 },
-                products
             } as SalesOrderJSONInterface;
         });
 
@@ -145,6 +132,27 @@ export const subscribeToTableOrders = (states: string[], callback: (orders: Sale
         callback(fullOrders);
     });
 };
+
+type TypeWhereArg = {
+    prop: string;
+    operation: WhereFilterOp;
+    value: unknown;
+};
+export const createQuery = (collectionArg: string, callback: (snapshot: any[]) => void, whereArgs: TypeWhereArg[] = []) => {
+    const salesOrdersCollection = collection(db, collectionArg);
+    const constraints = whereArgs.map(({ prop, operation, value }) => (
+        where(prop, operation, value)
+    ));
+    const q = query(salesOrdersCollection, ...constraints);
+
+    return onSnapshot(q, (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    })
+};
+
+const salesOrdersHook = (callback: (snapshot: SalesOrderJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("salesOrders", callback, query);
+const productsHook = (callback: (snapshot: ProductJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("products", callback, query);
+const tablesHook = (callback: (snapshot: TableJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("tables", callback, query);
 
 export const subscribeToOrders = (states: string[], callback: (orders: SalesOrderJSONInterface[]) => void) => {
     const q = query(

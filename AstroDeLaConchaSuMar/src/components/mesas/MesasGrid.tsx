@@ -14,7 +14,7 @@ interface TablesResponse {
     readonly data?: readonly RestTable[];
 }
 
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://localhost:3001";
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
 
 function toMesaCardProps({ id, name, place }: RestTable): MesasCardProps {
     return {
@@ -73,9 +73,12 @@ export default function MesasGrid() {
             return <p className="mesas-grid-status">Cargando mesas...</p>;
         }
 
-        return tables.map((mesa) => (
-            <MesasCard key={mesa.id} {...mesa} state={tableStates[mesa.id] ?? "libre"} />
-        ));
+        return tables.map((mesa) => {
+            console.log(mesa.id, tableStates[mesa.id]);
+            return ((
+                <MesasCard key={mesa.id} {...mesa} state={tableStates[mesa.id]?.state ?? "libre"} updateAt={tableStates[mesa.id]?.updateAt} />
+            ))
+        });
     }, [isLoading, tables, tableStates]);
 
     return (

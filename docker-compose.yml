@@ -33,7 +33,7 @@ services:
     environment:
       - PORT=3000
       - BACKEND_URL=http://backend:3001
-      - PUBLIC_BACKEND_URL=http://localhost:3001
+      - PUBLIC_BACKEND_URL=http://127.0.0.1:3001
       - CHOKIDAR_USEPOLLING=true
       - CHOKIDAR_INTERVAL=500
       - WATCHPACK_POLLING=true
