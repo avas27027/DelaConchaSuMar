@@ -1,69 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import KitchenTicket, { type KitchenTicketProps } from './KitchenTicket';
 import './KitchenGrid.css';
-import { subscribeToOrders, type SalesOrderJSONInterface } from '../../controller/salesOrders.hook';
-
-const orders = [
-    {
-        orderNumber: "042",
-        customerName: "Mesa 4 - Juan Pérez",
-        time: "20260414173800",
-        items: [
-            { quantity: 2, name: "Cebiche de Pescado", note: "Sin picante" },
-            { quantity: 1, name: "Chicharrón de Calamar" },
-            { quantity: 1, name: "Arroz con Mariscos" },
-        ],
-    },
-    {
-        orderNumber: "045",
-        customerName: "Mesa 12 - Ana García",
-        time: "20260414112800",
-        items: [
-            { quantity: 1, name: "Tiradito en Crema de Rocoto" },
-            { quantity: 2, name: "Limonada Jarra" },
-        ],
-    },
-    {
-        orderNumber: "048",
-        customerName: "Mesa 7 - Carlos Ruiz",
-        time: "20260414113800",
-        items: [
-            { quantity: 3, name: "Causa Acevichada" },
-            { quantity: 1, name: "Jalea Mixta" },
-        ],
-    },
-    {
-        orderNumber: "040",
-        customerName: "Mesa 2 - Para Llevar",
-        time: "20260414174000",
-        items: [
-            { quantity: 1, name: "Chupe de Camarones" },
-            { quantity: 1, name: "Parihuela Especial" },
-        ],
-    },
-];
+import { productsHook, salesOrdersHook, tablesHook, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
 
 export default function KitchenGrid() {
-    const [kitchenOrders, setKitchenOrders] = React.useState<KitchenTicketProps[]>([]);
+    const [kitchenOrders, setKitchenOrders] = useState<KitchenTicketProps[]>([]);
+    const [tables, setTables] = useState<Map<string, TableJSONInterface>>(new Map());
+    const [products, setProducts] = useState<Map<string, ProductJSONInterface>>(new Map());
 
     useEffect(() => {
-        const unsubscribe = subscribeToOrders(['toCook', 'inProgress'], (orders) => {
-            console.log(orders);
-            const kO: KitchenTicketProps[] = orders.map((order: SalesOrderJSONInterface, i: number) => ({
-                id: order.id,
-                orderNumber: `0${i + 1}`,
-                customerName: order.table.name,
-                time: new Date(order.createdAt).getTime(),
-                items: order.products.map((p: typeof order.products[number]) => ({
-                    quantity: p.quantity,
-                    name: p.name,
-                    note: p.observations,
-                })),
-            }));
+        const unsubscribeTables = tablesHook((tables) => {
+            setTables(new Map(tables.map(table => [table.id, table])));
+        })
+        const unsubscribeProducts = productsHook((products) => {
+            setProducts(new Map(products.map(product => [product.id, product])));
+        })
+        const unsubscribeOrders = salesOrdersHook((orders) => {
+            const kO: KitchenTicketProps[] = orders.map((order: SalesOrderJSONInterface, i: number) => {
+                const order_x_products = order.products.map(({ observations, product, quantity }) => {
+                    return { observations, name: products.get(product)?.name || "", quantity }
+                })
+                return {
+                    id: order.id,
+                    orderNumber: `0${i + 1}`,
+                    customerName: tables.get(order.table)?.name || "",
+                    time: new Date(order.createdAt).getTime(),
+                    items: order_x_products
+                }
+            })
             setKitchenOrders(kO);
         })
-        return () => unsubscribe();
-    }, [])
+        return () => {
+            unsubscribeOrders();
+            unsubscribeProducts();
+            unsubscribeTables();
+        }
+    }, [kitchenOrders, products, tables])
     return (
         <div className="kitchen-grid">
             {kitchenOrders.map((order) => (
