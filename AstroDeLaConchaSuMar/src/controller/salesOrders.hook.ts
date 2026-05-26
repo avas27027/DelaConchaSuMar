@@ -38,7 +38,7 @@ export interface TableStateInfo {
 }
 export type TableStatesMap = Record<string, TableStateInfo>;
 
-function toTableVisualState(orderState: string): TableVisualState {
+export function toTableVisualState(orderState: string): TableVisualState {
     if (orderState === "cooked") {
         return "cocinado";
     }
@@ -50,7 +50,7 @@ function toTableVisualState(orderState: string): TableVisualState {
     return "libre";
 }
 
-function getTableStatePriority(state: TableVisualState): number {
+export function getTableStatePriority(state: TableVisualState): number {
     if (state === "cocinado") {
         return 3;
     }

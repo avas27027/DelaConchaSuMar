@@ -2,84 +2,61 @@ import { useEffect, useMemo, useState } from "react";
 import MesasCard, { type MesasCardProps } from "./MesasCard";
 import Modal from "./Modal";
 import "./MesasGrid.css";
-import { subscribeToTableStates, type TableStatesMap } from "../../controller/salesOrders.hook";
-
-interface RestTable {
-    readonly id: string;
-    readonly name: string;
-    readonly place: string;
-}
-
-interface TablesResponse {
-    readonly data?: readonly RestTable[];
-}
+import { salesOrdersHook, tablesHook, type SalesOrderJSONInterface, getTableStatePriority, toTableVisualState, type TableVisualState } from "../../controller/salesOrders.hook";
 
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
 
-function toMesaCardProps({ id, name, place }: RestTable): MesasCardProps {
-    return {
-        id,
-        number: Number.parseInt(name, 10),
-        name: place,
-        chairs: 0,
-        state: "libre",
-    };
-}
-
 export default function MesasGrid() {
-    const [tables, setTables] = useState<MesasCardProps[]>([]);
-    const [tableStates, setTableStates] = useState<TableStatesMap>({});
-    const [isLoading, setIsLoading] = useState(true);
+
+    const [mesasCard, setMesasCard] = useState<MesasCardProps[]>([])
 
     useEffect(() => {
-        const controller = new AbortController();
+        const unsubscribeTables = tablesHook((tables) => {
+            const newMesasCard = tables.map((table) => ({
+                id: table.id,
+                name: table.place,
+                chairs: 4,
+                state: "libre" as TableVisualState,
+                number: Number.parseInt(table.name) || 0
+            }))
+            setMesasCard(newMesasCard);
+        })
 
-        async function loadTables() {
-            try {
-                const response = await fetch(`${backendUrl}/tables`, {
-                    method: "GET",
-                    signal: controller.signal,
-                });
-                const result = (await response.json()) as TablesResponse;
-                const nextTables = (result.data ?? [])
-                    .map(toMesaCardProps)
-                    .sort((a, b) => a.number - b.number);
+        const unsubscribeSalesOrders = salesOrdersHook((salesOrders) => {
+            const newOrderSalesMap = new Map<string, SalesOrderJSONInterface[]>();
+            salesOrders.forEach((order) => {
+                const tableId = order.table;
+                const ordersForTable = newOrderSalesMap.get(tableId) || [];
+                ordersForTable.push(order);
+                newOrderSalesMap.set(tableId, ordersForTable);
+            });
 
-                setTables(nextTables);
-            } catch (error) {
-                if (!controller.signal.aborted) {
-                    console.error("Error fetching tables:", error);
-                    setTables([]);
+            setMesasCard((prevMesasCard) => prevMesasCard.map((mesa) => {
+                const ordersForTable = newOrderSalesMap.get(mesa.id) || [];
+                let updateAt = "";
+                const visualState = ordersForTable.reduce((state, order) => {
+                    const orderVisualState = toTableVisualState(order.state);
+                    if (getTableStatePriority(orderVisualState) > getTableStatePriority(state)) {
+                        updateAt = order.updateAt || "";
+                        return orderVisualState;
+                    }
+                    return state;
+                }, "libre" as TableVisualState);
+                return {
+                    ...mesa, state: visualState, updateAt: updateAt
                 }
-            } finally {
-                if (!controller.signal.aborted) {
-                    setIsLoading(false);
-                }
-            }
-        }
-
-        const unsubscribe = subscribeToTableStates(["pending", "toCook", "cooked"], setTableStates);
-
-        loadTables();
+            }))
+        })
 
         return () => {
-            controller.abort();
-            unsubscribe();
+            unsubscribeTables();
+            unsubscribeSalesOrders();
         }
-    }, []);
+    }, [mesasCard]);
 
     const content = useMemo(() => {
-        if (isLoading) {
-            return <p className="mesas-grid-status">Cargando mesas...</p>;
-        }
-
-        return tables.map((mesa) => {
-            console.log(mesa.id, tableStates[mesa.id]);
-            return ((
-                <MesasCard key={mesa.id} {...mesa} state={tableStates[mesa.id]?.state ?? "libre"} updateAt={tableStates[mesa.id]?.updateAt} />
-            ))
-        });
-    }, [isLoading, tables, tableStates]);
+        return mesasCard.map((mesa) => <MesasCard key={mesa.id} {...mesa} />);
+    }, [mesasCard]);
 
     return (
         <div className="mesas-grid">
