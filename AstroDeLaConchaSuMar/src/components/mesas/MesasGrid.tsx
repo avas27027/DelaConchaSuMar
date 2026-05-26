@@ -35,8 +35,9 @@ export default function MesasGrid() {
 
             setMesasCard((prevMesasCard) => prevMesasCard.map((mesa) => {
                 const ordersForTable = newOrderSalesMap.get(mesa.id) || [];
+                const allOrdersCooked = ordersForTable.length > 0 && ordersForTable.every((order) => order.state === "cooked");
                 let updateAt = "";
-                const visualState = ordersForTable.reduce((state, order) => {
+                const visualStateFromOrders = ordersForTable.reduce((state, order) => {
                     const orderVisualState = toTableVisualState(order.state);
                     if (getTableStatePriority(orderVisualState) > getTableStatePriority(state)) {
                         updateAt = order.updatedAt || order.createdAt || "";
@@ -44,6 +45,7 @@ export default function MesasGrid() {
                     }
                     return state;
                 }, "libre" as TableVisualState);
+                const visualState = allOrdersCooked ? "entregado" : visualStateFromOrders;
                 return {
                     ...mesa, state: visualState, updateAt: updateAt
                 }

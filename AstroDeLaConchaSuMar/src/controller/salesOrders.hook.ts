@@ -31,7 +31,7 @@ export interface TableJSONInterface {
     readonly place: string;
 }
 
-export type TableVisualState = "libre" | "preparacion" | "cocinado";
+export type TableVisualState = "libre" | "preparacion" | "cocinado" | "entregado";
 export interface TableStateInfo {
     state: TableVisualState;
     updateAt?: string;
