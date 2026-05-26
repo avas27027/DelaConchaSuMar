@@ -13,11 +13,12 @@ interface CurrentOrderProps {
     readonly orders: OrderItem[];
     readonly prevOrders: { orderId: string, state: string, products: OrderItem[] }[]
     readonly onRemoveOrder: (id: string) => void;
+    readonly onSubmit: () => void;
 }
 
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
-export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }: CurrentOrderProps) {
+export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, onSubmit }: CurrentOrderProps) {
     const [productObservations, setProductObservations] = useState<Record<string, string>>({});
 
     const stateLabels: Record<string, string> = {
@@ -41,7 +42,6 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
             [productId]: observation,
         }));
     };
-
     const sendToKitchen = () => {
         const sendJson = {
             tableId: name,
@@ -67,11 +67,12 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder }
             },
         )
             .then((res) => res.json())
-            .then((data) => {console.log(data); if (data.success) alert("Pedido enviado a cocina")})
+            .then((data) => { console.log(data); if (data.success) alert("Pedido enviado a cocina") })
             .catch((error) => {
                 console.error("Error creating sale:", error);
                 return { data: [] };
             });
+        onSubmit();
 
     };
 

@@ -8,7 +8,8 @@ export class CreateSalesOrderDto {
     @IsOptional()
     userId?: string
     products: {
-        productId: string,
+        productId?: string, //Para crear el producto con su referencia
+        product?: string, //Para darle update al producto (ya viene como referencia)
         quantity: number,
         observations?: string
     }[] = []

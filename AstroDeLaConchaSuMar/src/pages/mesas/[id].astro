@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import MenuDetalle from "../../components/mesasOrder/MenuDetalle";
 import type { DishCardProps } from "../../components/mesasOrder/DishCard";
-
+const backendUrl = import.meta.env.BACKEND_URL ?? "http://backend:3001";
 const { id } = Astro.params;
 
 type RestMenuInterface = {
@@ -19,8 +19,9 @@ const orders = [
   { name: "Causa Limeña", price: 60, quantity: 2 },
 ];
 
+console.log(backendUrl);
 const res = await fetch(
-  `${process.env.BACKEND_URL ?? "http://localhost:3001"}/menu`,
+  `${backendUrl}/menu`,
   {
     method: "GET",
   },

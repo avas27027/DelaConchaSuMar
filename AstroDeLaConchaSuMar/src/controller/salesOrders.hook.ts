@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, query, where, onSnapshot, doc, getDoc, getDocs, type WhereFilterOp } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, getDocs, type WhereFilterOp, DocumentReference } from "firebase/firestore";
 
 export interface ProductJSONInterface {
     id: string;
@@ -12,14 +12,14 @@ export interface ProductJSONInterface {
 
 export interface SalesOrderJSONInterface {
     createdAt: string;
-    updateAt?: string;
+    updatedAt?: string;
     id: string;
     observations: string;
     state: string;
-    table: string;
+    table: DocumentReference;
     user: string;
     products: {
-        product: string;
+        product: DocumentReference;
         quantity: number;
         observations: string;
     }[];
@@ -68,15 +68,21 @@ type TypeWhereArg = {
     value: unknown;
 };
 export const createQuery = (collectionArg: string, callback: (snapshot: any[]) => void, whereArgs: TypeWhereArg[] = []) => {
-    const salesOrdersCollection = collection(db, collectionArg);
+    const collectionRef = collection(db, collectionArg);
     const constraints = whereArgs.map(({ prop, operation, value }) => (
         where(prop, operation, value)
     ));
-    const q = query(salesOrdersCollection, ...constraints);
+    const q = query(collectionRef, ...constraints);
 
-    return onSnapshot(q, (snapshot) => {
-        callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    })
+    return onSnapshot(q,
+        (snapshot) => {
+            callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            console.log(`Snapshot ${collectionArg}:`, snapshot.size);
+        },
+        (error) => {
+            console.error(`Firestore listener error in ${collectionArg}:`, error);
+        }
+    )
 };
 
 export const salesOrdersHook = (callback: (snapshot: SalesOrderJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("salesOrders", callback, query);

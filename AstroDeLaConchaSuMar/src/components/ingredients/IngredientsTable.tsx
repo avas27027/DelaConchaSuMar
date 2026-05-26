@@ -8,7 +8,7 @@ export interface IngredientsTableProperties {
   readonly currentStock: number | string;
   readonly minimumStock: number | string;
 }
-
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 export default function IngredientsTable() {
   const limit = 10;
   const [ingredients, setIngredients] = useState<IngredientsTableProperties[]>([]);
@@ -26,7 +26,7 @@ export default function IngredientsTable() {
       params.set("cursor", cursor);
     }
 
-    const res = await fetch(`http://localhost:3001/ingredients/paginate?${params}`);
+    const res = await fetch(`${backendUrl}/ingredients/paginate?${params}`);
     const result = await res.json();
     setIngredients(result.data.ingredients ?? []);
     setNextCursor(result.data.nextCursor);
@@ -35,7 +35,7 @@ export default function IngredientsTable() {
   }
 
   async function deleteIngredient(id: string) {
-    const res = await fetch(`http://localhost:3001/ingredients/${id}`, {
+    const res = await fetch(`${backendUrl}/ingredients/${id}`, {
       method: "DELETE",
     });
     const result = await res.json();

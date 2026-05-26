@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DishGrid from './DishGrid';
 import CurrentOrder, { type OrderItem } from './CurrentOrder';
 import type { DishCardProps } from './DishCard';
 import './MenuDetalle.css';
-import { subscribeToTableOrders } from '../../controller/salesOrders.hook';
+import { productsHook, salesOrdersHook, tablesHook, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
 
 interface MenuDetalleProps {
     readonly mesaName: string;
@@ -12,32 +12,48 @@ interface MenuDetalleProps {
 
 export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProps) {
     const [orders, setOrders] = useState<OrderItem[]>([]);
-    const [prevOrders, setPrevOrders] = useState<Array<{ orderId: string, state: string, products: OrderItem[] }>>([])
+    const [products, setProducts] = useState<Map<string, ProductJSONInterface>>(new Map());
+    const [tables, setTables] = useState<Map<string, TableJSONInterface>>(new Map());
+    const [ordersJSON, setOrdersJSON] = useState<SalesOrderJSONInterface[]>([]);
 
     useEffect(() => {
-        const unsubscribe = subscribeToTableOrders(["pending", "cooked", "toCook"], (orders) => {
-            setPrevOrders(orders.map((order) => {
-                const products: OrderItem[] = []
-                order.products.forEach(product =>
-                    products.push({
+        const unsubscribeTables = tablesHook((tables) => {
+            setTables(new Map(tables.map((table) => [table.id, table])));
+        })
+        const unsubscribeProducts = productsHook((products) => {
+            setProducts(new Map(products.map((product) => [product.id, product])));
+        })
+        const unsubscribeOrders = salesOrdersHook((orders) => {
+            setOrdersJSON(orders);
+        }, [{ prop: "state", operation: "in", value: ["pending", "cooked", "toCook"] }])
+        return () => {
+            unsubscribeOrders();
+            unsubscribeProducts();
+            unsubscribeTables();
+        }
+    }, []);
+
+    const prevOrders = useMemo(() => {
+        return ordersJSON
+        .filter((order) => order.table.id === mesaName)
+        .map((order) => {
+                console.log(order);
+                const orderProducts = order.products.map(
+                    ({ observations, product, quantity }) => ({
                         id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        quantity: product.quantity,
-                        observations: product.observations
+                        name: products.get(product.id)?.name || "",
+                        price: products.get(product.id)?.price || 0,
+                        quantity,
+                        observations,
                     })
                 );
                 return {
                     orderId: order.id,
                     state: order.state,
-                    products
-                }
-            }));
-        }, mesaName);
-        return () => {
-            unsubscribe();
-        }
-    }, [mesaName]);
+                    products: orderProducts,
+                };
+            });
+    }, [ordersJSON, products, tables]);
 
     const handleDishClick = (dish: DishCardProps) => {
         setOrders(prevOrders => {
@@ -64,7 +80,12 @@ export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProp
     return (
         <div className="menuDetalle-container">
             <DishGrid dishes={initialDishes} onDishClick={handleDishClick} />
-            <CurrentOrder name={mesaName} orders={orders} prevOrders={prevOrders} onRemoveOrder={handleRemoveOrder} />
+            <CurrentOrder
+                name={mesaName}
+                orders={orders}
+                prevOrders={prevOrders}
+                onRemoveOrder={handleRemoveOrder}
+                onSubmit={() => setOrders([])} />
         </div>
     );
 }

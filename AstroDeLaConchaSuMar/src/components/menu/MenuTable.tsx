@@ -14,6 +14,7 @@ export interface MenuTableProperties {
         readonly unit: string;
     }[]
 }
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:30011";
 export default function MenuTable() {
     const limit = 10
     const [products, setProducts] = useState<MenuTableProperties[]>([]);
@@ -32,7 +33,7 @@ export default function MenuTable() {
         }
 
         const res = await fetch(
-            `http://localhost:3001/menu/paginate?${params}`
+            `${backendUrl}/menu/paginate?${params}`
         );
         const result = await res.json();
         setProducts(result.data.products);
@@ -44,7 +45,7 @@ export default function MenuTable() {
 
     async function deleteProduct(id: string) {
         const res = await fetch(
-            `http://localhost:3001/menu/${id}`,
+            `${backendUrl}/menu/${id}`,
             {
                 method: 'DELETE',
             }

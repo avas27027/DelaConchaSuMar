@@ -51,6 +51,7 @@ type IngredientsResponse = {
   currentStock: string;
   unit: string;
 };
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
 export default function IngredientsForm(props: { id: string }) {
   const { id } = props;
@@ -100,7 +101,7 @@ export default function IngredientsForm(props: { id: string }) {
 
     console.log("Insumo:", payload);
 
-    fetch("http://localhost:3001/ingredients", {
+    fetch(`${backendUrl}/ingredients`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +115,7 @@ export default function IngredientsForm(props: { id: string }) {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3001/meassures")
+    fetch(`${backendUrl}/meassures`)
       .then((response) => response.json())
       .then((data) => setMeassures(data.data))
       .catch((error) => console.error(error));
@@ -122,7 +123,7 @@ export default function IngredientsForm(props: { id: string }) {
 
     if (id === "nuevo") return;
     fetch(
-      `http://localhost:3001/ingredients/${id}`,
+      `${backendUrl}/ingredients/${id}`,
       {
         method: "GET",
       },

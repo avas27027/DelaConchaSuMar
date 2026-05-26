@@ -105,19 +105,13 @@ export class SalesOrdersService {
       const doc = await docRef.get();
 
       if (!doc.exists) throw new NotFoundException('Orden no encontrada');
-      if (updateSalesOrderDto.products) {
-        productsRef = updateSalesOrderDto.products.map(({ productId, quantity, observations }) => {
-          return { quantity, observations, product: this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`) }
-        });
-      }
 
       await docRef.update({
         ...updateSalesOrderDto,
-        products: productsRef,
         updatedAt: new Date().toISOString(),
       });
 
-
+      response.data.products = productsRef ?? {};
     } catch (error: any) {
       response.success = false
       response.message = error.message

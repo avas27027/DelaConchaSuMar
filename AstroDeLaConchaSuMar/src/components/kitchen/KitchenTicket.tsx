@@ -12,7 +12,7 @@ export interface KitchenTicketProps {
         readonly note?: string;
     }[];
 }
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
 export default function KitchenTicket({ id, orderNumber, customerName, time, items }: KitchenTicketProps) {
     const [tiempo, setTiempo] = useState('');

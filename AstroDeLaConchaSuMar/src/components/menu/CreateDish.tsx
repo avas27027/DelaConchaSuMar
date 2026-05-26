@@ -30,7 +30,7 @@ export interface DishProperties {
 interface CreateDishProperties {
     readonly id?: string;
 }
-
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 export default function CreateDish(props?: CreateDishProperties) {
     const { id } = props ?? { id: "nuevo" };
     const [dish, setDish] = useState({
@@ -47,7 +47,7 @@ export default function CreateDish(props?: CreateDishProperties) {
     const [newIngredient, setNewIngredient] = useState<DishIngredient>({ ingredient: "", quantity: 1 });
 
     useEffect(() => {
-        fetch("http://localhost:3001/ingredients")
+        fetch(`${backendUrl}/ingredients`)
             .then(res => res.json())
             .then(result => {
                 if (result.success) {
@@ -64,7 +64,7 @@ export default function CreateDish(props?: CreateDishProperties) {
     useEffect(() => {
         if (id === "nuevo") return;
         fetch(
-            `http://localhost:3001/menu/${id}`
+            `${backendUrl}/menu/${id}`
         ).then(res => res.json()).then(result => {
             if (result.success) {
                 setDish({ ...result.data, image: null, previewImageUrl: result.data.imageUrl, ingredients: result.data.ingredients ?? [] });
@@ -133,7 +133,7 @@ export default function CreateDish(props?: CreateDishProperties) {
         ));
         try {
             const method = id === "nuevo" ? "POST" : "PATCH";
-            const url = id === "nuevo" ? "http://localhost:3001/menu/register" : `http://localhost:3001/menu/${id}`;
+            const url = id === "nuevo" ? `${backendUrl}/menu/register` : `${backendUrl}/menu/${id}`;
             fetch(url, {
                 method,
                 body: formData,

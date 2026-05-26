@@ -383,6 +383,7 @@ import "../styles/global.css";
     } from "firebase/auth";
     import app from "../controller/firebase";
 
+    const backendUrl = import.meta.env.BACKEND_URL ?? "http://backend:3001";
     const auth = getAuth(app);
     const form = document.getElementById(
         "login-form",
@@ -430,7 +431,7 @@ import "../styles/global.css";
 
     async function createSession(user: any) {
         const idToken = await user.getIdToken();
-        const res = await fetch("http://localhost:3001/authentication/token", {
+        const res = await fetch(`${backendUrl}/authentication/token`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${idToken}`,
