@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SalesOrders {
+  id        Int      @id @default(autoincrement())
+  state     String
+  table     Int
+  updatedAt DateTime @default(now())
+
+  tables             Tables               @relation(fields: [table], references: [id])
+  salesOrderProducts SalesOrderProducts[]
+
+  @@map("sales_orders")
+}
+
+model SalesOrderProducts {
+  id           Int     @id @default(autoincrement())
+  order        Int
+  product      Int
+  quantity     Decimal
+  observations String
+
+  products    Products    @relation(fields: [product], references: [id])
+  salesOrders SalesOrders @relation(fields: [order], references: [id])
+
+  @@map("sales_orders_products")
+}
+
+model Products {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String
+  imageUrl      String
+  price         Decimal
+  category      String
+  priceMeassure Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  priceMeassures      MeassureUnits         @relation(fields: [priceMeassure], references: [id])
+  orderDetail         SalesOrderProducts[]
+  productsIngredients ProductsIngredients[]
+
+  @@map("products")
+}
+
+model ProductsIngredients {
+  id         Int     @id @default(autoincrement())
+  product    Int
+  ingredient Int
+  quantity   Decimal
+
+  products    Products    @relation(fields: [product], references: [id])
+  ingredients Ingredients @relation(fields: [ingredient], references: [id])
+
+  @@map("products_ingredients")
+}
+
+model Ingredients {
+  id           Int      @id @default(autoincrement())
+  category     String
+  currentStock Decimal
+  name         String
+  minimumStock Decimal
+  unit         Int
+  updatedAt    DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  units                MeassureUnits          @relation(fields: [unit], references: [id])
+  productsIngredients  ProductsIngredients[]
+  ingredientsSuppliers IngredientsSuppliers[]
+
+  @@map("ingredients")
+}
+
+model Tables {
+  id        Int      @id @default(autoincrement())
+  name      String
+  place     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  salesOrders SalesOrders[]
+
+  @@map("tables")
+}
+
+model IngredientsSuppliers {
+  id         Int     @id @default(autoincrement())
+  ingredient Int
+  supplier   Int
+  price      Decimal
+  type       String
+
+  ingredients Ingredients @relation(fields: [ingredient], references: [id])
+  suppliers   Suppliers   @relation(fields: [supplier], references: [id])
+
+  @@map("ingredients_suppliers")
+}
+
+model Suppliers {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  ingredientsSuppliers IngredientsSuppliers[]
+
+  @@map("suppliers")
+}
+
+model MeassureUnits {
+  id        Int      @id @default(autoincrement())
+  longName  String
+  name      String
+  symbol    String
+  createdAt DateTime @default(now())
+
+  ingredients Ingredients[]
+  products    Products[]
+
+  @@map("meassure_units")
+}
