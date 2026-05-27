@@ -86,10 +86,10 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    state: 'toPay',
+                    state: 'paid',
                 }),
             }).then(() => {
-                console.log('Order marked as toPay');
+                console.log('Order marked as paid');
             });
         });
     };
@@ -165,7 +165,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
 
                         <div className="order-buttons">
                             <button className="btn-kitchen" onClick={sendToKitchen} disabled={orders.length === 0}> Enviar a cocina </button>
-                            <button className="btn-confirm" onClick={confirmOrder}> Confirmar Pedido </button>
+                            <button className="btn-confirm" onClick={confirmOrder} disabled={!prevOrders.every((order) => order.state === "cooked") || prevOrders.length === 0}> Confirmar Pedido </button>
                         </div>
                     </div>
                 </div>

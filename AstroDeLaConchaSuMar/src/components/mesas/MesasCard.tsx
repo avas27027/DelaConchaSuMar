@@ -16,7 +16,7 @@ const stateColors: Record<TableVisualState, readonly [string, string]> = {
     libre: ["var(--color-white)", "var(--color-brand-cyan)"],
     preparacion: ["var(--color-brand-cyan)", "var(--color-white)"],
     cocinado: ["var(--color-yellow)", "var(--color-white)"],
-    entregado: ["var(--color-white)", "var(--color-brand-cyan)"],
+    entregado: ["var(--color-white)", "var(--color-accent-orange)"],
 };
 
 export default function MesasCard({

@@ -320,6 +320,13 @@
     box-shadow: 0 4px 6px -1px rgba(0, 119, 145, 0.2);
 }
 
+.btn-confirm[disabled] {
+    background-color: transparent;
+    color: #3434344d;
+    cursor: auto;
+    box-shadow: none;
+}
+
 .btn-kitchen {
     margin-top: 12px;
     width: 100%;
@@ -333,6 +340,13 @@
     transition: all 0.2s ease;
     box-shadow: 0 4px 6px -1px rgba(0, 119, 145, 0.2);
     background: transparent;
+}
+
+.btn-kitchen[disabled] {
+    border-color: #0000004d;
+    color: #3434344d;
+    cursor: auto;
+    box-shadow: none;
 }
 
 .item-btn-delete {
@@ -362,6 +376,12 @@
     box-shadow: 0 10px 15px -3px rgba(0, 119, 145, 0.3);
 }
 
+.btn-confirm[disabled]:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: transparent;
+}
+
 .btn-confirm:active {
     transform: translateY(0);
 }
@@ -370,6 +390,12 @@
     transform: translateY(-1px);
     box-shadow: 0 10px 15px -3px rgba(0, 119, 145, 0.3);
     background: #f0f7ff;
+}
+
+.btn-kitchen[disabled]:hover {
+    transform: none;
+    box-shadow: none;
+    background: transparent;
 }
 
 .btn-kitchen:active {

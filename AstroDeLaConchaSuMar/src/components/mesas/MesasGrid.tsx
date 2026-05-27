@@ -35,7 +35,8 @@ export default function MesasGrid() {
 
             setMesasCard((prevMesasCard) => prevMesasCard.map((mesa) => {
                 const ordersForTable = newOrderSalesMap.get(mesa.id) || [];
-                const allOrdersCooked = ordersForTable.length > 0 && ordersForTable.every((order) => order.state === "cooked");
+                console.log(ordersForTable);
+                const allOrdersCooked = ordersForTable.length > 0 && ordersForTable.every((order) => order.state === "cooked" || order.state === "toPay");
                 let updateAt = "";
                 const visualStateFromOrders = ordersForTable.reduce((state, order) => {
                     const orderVisualState = toTableVisualState(order.state);
@@ -50,7 +51,7 @@ export default function MesasGrid() {
                     ...mesa, state: visualState, updateAt: updateAt
                 }
             }))
-        })
+        }, [{prop: "state", operation: "!=", value: "paid"}])
 
         return () => {
             unsubscribeTables();

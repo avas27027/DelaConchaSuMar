@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, query, where, onSnapshot, doc, getDoc, getDocs, type WhereFilterOp, DocumentReference } from "firebase/firestore";
+import { collection, query, where, onSnapshot, type WhereFilterOp, DocumentReference } from "firebase/firestore";
 
 export interface ProductJSONInterface {
     id: string;
