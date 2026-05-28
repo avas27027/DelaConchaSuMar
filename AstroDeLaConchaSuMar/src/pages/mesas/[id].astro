@@ -2,17 +2,9 @@
 import Layout from "../../layouts/Layout.astro";
 import MenuDetalle from "../../components/mesasOrder/MenuDetalle";
 import type { DishCardProps } from "../../components/mesasOrder/DishCard";
+import type { ProductJSONInterface } from "../../controller/salesOrders.hook";
 const backendUrl = import.meta.env.BACKEND_URL ?? "http://backend:3001";
 const { id } = Astro.params;
-
-type RestMenuInterface = {
-  id: string;
-  name: string;
-  imageUrl: string;
-  description: string;
-  price: number;
-  priceMeassure: any;
-};
 
 const orders = [
   { name: "Ceviche Clásico", price: 45, quantity: 1 },
@@ -33,8 +25,8 @@ const res = await fetch(
   });
 const dishes1: DishCardProps[] =
   res.data?.map(
-    ({ id, name, imageUrl, description, price }: RestMenuInterface) => {
-      return { id, image: imageUrl, price, title: name, description };
+    ({ id, name, imageUrl, description, price, category }: ProductJSONInterface) => {
+      return { id, image: imageUrl, price, title: name, description, category: category || "Sin categoría" };
     },
   ) || [];
 ---

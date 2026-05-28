@@ -3,6 +3,7 @@ import { collection, query, where, onSnapshot, type WhereFilterOp, DocumentRefer
 
 export interface ProductJSONInterface {
     id: string;
+    category?: string;
     createdAt: string;
     description: string;
     imageUrl: string;

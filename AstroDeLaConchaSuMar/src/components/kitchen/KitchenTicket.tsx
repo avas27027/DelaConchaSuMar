@@ -121,7 +121,7 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
             <div className="ticket-header">
                 <div className="header-left">
                     <h2 className="order-number">Pedido #{orderNumber}</h2>
-                    <p className="customer-name">Mesa 0{customerName} - {id}</p>
+                    <p className="customer-name">Mesa 0{customerName}</p>
                 </div>
                 <div className="header-right">
                     <span className="urgency-tag" style={{ backgroundColor: urgencyTagBg[urgency], color: urgencyTagText[urgency] }}>

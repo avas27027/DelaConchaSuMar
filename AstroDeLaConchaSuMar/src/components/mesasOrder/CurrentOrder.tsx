@@ -89,6 +89,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                     state: 'paid',
                 }),
             }).then(() => {
+                alert("Pedido enviado a caja, por favor dirigir al cliente a caja para pagar");
                 console.log('Order marked as paid');
             });
         });
@@ -98,7 +99,6 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
         <aside className="current-order">
             <div className="order-header">
                 <h2>Pedido Actual</h2>
-                <span className="table-badge">{name}</span>
             </div>
 
             <div className="order-content">

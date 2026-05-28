@@ -63,3 +63,4 @@ tmp/
 temp/
 
 package-lock.json
+firebaseMigration/serviceAccountKey.json
