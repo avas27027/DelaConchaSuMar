@@ -1,8 +1,8 @@
 export class CreateIngredientDto {
-    name: string;
-    description: string;
-    category: string;
-    quantity: string;
-    unitId: string;
-    minStock: number;
+    name: string = "";
+    description: string = "";
+    category: string = "";
+    currentStock: string = "";
+    unit: string = "";
+    minimumStock: number = 0;
 }

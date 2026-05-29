@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MeassuresService } from './meassures.service';
+import { MeassuresPostgresService } from './meassures.postgres.service';
 import { CreateMeassureDto } from './dto/create-meassure.dto';
 import { UpdateMeassureDto } from './dto/update-meassure.dto';
 
 @Controller('meassures')
 export class MeassuresController {
-  constructor(private readonly meassuresService: MeassuresService) {}
+  constructor(private readonly meassuresService: MeassuresPostgresService) {}
 
   @Post()
   create(@Body() createMeassureDto: CreateMeassureDto) {

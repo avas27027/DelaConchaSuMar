@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TablesService } from './tables.service';
+import { TablesPostgresService } from './tables.postgres.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 
 @Controller('tables')
 export class TablesController {
-  constructor(private readonly tablesService: TablesService) {}
+  constructor(private readonly tablesService: TablesPostgresService) {}
 
   @Post()
   create(@Body() createTableDto: CreateTableDto) {

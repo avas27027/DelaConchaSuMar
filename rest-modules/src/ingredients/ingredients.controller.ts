@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { IngredientsService } from './ingredients.service';
+import { IngredientsPostgresService } from './ingredients.postgres.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 
 @Controller('ingredients')
 export class IngredientsController {
-  constructor(private readonly ingredientsService: IngredientsService) {}
+  constructor(private readonly ingredientsService: IngredientsPostgresService) {}
 
   @Post()
   create(@Body() createIngredientDto: CreateIngredientDto) {

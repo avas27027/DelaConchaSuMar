@@ -1,0 +1,159 @@
+import { Response } from '@/commons/interfaces';
+import { PostgresService } from '@/commons/providers/postgres.service';
+import { Injectable } from '@nestjs/common';
+import { CreateIngredientDto } from './dto/create-ingredient.dto';
+import { UpdateIngredientDto } from './dto/update-ingredient.dto';
+
+@Injectable()
+export class IngredientsPostgresService {
+    constructor(private readonly db: PostgresService) { }
+
+    async count(): Promise<number> {
+        return this.db.ingredients.count()
+    }
+
+    async getIngredients(limit = 10, cursor?: string): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            const parsedLimit = Number.isNaN(limit) || limit < 1 ? 10 : limit
+            const ingredients = await this.db.ingredients.findMany({
+                take: parsedLimit + 1,
+                ...(cursor && {
+                    cursor: { id: Number.parseInt(cursor) },
+                    skip: 1,
+                }),
+                orderBy: { createdAt: 'desc' },
+                include: { units: true },
+            })
+            const hasMore = ingredients.length > parsedLimit
+            const data = ingredients.slice(0, parsedLimit)
+            const lastIngredient = data.at(-1)
+
+            response.data = {
+                ingredients: data,
+                nextCursor: hasMore && lastIngredient ? String(lastIngredient.id) : null,
+                hasMore,
+                total: await this.count(),
+            }
+            response.message = "Successful operation"
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
+    async findAll(): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            response.data = await this.db.ingredients.findMany({
+                include: { units: true },
+            })
+            response.message = `${response.data.length} ingredients retrieved successfully`
+            if (response.data.length === 0) {
+                response.message = "No ingredients found"
+            }
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
+    async findOne(id: string): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            response.data = await this.db.ingredients.findUnique({
+                where: { id: Number.parseInt(id) },
+                include: { units: true },
+            })
+            response.message = `Ingredient with ID ${id} retrieved successfully`
+            if (!response.data) {
+                response.message = "Ingredient not found"
+            }
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
+    async create(createIngredientDto: CreateIngredientDto): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            const { description, unit, ...data } = createIngredientDto
+
+            response.data = await this.db.ingredients.create({
+                data: { ...data, unit: Number.parseInt(unit) },
+                include: { units: true },
+            })
+            response.message = `Ingredient ${response.data.id} created successfully`
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
+    async update(id: string, updateIngredientDto: UpdateIngredientDto): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            const { description, unit, ...data } = updateIngredientDto
+
+            response.data = await this.db.ingredients.update({
+                where: { id: Number.parseInt(id) },
+                data: { ...data, ...(unit && { unit: Number.parseInt(unit) }) },
+            })
+            response.message = `Ingredient with ID ${id} updated successfully`
+            if (!response.data) {
+                response.message = "Ingredient not found"
+            }
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
+    async remove(id: string): Promise<Response> {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            response.data = await this.db.ingredients.delete({
+                where: { id: Number.parseInt(id) },
+                include: { units: true },
+            })
+            response.message = `Ingredient with ID ${id} deleted successfully`
+            if (!response.data) {
+                response.message = "Ingredient not found"
+            }
+            response.success = true
+        }
+        catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+}

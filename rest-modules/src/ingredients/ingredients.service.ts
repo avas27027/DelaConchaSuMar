@@ -34,8 +34,8 @@ export class IngredientsService {
 
   async create(createIngredientDto: CreateIngredientDto): Promise<Response> {
     try {
-      const { unitId, ...data } = createIngredientDto;
-      const meassureRef = this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/${unitId}`);
+      const { unit, ...data } = createIngredientDto;
+      const meassureRef = this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/${unit}`);
       const docRef = await this.firestore.collection(this.collectionName).add({
         ...data,
         unit: meassureRef,
@@ -151,8 +151,13 @@ export class IngredientsService {
         throw new NotFoundException('Insumo no encontrado');
       }
 
+      const { unit, ...data } = updateIngredientDto;
+
       await docRef.update({
-        ...updateIngredientDto,
+        ...data,
+        ...(unit && {
+          unit: this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/${unit}`),
+        }),
         updatedAt: new Date().toISOString(),
       });
 
