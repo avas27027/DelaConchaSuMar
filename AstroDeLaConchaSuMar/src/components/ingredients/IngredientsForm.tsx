@@ -93,7 +93,7 @@ export default function IngredientsForm(props: { id: string }) {
 
     const payload = {
       ...formState,
-      unitId: formState.unitId.split("-")[0],
+      unit: formState.unitId.split("-")[0],
       minimumStock: Number(formState.minimumStock || 0),
       currentStock: Number(formState.currentStock || 0),
       suppliers,

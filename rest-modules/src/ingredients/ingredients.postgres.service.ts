@@ -53,13 +53,19 @@ export class IngredientsPostgresService {
             message: "",
         }
         try {
-            response.data = await this.db.ingredients.findMany({
-                include: { units: true },
+            const docs = await this.db.ingredients.findMany({
+                include: {
+                    units: true,
+                    ingredientsSuppliers: {
+                        include: { suppliers: true },
+                    },
+                },
             })
-            response.message = `${response.data.length} ingredients retrieved successfully`
-            if (response.data.length === 0) {
+            response.message = `${docs.length} ingredients retrieved successfully`
+            if (docs.length === 0) {
                 response.message = "No ingredients found"
             }
+            response.data = docs
             response.success = true
         }
         catch (error: any) {
@@ -74,10 +80,16 @@ export class IngredientsPostgresService {
             message: "",
         }
         try {
-            response.data = await this.db.ingredients.findUnique({
+            const doc = await this.db.ingredients.findUnique({
                 where: { id: Number.parseInt(id) },
-                include: { units: true },
+                include: {
+                    units: true,
+                    ingredientsSuppliers: {
+                        include: { suppliers: true },
+                    },
+                },
             })
+            response.data = doc
             response.message = `Ingredient with ID ${id} retrieved successfully`
             if (!response.data) {
                 response.message = "Ingredient not found"
@@ -122,6 +134,7 @@ export class IngredientsPostgresService {
             response.data = await this.db.ingredients.update({
                 where: { id: Number.parseInt(id) },
                 data: { ...data, ...(unit && { unit: Number.parseInt(unit) }) },
+                include: { units: true },
             })
             response.message = `Ingredient with ID ${id} updated successfully`
             if (!response.data) {

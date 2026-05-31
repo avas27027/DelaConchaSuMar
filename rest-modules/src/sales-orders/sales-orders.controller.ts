@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SalesOrdersService } from './sales-orders.service';
+import { SalesOrdersPostgresService } from './sales-orders.postgres.service';
 import { CreateSalesOrderDto } from './dto/create-sales-order.dto';
 import { UpdateSalesOrderDto } from './dto/update-sales-order.dto';
 
 @Controller('sales-orders')
 export class SalesOrdersController {
-  constructor(private readonly salesOrdersService: SalesOrdersService) { }
+  constructor(private readonly salesOrdersService: SalesOrdersPostgresService) { }
 
   @Post()
   create(@Body() createSalesOrderDto: CreateSalesOrderDto) {
