@@ -1,24 +1,4 @@
 services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: postgres-dev
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=astro
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d astro" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - dev-network
-
   backend:
     build:
       context: ./rest-modules
@@ -37,12 +17,9 @@ services:
       - CHOKIDAR_INTERVAL=500
       - TSC_WATCHFILE=DynamicPriorityPolling
       - WATCHPACK_POLLING=true
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/astro?schema=public
+      - DATABASE_URL=postgresql://neondb_owner:npg_SRCfydYv8lT7@ep-restless-field-apo093l8.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require
     networks:
       - dev-network
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   frontend:
     build:
@@ -71,6 +48,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
   rest_node_modules:
   astro_node_modules:
