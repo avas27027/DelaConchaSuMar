@@ -14,7 +14,7 @@ export class CreateMenuDto {
   @Type(() => Number)
   price: number = 0;
 
-  meassureUnitId?: string = 'vA5JtuCa5F6aNepR8fbP';
+  priceMeassure?: string = '6';
 
   @IsOptional()
   ingredients?: {

@@ -17,6 +17,19 @@ type IngredientOption = {
     } | string | null;
 };
 
+type ProductIngredientResponse = {
+    ingredient: number | string;
+    quantity: number | string;
+};
+
+type ProductIngredientRelationResponse = {
+    ingredient?: number | string;
+    quantity: number | string;
+    ingredients?: {
+        id?: number | string;
+    } | null;
+};
+
 export interface DishProperties {
     name: string;
     description: string;
@@ -46,6 +59,20 @@ export default function CreateDish(props?: CreateDishProperties) {
     const [availableIngredients, setAvailableIngredients] = useState<IngredientOption[]>([]);
     const [newIngredient, setNewIngredient] = useState<DishIngredient>({ ingredient: "", quantity: 1 });
 
+    const mapDishIngredients = (data: {
+        ingredients?: ProductIngredientResponse[];
+        productsIngredients?: ProductIngredientRelationResponse[];
+    }): DishIngredient[] => {
+        const ingredients = data.ingredients ?? data.productsIngredients ?? [];
+
+        return ingredients
+            .map((item) => ({
+                ingredient: String(item.ingredient ?? item.ingredients?.id ?? ""),
+                quantity: Number(item.quantity),
+            }))
+            .filter((item) => item.ingredient && Number.isFinite(item.quantity));
+    };
+
     useEffect(() => {
         fetch(`${backendUrl}/ingredients`)
             .then(res => res.json())
@@ -67,7 +94,12 @@ export default function CreateDish(props?: CreateDishProperties) {
             `${backendUrl}/menu/${id}`
         ).then(res => res.json()).then(result => {
             if (result.success) {
-                setDish({ ...result.data, image: null, previewImageUrl: result.data.imageUrl, ingredients: result.data.ingredients ?? [] });
+                setDish({
+                    ...result.data,
+                    image: null,
+                    previewImageUrl: result.data.imageUrl,
+                    ingredients: mapDishIngredients(result.data),
+                });
             }
         });
 
@@ -125,15 +157,17 @@ export default function CreateDish(props?: CreateDishProperties) {
         if (dish.image) {
             formData.append('image', dish.image);
         }
-        formData.append('ingredients', JSON.stringify(
-            dish.ingredients.map((ingredient) => ({
+        const ingredients = dish.ingredients
+            .map((ingredient) => ({
                 ingredient: ingredient.ingredient,
-                quantity: ingredient.quantity,
+                quantity: Number(ingredient.quantity),
             }))
-        ));
+            .filter((ingredient) => ingredient.ingredient && Number.isFinite(ingredient.quantity));
+
+        formData.append('ingredients', JSON.stringify(ingredients));
         try {
             const method = id === "nuevo" ? "POST" : "PATCH";
-            const url = id === "nuevo" ? `${backendUrl}/menu/register` : `${backendUrl}/menu/${id}`;
+            const url = id === "nuevo" ? `${backendUrl}/menu` : `${backendUrl}/menu/${id}`;
             fetch(url, {
                 method,
                 body: formData,
