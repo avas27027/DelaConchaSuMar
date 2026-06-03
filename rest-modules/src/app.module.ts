@@ -11,7 +11,14 @@ import { IngredientsModule } from './ingredients/ingredients.module';
 import { MeassuresModule } from './meassures/meassures.module';
 
 @Module({
-  imports: [CommonsModule, ConfigModule.forRoot({ isGlobal: true }), AuthenticationModule, MenuModule, TablesModule, SalesOrdersModule, IngredientsModule, MeassuresModule],
+  imports: [CommonsModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthenticationModule,
+    MenuModule,
+    TablesModule,
+    SalesOrdersModule,
+    IngredientsModule,
+    MeassuresModule],
   controllers: [AppController],
   providers: [AppService],
 })
