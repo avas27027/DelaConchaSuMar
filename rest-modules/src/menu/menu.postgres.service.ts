@@ -98,7 +98,7 @@ export class MenuPostgresService {
                             ingredients: true
                         }
                     },
-                    priceMeassures: true,
+                    priceMeassures: true
                 }
             })
             response.message = "Successful operation"

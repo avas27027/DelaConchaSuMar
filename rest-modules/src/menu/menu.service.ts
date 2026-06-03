@@ -123,7 +123,7 @@ export class MenuService {
       data: {}
     }
     try {
-      const { meassureUnitId, ingredients, ...menuData } = createMenuDto;
+      const { priceMeassure, ingredients, ...menuData } = createMenuDto;
       const meassureRef = this.firestore.doc(`${this.firebase.collectionNames.MeassuresService}/vA5JtuCa5F6aNepR8fbP`);
 
       const docRef = await this.firestore.collection(this.collectionName).add({
@@ -210,7 +210,7 @@ export class MenuService {
       if (!doc.exists) throw new NotFoundException('Element not found');
 
       this.logger.debug("update", updateMenuDto)
-      const { ingredients, meassureUnitId, ...restDto } = updateMenuDto;
+      const { ingredients, priceMeassure, ...restDto } = updateMenuDto;
       const imageUrl = image ? await this.uploadMenuImage(image) : restDto.imageUrl;
 
       await docRef.update({

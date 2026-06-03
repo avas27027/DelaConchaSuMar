@@ -3,12 +3,55 @@ import { collection, query, where, onSnapshot, type WhereFilterOp, DocumentRefer
 
 export interface ProductJSONInterface {
     id: string;
-    category?: string;
-    createdAt: string;
+    name: string;
     description: string;
     imageUrl: string;
-    name: string;
     price: number;
+    category?: string;
+    priceMeassure: string;
+    createdAt: string;
+    updatedAt?: string;
+    productsIngredients?: {
+        id: string;
+        product: string;
+        ingredient: string;
+        quantity: number;
+        ingredients?: IngredientsJSONInterface
+    }[]
+    priceMeassures?: PriceMeassureJSONInterface
+}
+
+export type IngredientsJSONInterface = {
+    id: string;
+    category?: string;
+    currentStock: string;
+    name: string;
+    minimumStock: string;
+    unit: string;
+    createdAt: string;
+    updatedAt?: string;
+    units?: PriceMeassureJSONInterface;
+    ingredientsSuppliers?: {
+        id: string;
+        ingredient: string;
+        supplier: string;
+        price: string;
+        type: string;
+        suppliers: SuppliersJSONInterface;
+    }
+}
+
+export type SuppliersJSONInterface = {
+    id: string;
+    name: string;
+}
+export type PriceMeassureJSONInterface = {
+    id: string;
+    name: string;
+    longName: string;
+    symbol: string;
+    createdAt: string;
+    updatedAt?: string;
 }
 
 export interface SalesOrderJSONInterface {
@@ -68,6 +111,36 @@ type TypeWhereArg = {
     operation: WhereFilterOp;
     value: unknown;
 };
+
+type BackendMethod = "GET" | "POST" | "PUT" | "DELETE";
+type Response<T> = { success: boolean, message: string, data?: T }
+type BackendEndPoint = keyof BackendTypesMap;
+type BackendTypesMap = {
+    salesOrders: SalesOrderJSONInterface[];
+    tables: TableJSONInterface[];
+    menu: ProductJSONInterface[];
+    ingredients: IngredientsJSONInterface[];
+};
+
+export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
+    const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://backend:3001";
+    return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
+        method: method,
+        ...(body && { body: JSON.stringify(body) }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then(res => res.json())
+        .then((data: Response<BackendTypesMap[T]>) => data)
+        .catch((error) => {
+            return {
+                success: false,
+                message: error.message,
+            }
+        });
+}
+
 export const createQuery = (collectionArg: string, callback: (snapshot: any[]) => void, whereArgs: TypeWhereArg[] = []) => {
     const collectionRef = collection(db, collectionArg);
     const constraints = whereArgs.map(({ prop, operation, value }) => (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./CreateDish.css"
+import { backendConection } from "../../controller/salesOrders.hook";
 
 type DishIngredient = {
     ingredient: string;
@@ -67,25 +68,21 @@ export default function CreateDish(props?: CreateDishProperties) {
 
         return ingredients
             .map((item) => ({
-                ingredient: String(item.ingredient ?? item.ingredients?.id ?? ""),
+                ingredient: String(item.ingredient ?? item.ingredient ?? ""),
                 quantity: Number(item.quantity),
             }))
             .filter((item) => item.ingredient && Number.isFinite(item.quantity));
     };
 
     useEffect(() => {
-        fetch(`${backendUrl}/ingredients`)
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    setAvailableIngredients((result.data ?? []).map((ingredient: IngredientOption) => ({
-                        id: ingredient.id,
-                        name: ingredient.name,
-                        unit: ingredient.unit,
-                    })));
+        backendConection("GET", "ingredients")
+            .then(r => setAvailableIngredients((r.data ?? []).map(i => {
+                return {
+                    id: i.id,
+                    name: i.name,
+                    unit: i.units?.name,
                 }
-            })
-            .catch(error => console.error(error));
+            })))
     }, []);
 
     useEffect(() => {
