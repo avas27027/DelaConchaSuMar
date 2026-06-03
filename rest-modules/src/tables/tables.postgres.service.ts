@@ -16,7 +16,7 @@ export class TablesPostgresService {
         try {
             response.data = await this.db.tables.findMany()
             response.message = `${response.data.length} tables retrieved successfully`
-            if(response.data.length === 0) {
+            if (response.data.length === 0) {
                 response.message = "No tables found"
             }
             response.success = true
@@ -33,12 +33,13 @@ export class TablesPostgresService {
             message: "",
         }
         try {
-            response.data = await this.db.tables.findUnique({ where: { id: Number.parseInt(id) } })
+            const doc = await this.db.tables.findUnique({ where: { id: Number.parseInt(id) } })
             response.message = `Table with ID ${id} retrieved successfully`
-            if(!response.data) {
+            if (!doc) {
                 response.message = "Table not found"
             }
             response.success = true
+            response.data = [doc]
         }
         catch (error: any) {
             response.message = error.message
@@ -75,7 +76,7 @@ export class TablesPostgresService {
                 data: updateTableDto
             })
             response.message = `Table with ID ${id} updated successfully`
-            if(!response.data) {
+            if (!response.data) {
                 response.message = "Table not found"
             }
             response.success = true
@@ -96,7 +97,7 @@ export class TablesPostgresService {
                 where: { id: Number.parseInt(id) }
             })
             response.message = `Table with ID ${id} deleted successfully`
-            if(!response.data) {
+            if (!response.data) {
                 response.message = "Table not found"
             }
             response.success = true

@@ -89,7 +89,7 @@ export class IngredientsPostgresService {
                     },
                 },
             })
-            response.data = doc
+            response.data = [doc]
             response.message = `Ingredient with ID ${id} retrieved successfully`
             if (!response.data) {
                 response.message = "Ingredient not found"

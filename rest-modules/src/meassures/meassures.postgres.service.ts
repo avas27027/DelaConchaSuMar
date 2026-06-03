@@ -16,7 +16,7 @@ export class MeassuresPostgresService {
         try {
             response.data = await this.db.meassureUnits.findMany()
             response.message = `${response.data.length} meassures retrieved successfully`
-            if(response.data.length === 0) {
+            if (response.data.length === 0) {
                 response.message = "No meassures found"
             }
             response.success = true
@@ -33,12 +33,13 @@ export class MeassuresPostgresService {
             message: "",
         }
         try {
-            response.data = await this.db.meassureUnits.findUnique({ where: { id: Number.parseInt(id) } })
+            const doc = await this.db.meassureUnits.findUnique({ where: { id: Number.parseInt(id) } })
             response.message = `Meassure with ID ${id} retrieved successfully`
-            if(!response.data) {
+            if (!doc) {
                 response.message = "Meassure not found"
             }
             response.success = true
+            response.data = [doc]
         }
         catch (error: any) {
             response.message = error.message
@@ -79,7 +80,7 @@ export class MeassuresPostgresService {
                 data
             })
             response.message = `Meassure with ID ${id} updated successfully`
-            if(!response.data) {
+            if (!response.data) {
                 response.message = "Meassure not found"
             }
             response.success = true
@@ -100,7 +101,7 @@ export class MeassuresPostgresService {
                 where: { id: Number.parseInt(id) }
             })
             response.message = `Meassure with ID ${id} deleted successfully`
-            if(!response.data) {
+            if (!response.data) {
                 response.message = "Meassure not found"
             }
             response.success = true

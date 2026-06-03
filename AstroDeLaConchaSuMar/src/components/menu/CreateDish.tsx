@@ -18,19 +18,6 @@ type IngredientOption = {
     } | string | null;
 };
 
-type ProductIngredientResponse = {
-    ingredient: number | string;
-    quantity: number | string;
-};
-
-type ProductIngredientRelationResponse = {
-    ingredient?: number | string;
-    quantity: number | string;
-    ingredients?: {
-        id?: number | string;
-    } | null;
-};
-
 export interface DishProperties {
     name: string;
     description: string;
@@ -41,11 +28,8 @@ export interface DishProperties {
     ingredients: DishIngredient[];
 }
 
-interface CreateDishProperties {
-    readonly id?: string;
-}
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
-export default function CreateDish(props?: CreateDishProperties) {
+
+export default function CreateDish(props?: { id?: string }) {
     const { id } = props ?? { id: "nuevo" };
     const [dish, setDish] = useState({
         name: "",
@@ -60,20 +44,6 @@ export default function CreateDish(props?: CreateDishProperties) {
     const [availableIngredients, setAvailableIngredients] = useState<IngredientOption[]>([]);
     const [newIngredient, setNewIngredient] = useState<DishIngredient>({ ingredient: "", quantity: 1 });
 
-    const mapDishIngredients = (data: {
-        ingredients?: ProductIngredientResponse[];
-        productsIngredients?: ProductIngredientRelationResponse[];
-    }): DishIngredient[] => {
-        const ingredients = data.ingredients ?? data.productsIngredients ?? [];
-
-        return ingredients
-            .map((item) => ({
-                ingredient: String(item.ingredient ?? item.ingredient ?? ""),
-                quantity: Number(item.quantity),
-            }))
-            .filter((item) => item.ingredient && Number.isFinite(item.quantity));
-    };
-
     useEffect(() => {
         backendConection("GET", "ingredients")
             .then(r => setAvailableIngredients((r.data ?? []).map(i => {
@@ -87,19 +57,21 @@ export default function CreateDish(props?: CreateDishProperties) {
 
     useEffect(() => {
         if (id === "nuevo") return;
-        fetch(
-            `${backendUrl}/menu/${id}`
-        ).then(res => res.json()).then(result => {
-            if (result.success) {
-                setDish({
-                    ...result.data,
-                    image: null,
-                    previewImageUrl: result.data.imageUrl,
-                    ingredients: mapDishIngredients(result.data),
-                });
-            }
-        });
-
+        backendConection("GET", "menu", id)
+            .then(r => {
+                const product = r.data?.at(0);
+                if (product) {
+                    setDish({
+                        ...product,
+                        image: null,
+                        previewImageUrl: product.imageUrl,
+                        ingredients: product.productsIngredients?.map(i => ({
+                            ingredient: i.ingredients?.name ?? "",
+                            quantity: Number(i.quantity),
+                        })) ?? [],
+                    });
+                }
+            });
     }, [id])
 
 
@@ -163,12 +135,9 @@ export default function CreateDish(props?: CreateDishProperties) {
 
         formData.append('ingredients', JSON.stringify(ingredients));
         try {
-            const method = id === "nuevo" ? "POST" : "PATCH";
-            const url = id === "nuevo" ? `${backendUrl}/menu` : `${backendUrl}/menu/${id}`;
-            fetch(url, {
-                method,
-                body: formData,
-            }).then(res => res.json()).then(data => console.log(data));
+            if (id === "nuevo") backendConection("POST", "menu", "", formData)
+            else backendConection("PATCH", "menu", id, formData)
+
             alert('Platillo guardado correctamente');
 
         } catch (error) {

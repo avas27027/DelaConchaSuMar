@@ -7,7 +7,7 @@ export interface ProductJSONInterface {
     description: string;
     imageUrl: string;
     price: number;
-    category?: string;
+    category: string;
     priceMeassure: string;
     createdAt: string;
     updatedAt?: string;
@@ -112,7 +112,7 @@ type TypeWhereArg = {
     value: unknown;
 };
 
-type BackendMethod = "GET" | "POST" | "PUT" | "DELETE";
+type BackendMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type Response<T> = { success: boolean, message: string, data?: T }
 type BackendEndPoint = keyof BackendTypesMap;
 type BackendTypesMap = {

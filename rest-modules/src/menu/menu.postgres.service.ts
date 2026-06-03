@@ -130,7 +130,7 @@ export class MenuPostgresService {
             response.message = 'Menu found';
             if (!doc) response.message = 'Menu not found';
             response.success = true;
-            response.data = doc;
+            response.data = [doc];
         } catch (error: any) {
             response.message = error.message;
         }

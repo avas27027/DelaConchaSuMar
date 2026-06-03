@@ -96,7 +96,7 @@ export class SalesOrdersPostgresService {
 
             if (!doc) response.message = 'Order no encontrada';
             response.success = true;
-            response.data = doc;
+            response.data = [doc];
         } catch (error: any) {
             response.message = error.message;
         }
@@ -154,7 +154,7 @@ export class SalesOrdersPostgresService {
 
             response.message = `Order with ID ${id} updated successfully`;
             response.success = true;
-            response.data = doc;
+            response.data = [doc];
         } catch (error: any) {
             response.message = error.message;
         }
