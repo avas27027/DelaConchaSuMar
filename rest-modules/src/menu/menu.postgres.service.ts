@@ -6,13 +6,27 @@ import { Bucket } from '@google-cloud/storage';
 import { FirebaseService } from '@/commons/providers/firebase.service';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { CreateMenuDto } from './dto/create-menu.dto';
+import { EventsGateway } from '@/commons/providers/socketGateway.service';
+import { Prisma } from '../../generated/prisma/client';
+
+type ProductWithRelations = Prisma.ProductsGetPayload<{
+    include: {
+        productsIngredients: {
+            include: {
+                ingredients: true,
+            }
+        },
+        priceMeassures: true,
+    },
+}>
 
 @Injectable()
 export class MenuPostgresService {
     private readonly bucket: Bucket;
     constructor(
         private readonly db: PostgresService,
-        private readonly firebase: FirebaseService
+        private readonly firebase: FirebaseService,
+        private readonly websocket: EventsGateway
     ) {
         this.bucket = firebase.getBucket();
     }
@@ -70,12 +84,10 @@ export class MenuPostgresService {
             const data = products.slice(0, parsedLimit)
             const lastProduct = data.at(-1)
 
-            response.data = {
-                products: data,
-                nextCursor: hasMore && lastProduct ? String(lastProduct.id) : null,
-                hasMore,
-                total: await this.db.products.count(),
-            }
+            response.data = data
+            response.nextCursor = hasMore && lastProduct ? String(lastProduct.id) : null
+            response.hasMore = hasMore
+            response.total = await this.db.products.count()
             response.message = "Successful operation"
             response.success = true
         }
@@ -85,8 +97,8 @@ export class MenuPostgresService {
         return response
     }
 
-    async findAll(): Promise<Response> {
-        let response: Response = {
+    async findAll(): Promise<Response<ProductWithRelations[]>> {
+        let response: Response<ProductWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -110,8 +122,8 @@ export class MenuPostgresService {
         }
         return response
     }
-    async findOne(id: string): Promise<Response> {
-        let response: Response = {
+    async findOne(id: string): Promise<Response<ProductWithRelations[]>> {
+        let response: Response<ProductWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -130,7 +142,7 @@ export class MenuPostgresService {
             response.message = 'Menu found';
             if (!doc) response.message = 'Menu not found';
             response.success = true;
-            response.data = [doc];
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }
@@ -174,6 +186,8 @@ export class MenuPostgresService {
                     priceMeassures: true,
                 }
             })
+            const allProducts = await this.findAll()
+            allProducts.data && this.websocket.emitMenu(allProducts.data);
             response.message = 'Menu created successfully';
             response.success = true;
             response.data = doc;
@@ -182,8 +196,8 @@ export class MenuPostgresService {
         }
         return response
     }
-    async update(id: string, menu: UpdateMenuDto, file?: Express.Multer.File): Promise<Response> {
-        let response: Response = {
+    async update(id: string, menu: UpdateMenuDto, file?: Express.Multer.File): Promise<Response<ProductWithRelations[]>> {
+        let response: Response<ProductWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -200,27 +214,47 @@ export class MenuPostgresService {
                     ...(priceMeassure && { priceMeassure: Number.parseInt(priceMeassure) }),
                     ...(imageUrl && { imageUrl })
                 },
+                include: {
+                    productsIngredients: {
+                        include: {
+                            ingredients: true
+                        }
+                    },
+                    priceMeassures: true,
+                }
             })
+            const allProducts = await this.findAll()
+            allProducts.data && this.websocket.emitMenu(allProducts.data);
             response.message = 'Menu updated successfully';
             response.success = true;
-            response.data = doc;
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }
         return response
     }
-    async remove(id: string): Promise<Response> {
-        let response: Response = {
+    async remove(id: string): Promise<Response<ProductWithRelations[]>> {
+        let response: Response<ProductWithRelations[]> = {
             success: false,
             message: "",
         }
         try {
             const doc = await this.db.products.delete({
                 where: { id: Number.parseInt(id) },
+                include: {
+                    productsIngredients: {
+                        include: {
+                            ingredients: true
+                        }
+                    },
+                    priceMeassures: true,
+                }
             })
+            const allProducts = await this.findAll()
+            allProducts.data && this.websocket.emitMenu(allProducts.data);
             response.message = 'Menu deleted successfully';
             response.success = true;
-            response.data = doc;
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }

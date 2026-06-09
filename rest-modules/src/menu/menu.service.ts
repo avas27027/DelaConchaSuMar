@@ -46,26 +46,6 @@ export class MenuService {
     }
   }
 
-  async registerImage(file: Express.Multer.File, createMenuDto: CreateMenuDto): Promise<Response> {
-    const response: Response = {
-      success: true,
-      message: 'Successful operation',
-      data: {}
-    }
-
-    try {
-      const publicUrl = file ? await this.uploadMenuImage(file) : createMenuDto.imageUrl;
-      const responseDish = await this.create({ ...createMenuDto, imageUrl: publicUrl })
-      if (!responseDish.success) throw new Error(responseDish.message);
-
-      response.data.id = responseDish.data.id
-    } catch (error: any) {
-      this.logger.error(error);
-      response.success = false
-      response.message = error.message
-    }
-    return response
-  }
 
   async count() {
     const snapshot = await this.firestore.collection(this.collectionName).get();

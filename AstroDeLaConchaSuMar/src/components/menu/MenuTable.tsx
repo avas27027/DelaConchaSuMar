@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './MenuTable.css'
+import { backendConection } from '../../controller/salesOrders.hook';
 
 export interface MenuTableProperties {
     readonly id: string;
@@ -14,7 +15,6 @@ export interface MenuTableProperties {
         readonly unit: string;
     }[]
 }
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:30011";
 export default function MenuTable() {
     const limit = 10
     const [products, setProducts] = useState<MenuTableProperties[]>([]);
@@ -32,26 +32,27 @@ export default function MenuTable() {
             params.set('cursor', cursor);
         }
 
-        const res = await fetch(
-            `${backendUrl}/menu/paginate?${params}`
-        );
-        const result = await res.json();
-        setProducts(result.data.products);
-        setNextCursor(result.data.nextCursor);
-        setHasMore(result.data.hasMore);
-        setTotal(result.data.total)
+        const res = await backendConection("GET", "menu", `paginate?${params}`)
+        if (res.data && res.nextCursor !== undefined && res.hasMore !== undefined && res.total !== undefined) {
+            setProducts(res.data.map((item) => ({
+                ...item,
+                price: String(item.price),
+                ingredients: item.productsIngredients?.map((ingredient) => ({
+                    ...ingredient,
+                    name: ingredient.ingredients?.name ?? "",
+                    unit: ingredient.ingredients?.units?.name ?? ""
+                })) ?? []
+            })));
+            setNextCursor(res.nextCursor);
+            setHasMore(res.hasMore);
+            setTotal(res.total)
+        }
 
     }
 
     async function deleteProduct(id: string) {
-        const res = await fetch(
-            `${backendUrl}/menu/${id}`,
-            {
-                method: 'DELETE',
-            }
-        );
-        const result = await res.json();
-        if (result.success) {
+        const res = await backendConection("DELETE", "menu", id)
+        if (res.success) {
             setProducts(products.filter(product => product.id !== id));
         }
     }

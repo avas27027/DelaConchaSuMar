@@ -1,5 +1,11 @@
-export type Response = {
+export type Response<T = unknown> = {
     success: boolean;
     message: string;
-    data?: any;
+    data?: T;
+} & Pagination
+
+type Pagination = {
+    nextCursor?: string | null;
+    hasMore?: boolean;
+    total?: number;
 }

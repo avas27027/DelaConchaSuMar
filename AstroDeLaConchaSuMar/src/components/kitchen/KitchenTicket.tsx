@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './KitchenTicket.css';
+import { backendConection } from '../../controller/salesOrders.hook';
 
 export interface KitchenTicketProps {
     readonly id: string;
@@ -12,7 +13,6 @@ export interface KitchenTicketProps {
         readonly note?: string;
     }[];
 }
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
 export default function KitchenTicket({ id, orderNumber, customerName, time, items }: KitchenTicketProps) {
     const [tiempo, setTiempo] = useState('');
@@ -66,18 +66,7 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
 
     const handleReady = () => {
         if (!allItemsChecked) return;
-
-        fetch(`${backendUrl}/sales-orders/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                state: 'cooked',
-            }),
-        }).then(() => {
-            console.log('Order marked as cooked');
-        });
+        backendConection("PATCH", "salesOrders", id, JSON.stringify({ state: 'cooked' }))
     }
 
     useEffect(() => {

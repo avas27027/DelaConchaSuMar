@@ -1,12 +1,31 @@
-// src/events/events.gateway.ts
 import {
     WebSocketGateway,
     WebSocketServer,
-    SubscribeMessage,
-    MessageBody,
-    ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Prisma, Tables } from '../../../generated/prisma/client';
+
+type SalesOrderWithRelations = Prisma.SalesOrdersGetPayload<{
+    include: {
+        tables: true,
+        salesOrderProducts: {
+            include: {
+                products: true,
+            }
+        }
+    },
+}>
+
+type ProductWithRelations = Prisma.ProductsGetPayload<{
+    include: {
+        productsIngredients: {
+            include: {
+                ingredients: true,
+            }
+        },
+        priceMeassures: true,
+    },
+}>
 
 @WebSocketGateway({
     cors: {
@@ -25,15 +44,15 @@ export class EventsGateway {
         console.log('Cliente desconectado:', client.id);
     }
 
-    @SubscribeMessage('order:create')
-    handleOrderCreate(
-        @MessageBody() data: any,
-        @ConnectedSocket() client: Socket,
-    ) {
-        this.server.emit('order:created', data);
+    emitSalesOrder(order: SalesOrderWithRelations[]) {
+        this.server.emit('salesOrder:updated', order);
     }
 
-    emitOrderUpdated(order: any) {
-        this.server.emit('order:updated', order);
+    emitTables(tables: Tables[]) {
+        this.server.emit('tables:updated', tables);
+    }
+
+    emitMenu(menu: ProductWithRelations[]) {
+        this.server.emit('menu:updated', menu);
     }
 }

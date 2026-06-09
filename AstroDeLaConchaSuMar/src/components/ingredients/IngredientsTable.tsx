@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./IngredientsTable.css";
+import { backendConection } from "../../controller/salesOrders.hook";
 
 export interface IngredientsTableProperties {
   readonly id: string;
@@ -8,7 +9,6 @@ export interface IngredientsTableProperties {
   readonly currentStock: number | string;
   readonly minimumStock: number | string;
 }
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 export default function IngredientsTable() {
   const limit = 10;
   const [ingredients, setIngredients] = useState<IngredientsTableProperties[]>([]);
@@ -26,21 +26,18 @@ export default function IngredientsTable() {
       params.set("cursor", cursor);
     }
 
-    const res = await fetch(`${backendUrl}/ingredients/paginate?${params}`);
-    const result = await res.json();
-    setIngredients(result.data.ingredients ?? []);
-    setNextCursor(result.data.nextCursor);
-    setHasMore(result.data.hasMore);
-    setTotal(result.data.total);
+    const res = await backendConection("GET", "ingredients", `paginate?${params}`)
+    if (res.data && res.nextCursor !== undefined && res.hasMore !== undefined && res.total !== undefined) {
+      setIngredients(res.data);
+      setNextCursor(res.nextCursor);
+      setHasMore(res.hasMore);
+      setTotal(res.total);
+    }
   }
 
   async function deleteIngredient(id: string) {
-    const res = await fetch(`${backendUrl}/ingredients/${id}`, {
-      method: "DELETE",
-    });
-    const result = await res.json();
-
-    if (result.success) {
+    const res = await backendConection("DELETE", "ingredients", id);
+    if (res.success) {
       setIngredients((currentIngredients) =>
         currentIngredients.filter((ingredient) => ingredient.id !== id),
       );

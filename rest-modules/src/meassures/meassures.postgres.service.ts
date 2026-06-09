@@ -3,22 +3,25 @@ import { PostgresService } from '@/commons/providers/postgres.service';
 import { Injectable } from '@nestjs/common';
 import { CreateMeassureDto } from './dto/create-meassure.dto';
 import { UpdateMeassureDto } from './dto/update-meassure.dto';
+import { MeassureUnits } from '../../generated/prisma/client';
 
 @Injectable()
 export class MeassuresPostgresService {
     constructor(private readonly db: PostgresService) { }
 
-    async findAll(): Promise<Response> {
-        let response: Response = {
+    async findAll(): Promise<Response<MeassureUnits[]>> {
+        let response: Response<MeassureUnits[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.meassureUnits.findMany()
-            response.message = `${response.data.length} meassures retrieved successfully`
-            if (response.data.length === 0) {
+            const docs = await this.db.meassureUnits.findMany()
+            response.message = `${docs.length} meassures retrieved successfully`
+            if (docs.length === 0) {
                 response.message = "No meassures found"
             }
+            response.data = docs
             response.success = true
         }
         catch (error: any) {
@@ -27,10 +30,11 @@ export class MeassuresPostgresService {
         return response
     }
 
-    async findOne(id: string): Promise<Response> {
-        let response: Response = {
+    async findOne(id: string): Promise<Response<MeassureUnits[]>> {
+        let response: Response<MeassureUnits[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
             const doc = await this.db.meassureUnits.findUnique({ where: { id: Number.parseInt(id) } })
@@ -39,7 +43,7 @@ export class MeassuresPostgresService {
                 response.message = "Meassure not found"
             }
             response.success = true
-            response.data = [doc]
+            response.data = doc ? [doc] : []
         }
         catch (error: any) {
             response.message = error.message
@@ -55,10 +59,11 @@ export class MeassuresPostgresService {
         try {
             const { description, ...data } = createMeassureDto
 
-            response.data = await this.db.meassureUnits.create({
+            const doc = await this.db.meassureUnits.create({
                 data
             })
-            response.message = `Meassure ${response.data.id} created successfully`
+            response.data = doc ? [doc] : []
+            response.message = `Meassure ${doc.id} created successfully`
             response.success = true
         }
         catch (error: any) {
@@ -67,18 +72,20 @@ export class MeassuresPostgresService {
         return response
     }
 
-    async update(id: string, updateMeassureDto: UpdateMeassureDto): Promise<Response> {
-        let response: Response = {
+    async update(id: string, updateMeassureDto: UpdateMeassureDto): Promise<Response<MeassureUnits[]>> {
+        let response: Response<MeassureUnits[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
             const { description, ...data } = updateMeassureDto
 
-            response.data = await this.db.meassureUnits.update({
+            const doc = await this.db.meassureUnits.update({
                 where: { id: Number.parseInt(id) },
                 data
             })
+            response.data = doc ? [doc] : []
             response.message = `Meassure with ID ${id} updated successfully`
             if (!response.data) {
                 response.message = "Meassure not found"
@@ -91,15 +98,17 @@ export class MeassuresPostgresService {
         return response
     }
 
-    async remove(id: string): Promise<Response> {
-        let response: Response = {
+    async remove(id: string): Promise<Response<MeassureUnits[]>> {
+        let response: Response<MeassureUnits[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.meassureUnits.delete({
+            const doc = await this.db.meassureUnits.delete({
                 where: { id: Number.parseInt(id) }
             })
+            response.data = doc ? [doc] : []
             response.message = `Meassure with ID ${id} deleted successfully`
             if (!response.data) {
                 response.message = "Meassure not found"

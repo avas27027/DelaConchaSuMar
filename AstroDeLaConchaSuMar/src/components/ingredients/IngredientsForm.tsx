@@ -1,5 +1,6 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import "./IngredientsForm.css";
+import { backendConection } from "../../controller/salesOrders.hook";
 
 type SupplierOption = {
   name: string;
@@ -51,7 +52,6 @@ type IngredientsResponse = {
   currentStock: string;
   unit: string;
 };
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
 export default function IngredientsForm(props: { id: string }) {
   const { id } = props;
@@ -101,50 +101,23 @@ export default function IngredientsForm(props: { id: string }) {
 
     console.log("Insumo:", payload);
 
-    fetch(`${backendUrl}/ingredients`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => response.json())
-      .then((data) => {console.log(data); if (data.success) alert("Insumo guardado correctamente")})
-      .catch((error) => console.error(error));
-
+    backendConection("POST", "ingredients", undefined, JSON.stringify(payload))
+      .then((data) => {
+        console.log(data);
+        if (data.success) alert("Insumo guardado correctamente")
+      })
   };
 
   useEffect(() => {
-    fetch(`${backendUrl}/meassures`)
-      .then((response) => response.json())
-      .then((data) => setMeassures(data.data))
-      .catch((error) => console.error(error));
-
-
+    backendConection("GET", "meassures").then((data) => data.data && setMeassures(data.data))
     if (id === "nuevo") return;
-    fetch(
-      `${backendUrl}/ingredients/${id}`,
-      {
-        method: "GET",
-      },
-    )
-      .then((res) => res.json())
+    backendConection("GET", "ingredients", id)
       .then((data) => {
-        const ingredients: IngredientsResponse = data.data || {};
-        const ingredientsFormState: IngredientFormState = {
-          name: ingredients.name ?? "",
-          description: ingredients.description ?? "",
-          category: ingredients.category ?? "",
-          minimumStock: ingredients.minimumStock ?? "",
-          currentStock: ingredients.currentStock ?? "",
-          unitId: ingredients.unit,
-        };
-        setFormState(ingredientsFormState);
-        setSuppliers([]);
+        const ingredient = data.data?.at(0);
+        if (!ingredient) return
+        setFormState({ ...ingredient, unitId: ingredient.units?.name ?? "" })
+        setSuppliers([])
       })
-      .catch((error) => {
-        console.error("Error fetching ingredients:", error);
-      });
   }, [])
 
 

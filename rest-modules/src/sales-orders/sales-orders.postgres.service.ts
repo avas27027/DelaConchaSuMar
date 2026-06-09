@@ -3,10 +3,25 @@ import { PostgresService } from '@/commons/providers/postgres.service';
 import { Injectable } from '@nestjs/common';
 import { CreateSalesOrderDto } from './dto/create-sales-order.dto';
 import { UpdateSalesOrderDto } from './dto/update-sales-order.dto';
+import { Prisma } from '../../generated/prisma/client';
+import { EventsGateway } from '@/commons/providers/socketGateway.service';
+
+type SalesOrderWithRelations = Prisma.SalesOrdersGetPayload<{
+    include: {
+        tables: true,
+        salesOrderProducts: {
+            include: {
+                products: true,
+            },
+        },
+    },
+}>
 
 @Injectable()
 export class SalesOrdersPostgresService {
-    constructor(private readonly db: PostgresService) { }
+    constructor(private readonly db: PostgresService,
+        private readonly webSocket: EventsGateway,
+    ) { }
 
     async create(createSalesOrderDto: CreateSalesOrderDto): Promise<Response> {
         let response: Response = {
@@ -40,6 +55,8 @@ export class SalesOrdersPostgresService {
                 },
             })
 
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitSalesOrder(all.data)
             response.data = newOrder;
             response.message = "Orden creada";
             response.success = true;
@@ -49,8 +66,8 @@ export class SalesOrdersPostgresService {
         return response
     }
 
-    async findAll(): Promise<Response> {
-        let response: Response = {
+    async findAll(): Promise<Response<SalesOrderWithRelations[]>> {
+        let response: Response<SalesOrderWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -75,8 +92,8 @@ export class SalesOrdersPostgresService {
         return response
     }
 
-    async findOne(id: string): Promise<Response> {
-        let response: Response = {
+    async findOne(id: string): Promise<Response<SalesOrderWithRelations[]>> {
+        let response: Response<SalesOrderWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -96,15 +113,15 @@ export class SalesOrdersPostgresService {
 
             if (!doc) response.message = 'Order no encontrada';
             response.success = true;
-            response.data = [doc];
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }
         return response
     }
 
-    async update(id: string, updateSalesOrderDto: UpdateSalesOrderDto): Promise<Response> {
-        let response: Response = {
+    async update(id: string, updateSalesOrderDto: UpdateSalesOrderDto): Promise<Response<SalesOrderWithRelations[]>> {
+        let response: Response<SalesOrderWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -152,17 +169,19 @@ export class SalesOrdersPostgresService {
                 })
             })
 
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitSalesOrder(all.data)
             response.message = `Order with ID ${id} updated successfully`;
             response.success = true;
-            response.data = [doc];
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }
         return response
     }
 
-    async remove(id: string): Promise<Response> {
-        let response: Response = {
+    async remove(id: string): Promise<Response<SalesOrderWithRelations[]>> {
+        let response: Response<SalesOrderWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -187,9 +206,11 @@ export class SalesOrdersPostgresService {
                 })
             })
 
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitSalesOrder(all.data)
             response.message = `Order with ID ${id} deleted successfully`;
             response.success = true;
-            response.data = doc;
+            response.data = doc ? [doc] : [];
         } catch (error: any) {
             response.message = error.message;
         }

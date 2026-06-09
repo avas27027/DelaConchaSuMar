@@ -3,15 +3,18 @@ import { PostgresService } from '@/commons/providers/postgres.service';
 import { Injectable } from '@nestjs/common';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { CreateTableDto } from './dto/create-table.dto';
+import { Tables } from '../../generated/prisma/client';
+import { EventsGateway } from '@/commons/providers/socketGateway.service';
 
 @Injectable()
 export class TablesPostgresService {
-    constructor(private readonly db: PostgresService) { }
+    constructor(private readonly db: PostgresService, private readonly webSocket: EventsGateway) { }
 
-    async findAll(): Promise<Response> {
-        let response: Response = {
+    async findAll(): Promise<Response<Tables[]>> {
+        let response: Response<Tables[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
             response.data = await this.db.tables.findMany()
@@ -47,16 +50,20 @@ export class TablesPostgresService {
         return response
     }
 
-    async create(createTableDto: CreateTableDto): Promise<Response> {
-        let response: Response = {
+    async create(createTableDto: CreateTableDto): Promise<Response<Tables[]>> {
+        let response: Response<Tables[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.tables.create({
+            const doc = await this.db.tables.create({
                 data: createTableDto
             })
-            response.message = `Table ${response.data.id} created successfully`
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitTables(all.data)
+            response.data = [doc]
+            response.message = `Table ${doc.id} created successfully`
             response.success = true
         }
         catch (error: any) {
@@ -65,18 +72,22 @@ export class TablesPostgresService {
         return response
     }
 
-    async update(id: string, updateTableDto: UpdateTableDto): Promise<Response> {
-        let response: Response = {
+    async update(id: string, updateTableDto: UpdateTableDto): Promise<Response<Tables[]>> {
+        let response: Response<Tables[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.tables.update({
+            const doc = await this.db.tables.update({
                 where: { id: Number.parseInt(id) },
                 data: updateTableDto
             })
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitTables(all.data)
+            response.data = [doc]
             response.message = `Table with ID ${id} updated successfully`
-            if (!response.data) {
+            if (!doc) {
                 response.message = "Table not found"
             }
             response.success = true
@@ -87,17 +98,21 @@ export class TablesPostgresService {
         return response
     }
 
-    async remove(id: string): Promise<Response> {
-        let response: Response = {
+    async remove(id: string): Promise<Response<Tables[]>> {
+        let response: Response<Tables[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.tables.delete({
+            const doc = await this.db.tables.delete({
                 where: { id: Number.parseInt(id) }
             })
+            const all = await this.findAll()
+            all?.data && this.webSocket.emitTables(all.data)
+            response.data = [doc]
             response.message = `Table with ID ${id} deleted successfully`
-            if (!response.data) {
+            if (!doc) {
                 response.message = "Table not found"
             }
             response.success = true

@@ -3,6 +3,16 @@ import { PostgresService } from '@/commons/providers/postgres.service';
 import { Injectable } from '@nestjs/common';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
+import { Prisma } from '../../generated/prisma/client';
+
+type IngredientsWithRelations = Prisma.IngredientsGetPayload<{
+    include: {
+        units: true,
+        ingredientsSuppliers: {
+            include: { suppliers: true },
+        },
+    },
+}>
 
 @Injectable()
 export class IngredientsPostgresService {
@@ -32,12 +42,10 @@ export class IngredientsPostgresService {
             const data = ingredients.slice(0, parsedLimit)
             const lastIngredient = data.at(-1)
 
-            response.data = {
-                ingredients: data,
-                nextCursor: hasMore && lastIngredient ? String(lastIngredient.id) : null,
-                hasMore,
-                total: await this.count(),
-            }
+            response.data = data
+            response.nextCursor = hasMore && lastIngredient ? String(lastIngredient.id) : null
+            response.hasMore = hasMore
+            response.total = await this.count()
             response.message = "Successful operation"
             response.success = true
         }
@@ -47,8 +55,8 @@ export class IngredientsPostgresService {
         return response
     }
 
-    async findAll(): Promise<Response> {
-        let response: Response = {
+    async findAll(): Promise<Response<IngredientsWithRelations[]>> {
+        let response: Response<IngredientsWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -74,8 +82,8 @@ export class IngredientsPostgresService {
         return response
     }
 
-    async findOne(id: string): Promise<Response> {
-        let response: Response = {
+    async findOne(id: string): Promise<Response<IngredientsWithRelations[]>> {
+        let response: Response<IngredientsWithRelations[]> = {
             success: false,
             message: "",
         }
@@ -89,7 +97,7 @@ export class IngredientsPostgresService {
                     },
                 },
             })
-            response.data = [doc]
+            response.data = doc ? [doc] : []
             response.message = `Ingredient with ID ${id} retrieved successfully`
             if (!response.data) {
                 response.message = "Ingredient not found"
@@ -102,19 +110,26 @@ export class IngredientsPostgresService {
         return response
     }
 
-    async create(createIngredientDto: CreateIngredientDto): Promise<Response> {
-        let response: Response = {
+    async create(createIngredientDto: CreateIngredientDto): Promise<Response<IngredientsWithRelations[]>> {
+        let response: Response<IngredientsWithRelations[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
             const { description, unit, ...data } = createIngredientDto
 
-            response.data = await this.db.ingredients.create({
+            const doc = await this.db.ingredients.create({
                 data: { ...data, unit: Number.parseInt(unit) },
-                include: { units: true },
+                include: {
+                    units: true,
+                    ingredientsSuppliers: {
+                        include: { suppliers: true },
+                    },
+                },
             })
-            response.message = `Ingredient ${response.data.id} created successfully`
+            response.data = doc ? [doc] : []
+            response.message = `Ingredient ${response.data[0].id} created successfully`
             response.success = true
         }
         catch (error: any) {
@@ -123,19 +138,26 @@ export class IngredientsPostgresService {
         return response
     }
 
-    async update(id: string, updateIngredientDto: UpdateIngredientDto): Promise<Response> {
-        let response: Response = {
+    async update(id: string, updateIngredientDto: UpdateIngredientDto): Promise<Response<IngredientsWithRelations[]>> {
+        let response: Response<IngredientsWithRelations[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
             const { description, unit, ...data } = updateIngredientDto
 
-            response.data = await this.db.ingredients.update({
+            const doc = await this.db.ingredients.update({
                 where: { id: Number.parseInt(id) },
                 data: { ...data, ...(unit && { unit: Number.parseInt(unit) }) },
-                include: { units: true },
+                include: {
+                    units: true,
+                    ingredientsSuppliers: {
+                        include: { suppliers: true },
+                    },
+                },
             })
+            response.data = doc ? [doc] : []
             response.message = `Ingredient with ID ${id} updated successfully`
             if (!response.data) {
                 response.message = "Ingredient not found"
@@ -148,16 +170,23 @@ export class IngredientsPostgresService {
         return response
     }
 
-    async remove(id: string): Promise<Response> {
-        let response: Response = {
+    async remove(id: string): Promise<Response<IngredientsWithRelations[]>> {
+        let response: Response<IngredientsWithRelations[]> = {
             success: false,
             message: "",
+            data: []
         }
         try {
-            response.data = await this.db.ingredients.delete({
+            const doc = await this.db.ingredients.delete({
                 where: { id: Number.parseInt(id) },
-                include: { units: true },
+                include: {
+                    units: true,
+                    ingredientsSuppliers: {
+                        include: { suppliers: true },
+                    },
+                },
             })
+            response.data = doc ? [doc] : []
             response.message = `Ingredient with ID ${id} deleted successfully`
             if (!response.data) {
                 response.message = "Ingredient not found"

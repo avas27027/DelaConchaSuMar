@@ -1,5 +1,6 @@
 import { db } from "./firebase";
 import { collection, query, where, onSnapshot, type WhereFilterOp, DocumentReference } from "firebase/firestore";
+import { io, Socket } from 'socket.io-client';
 
 export interface ProductJSONInterface {
     id: string;
@@ -21,11 +22,18 @@ export interface ProductJSONInterface {
     priceMeassures?: PriceMeassureJSONInterface
 }
 
+type Pagination = {
+    nextCursor?: string | null,
+    hasMore?: boolean,
+    total?: number,
+}
+
 export type IngredientsJSONInterface = {
     id: string;
-    category?: string;
+    category: string;
     currentStock: string;
     name: string;
+    description: string;
     minimumStock: string;
     unit: string;
     createdAt: string;
@@ -113,17 +121,18 @@ type TypeWhereArg = {
 };
 
 type BackendMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type Response<T> = { success: boolean, message: string, data?: T }
+type Response<T> = { success: boolean, message: string, data?: T } & Pagination;
 type BackendEndPoint = keyof BackendTypesMap;
 type BackendTypesMap = {
     salesOrders: SalesOrderJSONInterface[];
     tables: TableJSONInterface[];
     menu: ProductJSONInterface[];
     ingredients: IngredientsJSONInterface[];
+    meassures: PriceMeassureJSONInterface[];
 };
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://backend:3001";
 
 export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
-    const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://backend:3001";
     return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
         method: method,
         ...(body && { body: JSON.stringify(body) }),
@@ -139,6 +148,36 @@ export async function backendConection<T extends BackendEndPoint>(method: Backen
                 message: error.message,
             }
         });
+}
+
+type SocketTypesMap = {
+    'order:updated': SalesOrderJSONInterface[],
+    'table:updated': TableJSONInterface[],
+    'menu:updated': ProductJSONInterface[],
+}
+type SocketEvent = keyof SocketTypesMap;
+type ServerToClientEvents = {
+    [K in SocketEvent]: (snapshot: SocketTypesMap[K]) => void;
+};
+const socket: Socket<ServerToClientEvents> = io(backendUrl);
+export const webSocketListener = <T extends SocketEvent>(
+    socketEvent: T,
+    callback: (snapshot: SocketTypesMap[T][number]) => void,
+    filter?: { field: keyof SocketTypesMap[T], value: unknown }) => {
+
+    const listener = (snapshot: SocketTypesMap[T]) => {
+        if (filter) {
+            callback(
+                snapshot.filter(item => item[filter.field] === filter.value)
+            );
+        } else {
+            callback(snapshot);
+        }
+    };
+    socket.on(socketEvent, listener);
+    return () => {
+        socket.off(socketEvent, listener);
+    };
 }
 
 export const createQuery = (collectionArg: string, callback: (snapshot: any[]) => void, whereArgs: TypeWhereArg[] = []) => {
@@ -162,3 +201,5 @@ export const createQuery = (collectionArg: string, callback: (snapshot: any[]) =
 export const salesOrdersHook = (callback: (snapshot: SalesOrderJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("salesOrders", callback, query);
 export const productsHook = (callback: (snapshot: ProductJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("products", callback, query);
 export const tablesHook = (callback: (snapshot: TableJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("tables", callback, query);
+
+

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { backendConection } from '../../controller/salesOrders.hook';
 
 export interface OrderItem {
     id: string;
@@ -16,7 +17,6 @@ interface CurrentOrderProps {
     readonly onSubmit: () => void;
 }
 
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://backend:3001";
 
 export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, onSubmit }: CurrentOrderProps) {
     const [productObservations, setProductObservations] = useState<Record<string, string>>({});
@@ -54,44 +54,25 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                 }
             })
         }
-        console.log(sendJson);
-
-        fetch(
-            `${backendUrl}/sales-orders`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendJson),
-            },
-        )
-            .then((res) => res.json())
-            .then((data) => { console.log(data); if (data.success) alert("Pedido enviado a cocina") })
-            .catch((error) => {
-                console.error("Error creating sale:", error);
-                return { data: [] };
-            });
+        backendConection("POST", "salesOrders", undefined, JSON.stringify(sendJson))
+            .then((res) => {
+                if (res.success) {
+                    alert("Pedido enviado a cocina")
+                }
+            })
         onSubmit();
 
     };
 
     const confirmOrder = () => {
-
-        prevOrders.forEach(order => {
-            if (order.state != 'cooked') return;
-            fetch(`${backendUrl}/sales-orders/${order.orderId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    state: 'paid',
-                }),
-            }).then(() => {
-                alert("Pedido enviado a caja, por favor dirigir al cliente a caja para pagar");
-                console.log('Order marked as paid');
-            });
+        prevOrders.forEach((prevOrder) => {
+            if (prevOrder.state != 'cooked') return;
+            backendConection("PATCH", "salesOrders", prevOrder.orderId, JSON.stringify({ state: 'paid' }))
+                .then((res) => {
+                    if (res.success) {
+                        alert("Pedido enviado a caja, por favor dirigir al cliente a caja para pagar");
+                    }
+                })
         });
     };
 
