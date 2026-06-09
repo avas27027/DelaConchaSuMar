@@ -59,7 +59,10 @@ export const ModelName = {
   Tables: 'Tables',
   IngredientsSuppliers: 'IngredientsSuppliers',
   Suppliers: 'Suppliers',
-  MeassureUnits: 'MeassureUnits'
+  MeassureUnits: 'MeassureUnits',
+  Users: 'Users',
+  UsersRoles: 'UsersRoles',
+  Roles: 'Roles'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,6 +134,7 @@ export const IngredientsScalarFieldEnum = {
   name: 'name',
   minimumStock: 'minimumStock',
   unit: 'unit',
+  description: 'description',
   updatedAt: 'updatedAt',
   createdAt: 'createdAt'
 } as const
@@ -177,6 +181,37 @@ export const MeassureUnitsScalarFieldEnum = {
 } as const
 
 export type MeassureUnitsScalarFieldEnum = (typeof MeassureUnitsScalarFieldEnum)[keyof typeof MeassureUnitsScalarFieldEnum]
+
+
+export const UsersScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const UsersRolesScalarFieldEnum = {
+  id: 'id',
+  user: 'user',
+  role: 'role',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type UsersRolesScalarFieldEnum = (typeof UsersRolesScalarFieldEnum)[keyof typeof UsersRolesScalarFieldEnum]
+
+
+export const RolesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RolesScalarFieldEnum = (typeof RolesScalarFieldEnum)[keyof typeof RolesScalarFieldEnum]
 
 
 export const SortOrder = {

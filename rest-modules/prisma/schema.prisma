@@ -74,6 +74,7 @@ model Ingredients {
   name         String
   minimumStock Decimal
   unit         Int
+  description  String
   updatedAt    DateTime @default(now())
   createdAt    DateTime @default(now())
 
@@ -129,4 +130,39 @@ model MeassureUnits {
   products    Products[]
 
   @@map("meassure_units")
+}
+
+model Users {
+  id        Int      @id @default(autoincrement())
+  email     String
+  updatedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  usersRoles UsersRoles[]
+
+  @@map("users")
+}
+
+model UsersRoles {
+  id        Int      @id @default(autoincrement())
+  user      Int
+  role      Int
+  updatedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  users Users @relation(fields: [user], references: [id])
+  roles Roles @relation(fields: [role], references: [id])
+
+  @@map("users_roles")
+}
+
+model Roles {
+  id        Int      @id @default(autoincrement())
+  name      String
+  updatedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  usersRoles UsersRoles[]
+
+  @@map("roles")
 }

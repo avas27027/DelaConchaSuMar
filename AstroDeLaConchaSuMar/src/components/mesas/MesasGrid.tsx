@@ -2,16 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import MesasCard, { type MesasCardProps } from "./MesasCard";
 import Modal from "./Modal";
 import "./MesasGrid.css";
-import { salesOrdersHook, tablesHook, type SalesOrderJSONInterface, getTableStatePriority, toTableVisualState, type TableVisualState } from "../../controller/salesOrders.hook";
+import { getTableStatePriority, toTableVisualState, type TableVisualState, listenSocket } from "../../controller/salesOrders.hook";
 
 export default function MesasGrid() {
 
     const [mesasCard, setMesasCard] = useState<MesasCardProps[]>([])
 
     useEffect(() => {
-        const unsubscribeTables = tablesHook((tables) => {
-            setMesasCard((prev) =>{
-                return tables.map((table) => {
+        const unsubscribeTables = listenSocket("table", (snapshot) => {
+            setMesasCard((prev) => {
+                return snapshot.map((table) => {
                     const prevMesa = prev.find((mesa) => mesa.id === table.id);
                     return {
                         id: table.id,
@@ -24,8 +24,9 @@ export default function MesasGrid() {
             });
         })
 
-        const unsubscribeSalesOrders = salesOrdersHook((salesOrders) => {
-            const newOrderSalesMap = new Map<string, SalesOrderJSONInterface[]>();
+        const unsubscribeSalesOrders = listenSocket("order", (snapshot) => {
+            const newOrderSalesMap = new Map<string, typeof snapshot>();
+            const salesOrders = snapshot.filter((order) => order.state !== "paid")
             salesOrders.forEach((order) => {
                 const tableId = order.table.id;
                 const ordersForTable = newOrderSalesMap.get(tableId) || [];
@@ -35,7 +36,6 @@ export default function MesasGrid() {
 
             setMesasCard((prevMesasCard) => prevMesasCard.map((mesa) => {
                 const ordersForTable = newOrderSalesMap.get(mesa.id) || [];
-                console.log(ordersForTable);
                 const allOrdersCooked = ordersForTable.length > 0 && ordersForTable.every((order) => order.state === "cooked" || order.state === "toPay");
                 let updateAt = "";
                 const visualStateFromOrders = ordersForTable.reduce((state, order) => {
@@ -51,7 +51,7 @@ export default function MesasGrid() {
                     ...mesa, state: visualState, updateAt: updateAt
                 }
             }))
-        }, [{prop: "state", operation: "!=", value: "paid"}])
+        })
 
         return () => {
             unsubscribeTables();

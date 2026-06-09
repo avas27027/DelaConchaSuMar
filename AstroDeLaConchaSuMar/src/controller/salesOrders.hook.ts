@@ -1,6 +1,4 @@
-import { db } from "./firebase";
-import { collection, query, where, onSnapshot, type WhereFilterOp, DocumentReference } from "firebase/firestore";
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 export interface ProductJSONInterface {
     id: string;
@@ -22,13 +20,30 @@ export interface ProductJSONInterface {
     priceMeassures?: PriceMeassureJSONInterface
 }
 
+export type UserJSONInterface = {
+    id: string;
+    email: string;
+    createdAt: string;
+    updatedAt?: string;
+    usersRoles: {
+        roles: RoleJSONInterface;
+    }[];
+}
+
+export type RoleJSONInterface = {
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
 type Pagination = {
     nextCursor?: string | null,
     hasMore?: boolean,
     total?: number,
 }
 
-export type IngredientsJSONInterface = {
+type IngredientsJSONInterface = {
     id: string;
     category: string;
     currentStock: string;
@@ -49,11 +64,12 @@ export type IngredientsJSONInterface = {
     }
 }
 
-export type SuppliersJSONInterface = {
+type SuppliersJSONInterface = {
     id: string;
     name: string;
 }
-export type PriceMeassureJSONInterface = {
+
+type PriceMeassureJSONInterface = {
     id: string;
     name: string;
     longName: string;
@@ -68,10 +84,10 @@ export interface SalesOrderJSONInterface {
     id: string;
     observations: string;
     state: string;
-    table: DocumentReference;
+    table: TableJSONInterface;
     user: string;
     products: {
-        product: DocumentReference;
+        product: ProductJSONInterface;
         quantity: number;
         observations: string;
     }[];
@@ -84,12 +100,6 @@ export interface TableJSONInterface {
 }
 
 export type TableVisualState = "libre" | "preparacion" | "cocinado" | "entregado";
-export interface TableStateInfo {
-    state: TableVisualState;
-    updateAt?: string;
-}
-export type TableStatesMap = Record<string, TableStateInfo>;
-
 export function toTableVisualState(orderState: string): TableVisualState {
     if (orderState === "cooked") {
         return "cocinado";
@@ -114,21 +124,16 @@ export function getTableStatePriority(state: TableVisualState): number {
     return 1;
 }
 
-type TypeWhereArg = {
-    prop: string;
-    operation: WhereFilterOp;
-    value: unknown;
-};
-
 type BackendMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type Response<T> = { success: boolean, message: string, data?: T } & Pagination;
+export type Response<T> = { success: boolean, message: string, data?: T } & Pagination;
 type BackendEndPoint = keyof BackendTypesMap;
 type BackendTypesMap = {
-    salesOrders: SalesOrderJSONInterface[];
+    "sales-orders": SalesOrderJSONInterface[];
     tables: TableJSONInterface[];
     menu: ProductJSONInterface[];
     ingredients: IngredientsJSONInterface[];
     meassures: PriceMeassureJSONInterface[];
+    user: UserJSONInterface[];
 };
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://backend:3001";
 
@@ -150,56 +155,31 @@ export async function backendConection<T extends BackendEndPoint>(method: Backen
         });
 }
 
-type SocketTypesMap = {
-    'order:updated': SalesOrderJSONInterface[],
-    'table:updated': TableJSONInterface[],
-    'menu:updated': ProductJSONInterface[],
-}
-type SocketEvent = keyof SocketTypesMap;
-type ServerToClientEvents = {
-    [K in SocketEvent]: (snapshot: SocketTypesMap[K]) => void;
+type SocketDataMap = {
+    "order": SalesOrderJSONInterface[];
+    "table": TableJSONInterface[];
+    "menu": ProductJSONInterface[];
 };
-const socket: Socket<ServerToClientEvents> = io(backendUrl);
-export const webSocketListener = <T extends SocketEvent>(
-    socketEvent: T,
-    callback: (snapshot: SocketTypesMap[T][number]) => void,
-    filter?: { field: keyof SocketTypesMap[T], value: unknown }) => {
 
-    const listener = (snapshot: SocketTypesMap[T]) => {
-        if (filter) {
-            callback(
-                snapshot.filter(item => item[filter.field] === filter.value)
-            );
-        } else {
-            callback(snapshot);
-        }
+type SocketEvent = keyof SocketDataMap;
+
+const socket = io(backendUrl);
+
+export function listenSocket<TEvent extends SocketEvent>(
+    event: TEvent,
+    callback: (data: SocketDataMap[TEvent]) => void
+) {
+    const listener = (data: SocketDataMap[TEvent]) => {
+        callback(data);
     };
-    socket.on(socketEvent, listener);
+
+    socket.on(`${event}:updated`, listener as any);
+    socket.emit(`${event}:subscribe`);
+
     return () => {
-        socket.off(socketEvent, listener);
+        socket.off(`${event}:updated`, listener as any);
     };
 }
 
-export const createQuery = (collectionArg: string, callback: (snapshot: any[]) => void, whereArgs: TypeWhereArg[] = []) => {
-    const collectionRef = collection(db, collectionArg);
-    const constraints = whereArgs.map(({ prop, operation, value }) => (
-        where(prop, operation, value)
-    ));
-    const q = query(collectionRef, ...constraints);
-
-    return onSnapshot(q,
-        (snapshot) => {
-            callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-            console.log(`Snapshot ${collectionArg}:`, snapshot.size);
-        },
-        (error) => {
-            console.error(`Firestore listener error in ${collectionArg}:`, error);
-        }
-    )
-};
-
-export const salesOrdersHook = (callback: (snapshot: SalesOrderJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("salesOrders", callback, query);
-export const productsHook = (callback: (snapshot: ProductJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("products", callback, query);
-export const tablesHook = (callback: (snapshot: TableJSONInterface[]) => void, query?: TypeWhereArg[]) => createQuery("tables", callback, query);
 
 

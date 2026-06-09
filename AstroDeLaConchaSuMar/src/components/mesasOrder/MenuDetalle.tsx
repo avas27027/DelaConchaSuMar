@@ -3,7 +3,7 @@ import DishGrid from './DishGrid';
 import CurrentOrder, { type OrderItem } from './CurrentOrder';
 import type { DishCardProps } from './DishCard';
 import './MenuDetalle.css';
-import { productsHook, salesOrdersHook, tablesHook, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
+import { listenSocket, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
 
 interface MenuDetalleProps {
     readonly mesaName: string;
@@ -17,15 +17,15 @@ export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProp
     const [ordersJSON, setOrdersJSON] = useState<SalesOrderJSONInterface[]>([]);
 
     useEffect(() => {
-        const unsubscribeTables = tablesHook((tables) => {
-            setTables(new Map(tables.map((table) => [table.id, table])));
+        const unsubscribeTables = listenSocket("table", (snapshot) => {
+            setTables(new Map(snapshot.map((table) => [table.id, table])));
         })
-        const unsubscribeProducts = productsHook((products) => {
-            setProducts(new Map(products.map((product) => [product.id, product])));
+        const unsubscribeProducts = listenSocket("menu", (snapshot) => {
+            setProducts(new Map(snapshot.map((product) => [product.id, product])));
         })
-        const unsubscribeOrders = salesOrdersHook((orders) => {
-            setOrdersJSON(orders);
-        }, [{ prop: "state", operation: "in", value: ["pending", "cooked", "toCook"] }])
+        const unsubscribeOrders = listenSocket("order", (snapshot) => {
+            setOrdersJSON(snapshot.filter((order) => order.state === "pending" || order.state === "cooked" || order.state === "toCook"));
+        })
         return () => {
             unsubscribeOrders();
             unsubscribeProducts();
@@ -35,9 +35,8 @@ export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProp
 
     const prevOrders = useMemo(() => {
         return ordersJSON
-        .filter((order) => order.table.id === mesaName)
-        .map((order) => {
-                console.log(order);
+            .filter((order) => Number.parseInt(order.table.id) === Number.parseInt(mesaName))
+            .map((order) => {
                 const orderProducts = order.products.map(
                     ({ observations, product, quantity }) => ({
                         id: product.id,

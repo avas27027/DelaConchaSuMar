@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './MenuTable.css'
-import { backendConection } from '../../controller/salesOrders.hook';
+import { backendConection, type ProductJSONInterface } from '../../controller/salesOrders.hook';
 
-export interface MenuTableProperties {
-    readonly id: string;
-    readonly name: string;
-    readonly description: string;
-    readonly category: string;
-    readonly price: string;
-    readonly imageUrl: string;
-    readonly ingredients: readonly {
-        readonly name: string;
-        readonly quantity: number;
-        readonly unit: string;
-    }[]
-}
 export default function MenuTable() {
     const limit = 10
-    const [products, setProducts] = useState<MenuTableProperties[]>([]);
+    const [products, setProducts] = useState<ProductJSONInterface[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([null]);
@@ -34,15 +21,7 @@ export default function MenuTable() {
 
         const res = await backendConection("GET", "menu", `paginate?${params}`)
         if (res.data && res.nextCursor !== undefined && res.hasMore !== undefined && res.total !== undefined) {
-            setProducts(res.data.map((item) => ({
-                ...item,
-                price: String(item.price),
-                ingredients: item.productsIngredients?.map((ingredient) => ({
-                    ...ingredient,
-                    name: ingredient.ingredients?.name ?? "",
-                    unit: ingredient.ingredients?.units?.name ?? ""
-                })) ?? []
-            })));
+            setProducts(res.data);
             setNextCursor(res.nextCursor);
             setHasMore(res.hasMore);
             setTotal(res.total)

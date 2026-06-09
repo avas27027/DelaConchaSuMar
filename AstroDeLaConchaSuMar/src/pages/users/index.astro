@@ -1,20 +1,20 @@
 ---
-import MenuTable from "../../components/menu/MenuTable";
+import UsersTable from "../../components/users/UsersTable";
 import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="De la Concha su Mar">
-  <section class="menu-management-page" aria-labelledby="menu-title">
-    <div class="menu-header">
+  <section class="users-management-page" aria-labelledby="users-title">
+    <div class="users-header">
       <div>
-        <h2 id="menu-title">GESTIÓN DE MENÚ</h2>
-        <p>Administra la disponibilidad y detalles de la carta maestra.</p>
+        <h2 id="users-title">GESTION DE USUARIOS</h2>
+        <p>Administra correos de acceso y roles del equipo operativo.</p>
       </div>
 
       <a
-        class="add-dish-button"
-        href="/menu/nuevo"
-        aria-label="Agregar platillo"
+        class="add-user-button"
+        href="/users/nuevo"
+        aria-label="Agregar usuario"
       >
         <svg
           width="16"
@@ -29,29 +29,29 @@ import Layout from "../../layouts/Layout.astro";
             stroke-width="2"
             stroke-linecap="round"></path>
         </svg>
-        Agregar Platillo
+        Agregar Usuario
       </a>
     </div>
   </section>
-  <MenuTable client:only="react" />
+  <UsersTable client:only="react" />
 </Layout>
 
 <style>
-  .menu-management-page {
+  .users-management-page {
     padding: 32px 24px;
     display: flex;
     flex-direction: column;
     gap: 24px;
   }
 
-  .menu-header {
+  .users-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
   }
 
-  .menu-header h2 {
+  .users-header h2 {
     color: var(--color-deep-cyan);
     font-size: 32px;
     line-height: 1;
@@ -59,13 +59,13 @@ import Layout from "../../layouts/Layout.astro";
     letter-spacing: 0;
   }
 
-  .menu-header p {
+  .users-header p {
     color: var(--color-text-secondary);
     font-size: 13px;
     font-weight: 500;
   }
 
-  .add-dish-button {
+  .add-user-button {
     min-height: 44px;
     display: inline-flex;
     align-items: center;

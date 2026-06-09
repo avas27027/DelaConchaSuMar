@@ -1,0 +1,10 @@
+---
+import CreateUser from "../../components/users/CreateUser";
+import Layout from "../../layouts/Layout.astro";
+
+const { id } = Astro.params;
+---
+
+<Layout title="De la Concha su Mar">
+  <CreateUser client:only="react" id={id ?? "nuevo"} />
+</Layout>

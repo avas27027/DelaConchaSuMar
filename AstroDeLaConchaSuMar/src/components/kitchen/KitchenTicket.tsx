@@ -66,7 +66,7 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
 
     const handleReady = () => {
         if (!allItemsChecked) return;
-        backendConection("PATCH", "salesOrders", id, JSON.stringify({ state: 'cooked' }))
+        backendConection("PATCH", "sales-orders", id, { state: 'cooked' })
     }
 
     useEffect(() => {

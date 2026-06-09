@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import KitchenTicket, { type KitchenTicketProps } from './KitchenTicket';
+import KitchenTicket from './KitchenTicket';
 import './KitchenGrid.css';
-import { productsHook, salesOrdersHook, tablesHook, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
+import { listenSocket, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
 
 export default function KitchenGrid() {
     const [orders, setOrders] = useState<SalesOrderJSONInterface[]>([]);
@@ -9,15 +9,15 @@ export default function KitchenGrid() {
     const [products, setProducts] = useState<Map<string, ProductJSONInterface>>(new Map());
 
     useEffect(() => {
-        const unsubscribeTables = tablesHook((tables) => {
-            setTables(new Map(tables.map((table) => [table.id, table])));
+        const unsubscribeTables = listenSocket("table", (snapshot) => {
+            setTables(new Map(snapshot.map((table) => [table.id, table])));
         })
-        const unsubscribeProducts = productsHook((products) => {
-            setProducts(new Map(products.map((product) => [product.id, product])));
+        const unsubscribeProducts = listenSocket("menu", (snapshot) => {
+            setProducts(new Map(snapshot.map((product) => [product.id, product])));
         })
-        const unsubscribeOrders = salesOrdersHook((orders) => {
-            setOrders(orders);
-        }, [{ prop: "state", operation: "in", value: [ "toCook"] }])
+        const unsubscribeOrders = listenSocket("order", (snapshot) => {
+            setOrders(snapshot.filter(order => order.state === "toCook"));
+        });
         return () => {
             unsubscribeOrders();
             unsubscribeProducts();
@@ -39,7 +39,7 @@ export default function KitchenGrid() {
                 id: order.id,
                 orderNumber: `0${i + 1}`,
                 customerName: tables.get(order.table.id)?.name || "",
-                time: new Date(order.createdAt).getTime(),
+                time: new Date(order.createdAt ?? order.updatedAt).getTime(),
                 items: orderProducts,
             };
         });

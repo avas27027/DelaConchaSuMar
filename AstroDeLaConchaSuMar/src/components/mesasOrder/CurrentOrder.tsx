@@ -54,7 +54,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                 }
             })
         }
-        backendConection("POST", "salesOrders", undefined, JSON.stringify(sendJson))
+        backendConection("POST", "sales-orders", undefined, sendJson)
             .then((res) => {
                 if (res.success) {
                     alert("Pedido enviado a cocina")
@@ -67,7 +67,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
     const confirmOrder = () => {
         prevOrders.forEach((prevOrder) => {
             if (prevOrder.state != 'cooked') return;
-            backendConection("PATCH", "salesOrders", prevOrder.orderId, JSON.stringify({ state: 'paid' }))
+            backendConection("PATCH", "sales-orders", prevOrder.orderId, { state: 'paid' })
                 .then((res) => {
                     if (res.success) {
                         alert("Pedido enviado a caja, por favor dirigir al cliente a caja para pagar");
@@ -84,6 +84,10 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
 
             <div className="order-content">
                 <div className="order-items">
+                    {[].map(() => {
+                        console.log(prevOrders)
+                        return <h1>hola</h1>
+                    })}
                     {prevOrders.map((prevOrder) => (
                         prevOrder.products.map((product) => (
                             <div className="order-item" key={product.id}>

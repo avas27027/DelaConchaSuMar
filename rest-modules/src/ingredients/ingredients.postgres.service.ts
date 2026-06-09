@@ -117,7 +117,7 @@ export class IngredientsPostgresService {
             data: []
         }
         try {
-            const { description, unit, ...data } = createIngredientDto
+            const { unit, ...data } = createIngredientDto
 
             const doc = await this.db.ingredients.create({
                 data: { ...data, unit: Number.parseInt(unit) },
@@ -145,7 +145,7 @@ export class IngredientsPostgresService {
             data: []
         }
         try {
-            const { description, unit, ...data } = updateIngredientDto
+            const { unit, ...data } = updateIngredientDto
 
             const doc = await this.db.ingredients.update({
                 where: { id: Number.parseInt(id) },

@@ -2,31 +2,30 @@
 import Layout from "../../layouts/Layout.astro";
 import MenuDetalle from "../../components/mesasOrder/MenuDetalle";
 import type { DishCardProps } from "../../components/mesasOrder/DishCard";
-import type { ProductJSONInterface } from "../../controller/salesOrders.hook";
-const backendUrl = import.meta.env.BACKEND_URL ?? "http://backend:3001";
+import {
+  backendConection,
+  type ProductJSONInterface,
+} from "../../controller/salesOrders.hook";
 const { id } = Astro.params;
-
-const orders = [
-  { name: "Ceviche Clásico", price: 45, quantity: 1 },
-  { name: "Causa Limeña", price: 60, quantity: 2 },
-];
-
-console.log(backendUrl);
-const res = await fetch(
-  `${backendUrl}/menu`,
-  {
-    method: "GET",
-  },
-)
-  .then((res) => res.json())
-  .catch((error) => {
-    console.error("Error fetching menu:", error);
-    return { data: [] };
-  });
+const res = await backendConection("GET", "menu");
 const dishes1: DishCardProps[] =
   res.data?.map(
-    ({ id, name, imageUrl, description, price, category }: ProductJSONInterface) => {
-      return { id, image: imageUrl, price, title: name, description, category: category || "Sin categoría" };
+    ({
+      id,
+      name,
+      imageUrl,
+      description,
+      price,
+      category,
+    }: ProductJSONInterface) => {
+      return {
+        id,
+        image: imageUrl,
+        price,
+        title: name,
+        description,
+        category: category || "Sin categoría",
+      };
     },
   ) || [];
 ---

@@ -8,6 +8,94 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+    /**
+     * ROLES
+     */
+    await prisma.roles.createMany({
+        data: [
+            { name: "admin" },
+            { name: "cashier" },
+            { name: "cook" },
+            { name: "barman" },
+            { name: "waiter" }
+        ],
+        skipDuplicates: true
+    });
+
+    const admin = await prisma.roles.findFirst({
+        where: { name: "admin" }
+    });
+
+    const cook = await prisma.roles.findFirst({
+        where: { name: "cook" }
+    });
+
+    const barman = await prisma.roles.findFirst({
+        where: { name: "barman" }
+    });
+
+    const waiter = await prisma.roles.findFirst({
+        where: { name: "waiter" }
+    });
+
+    /** 
+     * USUARIOS
+     */
+    await prisma.users.createMany({
+        data: [
+            {
+                email: "alvaro_10_12@hotmail.com",
+            },
+            {
+                email: "alvas27027@gmail.com",
+            }
+        ],
+        skipDuplicates: true
+    });
+
+    const correo1 = await prisma.users.findFirst({
+        where: { email: "alvaro_10_12@hotmail.com" }
+    });
+
+    const correo2 = await prisma.users.findFirst({
+        where: { email: "alvas27027@gmail.com" }
+    });
+
+    /**
+     * RELACION USERS ROLES
+     */
+    await prisma.usersRoles.createMany({
+        data: [
+            {
+                role: admin!.id,
+                user: correo1!.id
+            },
+            {
+                role: admin!.id,
+                user: correo2!.id
+            },
+            {
+                role: cook!.id,
+                user: correo1!.id
+            },
+            {
+                role: barman!.id,
+                user: correo2!.id
+            },
+            {
+                role: waiter!.id,
+                user: correo1!.id
+            },
+            {
+                role: waiter!.id,
+                user: correo2!.id
+            }
+        ],
+        skipDuplicates: true
+    });
+
+
+
     /*
    * UNIDADES
    */
@@ -38,6 +126,7 @@ async function main() {
             {
                 name: "Pescado fresco",
                 category: "Mariscos",
+                description: "Pescado fresco",
                 currentStock: 20,
                 minimumStock: 5,
                 unit: kg!.id
@@ -45,6 +134,7 @@ async function main() {
             {
                 name: "Limón",
                 category: "Frutas",
+                description: "Limón",
                 currentStock: 100,
                 minimumStock: 20,
                 unit: unidad!.id
@@ -52,6 +142,7 @@ async function main() {
             {
                 name: "Cebolla roja",
                 category: "Verduras",
+                description: "Cebolla roja",
                 currentStock: 25,
                 minimumStock: 5,
                 unit: kg!.id
@@ -59,6 +150,7 @@ async function main() {
             {
                 name: "Ají limo",
                 category: "Condimentos",
+                description: "Ají limo",
                 currentStock: 50,
                 minimumStock: 10,
                 unit: unidad!.id
@@ -66,6 +158,7 @@ async function main() {
             {
                 name: "Camote",
                 category: "Tubérculos",
+                description: "Camote",
                 currentStock: 30,
                 minimumStock: 5,
                 unit: kg!.id
@@ -73,6 +166,7 @@ async function main() {
             {
                 name: "Cancha serrana",
                 category: "Acompañamientos",
+                description: "Cancha serrana",
                 currentStock: 15,
                 minimumStock: 3,
                 unit: kg!.id

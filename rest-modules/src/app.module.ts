@@ -9,6 +9,7 @@ import { TablesModule } from './tables/tables.module';
 import { SalesOrdersModule } from './sales-orders/sales-orders.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MeassuresModule } from './meassures/meassures.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [CommonsModule,
@@ -18,7 +19,8 @@ import { MeassuresModule } from './meassures/meassures.module';
     TablesModule,
     SalesOrdersModule,
     IngredientsModule,
-    MeassuresModule],
+    MeassuresModule,
+    UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

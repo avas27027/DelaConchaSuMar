@@ -62,3 +62,18 @@ export type Suppliers = Prisma.SuppliersModel
  * 
  */
 export type MeassureUnits = Prisma.MeassureUnitsModel
+/**
+ * Model Users
+ * 
+ */
+export type Users = Prisma.UsersModel
+/**
+ * Model UsersRoles
+ * 
+ */
+export type UsersRoles = Prisma.UsersRolesModel
+/**
+ * Model Roles
+ * 
+ */
+export type Roles = Prisma.RolesModel

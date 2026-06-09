@@ -47,6 +47,7 @@ export type IngredientsMinAggregateOutputType = {
   name: string | null
   minimumStock: runtime.Decimal | null
   unit: number | null
+  description: string | null
   updatedAt: Date | null
   createdAt: Date | null
 }
@@ -58,6 +59,7 @@ export type IngredientsMaxAggregateOutputType = {
   name: string | null
   minimumStock: runtime.Decimal | null
   unit: number | null
+  description: string | null
   updatedAt: Date | null
   createdAt: Date | null
 }
@@ -69,6 +71,7 @@ export type IngredientsCountAggregateOutputType = {
   name: number
   minimumStock: number
   unit: number
+  description: number
   updatedAt: number
   createdAt: number
   _all: number
@@ -96,6 +99,7 @@ export type IngredientsMinAggregateInputType = {
   name?: true
   minimumStock?: true
   unit?: true
+  description?: true
   updatedAt?: true
   createdAt?: true
 }
@@ -107,6 +111,7 @@ export type IngredientsMaxAggregateInputType = {
   name?: true
   minimumStock?: true
   unit?: true
+  description?: true
   updatedAt?: true
   createdAt?: true
 }
@@ -118,6 +123,7 @@ export type IngredientsCountAggregateInputType = {
   name?: true
   minimumStock?: true
   unit?: true
+  description?: true
   updatedAt?: true
   createdAt?: true
   _all?: true
@@ -216,6 +222,7 @@ export type IngredientsGroupByOutputType = {
   name: string
   minimumStock: runtime.Decimal
   unit: number
+  description: string
   updatedAt: Date
   createdAt: Date
   _count: IngredientsCountAggregateOutputType | null
@@ -250,6 +257,7 @@ export type IngredientsWhereInput = {
   name?: Prisma.StringFilter<"Ingredients"> | string
   minimumStock?: Prisma.DecimalFilter<"Ingredients"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFilter<"Ingredients"> | number
+  description?: Prisma.StringFilter<"Ingredients"> | string
   updatedAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
   units?: Prisma.XOR<Prisma.MeassureUnitsScalarRelationFilter, Prisma.MeassureUnitsWhereInput>
@@ -264,6 +272,7 @@ export type IngredientsOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   minimumStock?: Prisma.SortOrder
   unit?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   units?: Prisma.MeassureUnitsOrderByWithRelationInput
@@ -281,6 +290,7 @@ export type IngredientsWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Ingredients"> | string
   minimumStock?: Prisma.DecimalFilter<"Ingredients"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFilter<"Ingredients"> | number
+  description?: Prisma.StringFilter<"Ingredients"> | string
   updatedAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
   units?: Prisma.XOR<Prisma.MeassureUnitsScalarRelationFilter, Prisma.MeassureUnitsWhereInput>
@@ -295,6 +305,7 @@ export type IngredientsOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   minimumStock?: Prisma.SortOrder
   unit?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.IngredientsCountOrderByAggregateInput
@@ -314,6 +325,7 @@ export type IngredientsScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Ingredients"> | string
   minimumStock?: Prisma.DecimalWithAggregatesFilter<"Ingredients"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntWithAggregatesFilter<"Ingredients"> | number
+  description?: Prisma.StringWithAggregatesFilter<"Ingredients"> | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Ingredients"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Ingredients"> | Date | string
 }
@@ -323,6 +335,7 @@ export type IngredientsCreateInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   units: Prisma.MeassureUnitsCreateNestedOneWithoutIngredientsInput
@@ -337,6 +350,7 @@ export type IngredientsUncheckedCreateInput = {
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit: number
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedCreateNestedManyWithoutIngredientsInput
@@ -348,6 +362,7 @@ export type IngredientsUpdateInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   units?: Prisma.MeassureUnitsUpdateOneRequiredWithoutIngredientsNestedInput
@@ -362,6 +377,7 @@ export type IngredientsUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedUpdateManyWithoutIngredientsNestedInput
@@ -375,6 +391,7 @@ export type IngredientsCreateManyInput = {
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit: number
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
 }
@@ -384,6 +401,7 @@ export type IngredientsUpdateManyMutationInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -395,6 +413,7 @@ export type IngredientsUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -411,6 +430,7 @@ export type IngredientsCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   minimumStock?: Prisma.SortOrder
   unit?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -429,6 +449,7 @@ export type IngredientsMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   minimumStock?: Prisma.SortOrder
   unit?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -440,6 +461,7 @@ export type IngredientsMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   minimumStock?: Prisma.SortOrder
   unit?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -536,6 +558,7 @@ export type IngredientsCreateWithoutProductsIngredientsInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   units: Prisma.MeassureUnitsCreateNestedOneWithoutIngredientsInput
@@ -549,6 +572,7 @@ export type IngredientsUncheckedCreateWithoutProductsIngredientsInput = {
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit: number
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   ingredientsSuppliers?: Prisma.IngredientsSuppliersUncheckedCreateNestedManyWithoutIngredientsInput
@@ -575,6 +599,7 @@ export type IngredientsUpdateWithoutProductsIngredientsInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   units?: Prisma.MeassureUnitsUpdateOneRequiredWithoutIngredientsNestedInput
@@ -588,6 +613,7 @@ export type IngredientsUncheckedUpdateWithoutProductsIngredientsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ingredientsSuppliers?: Prisma.IngredientsSuppliersUncheckedUpdateManyWithoutIngredientsNestedInput
@@ -598,6 +624,7 @@ export type IngredientsCreateWithoutIngredientsSuppliersInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   units: Prisma.MeassureUnitsCreateNestedOneWithoutIngredientsInput
@@ -611,6 +638,7 @@ export type IngredientsUncheckedCreateWithoutIngredientsSuppliersInput = {
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   unit: number
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedCreateNestedManyWithoutIngredientsInput
@@ -637,6 +665,7 @@ export type IngredientsUpdateWithoutIngredientsSuppliersInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   units?: Prisma.MeassureUnitsUpdateOneRequiredWithoutIngredientsNestedInput
@@ -650,6 +679,7 @@ export type IngredientsUncheckedUpdateWithoutIngredientsSuppliersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFieldUpdateOperationsInput | number
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedUpdateManyWithoutIngredientsNestedInput
@@ -660,6 +690,7 @@ export type IngredientsCreateWithoutUnitsInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   productsIngredients?: Prisma.ProductsIngredientsCreateNestedManyWithoutIngredientsInput
@@ -672,6 +703,7 @@ export type IngredientsUncheckedCreateWithoutUnitsInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedCreateNestedManyWithoutIngredientsInput
@@ -714,6 +746,7 @@ export type IngredientsScalarWhereInput = {
   name?: Prisma.StringFilter<"Ingredients"> | string
   minimumStock?: Prisma.DecimalFilter<"Ingredients"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   unit?: Prisma.IntFilter<"Ingredients"> | number
+  description?: Prisma.StringFilter<"Ingredients"> | string
   updatedAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Ingredients"> | Date | string
 }
@@ -724,6 +757,7 @@ export type IngredientsCreateManyUnitsInput = {
   currentStock: runtime.Decimal | runtime.DecimalJsLike | number | string
   name: string
   minimumStock: runtime.Decimal | runtime.DecimalJsLike | number | string
+  description: string
   updatedAt?: Date | string
   createdAt?: Date | string
 }
@@ -733,6 +767,7 @@ export type IngredientsUpdateWithoutUnitsInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productsIngredients?: Prisma.ProductsIngredientsUpdateManyWithoutIngredientsNestedInput
@@ -745,6 +780,7 @@ export type IngredientsUncheckedUpdateWithoutUnitsInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productsIngredients?: Prisma.ProductsIngredientsUncheckedUpdateManyWithoutIngredientsNestedInput
@@ -757,6 +793,7 @@ export type IngredientsUncheckedUpdateManyWithoutUnitsInput = {
   currentStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   minimumStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -808,6 +845,7 @@ export type IngredientsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   name?: boolean
   minimumStock?: boolean
   unit?: boolean
+  description?: boolean
   updatedAt?: boolean
   createdAt?: boolean
   units?: boolean | Prisma.MeassureUnitsDefaultArgs<ExtArgs>
@@ -823,6 +861,7 @@ export type IngredientsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   name?: boolean
   minimumStock?: boolean
   unit?: boolean
+  description?: boolean
   updatedAt?: boolean
   createdAt?: boolean
   units?: boolean | Prisma.MeassureUnitsDefaultArgs<ExtArgs>
@@ -835,6 +874,7 @@ export type IngredientsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   name?: boolean
   minimumStock?: boolean
   unit?: boolean
+  description?: boolean
   updatedAt?: boolean
   createdAt?: boolean
   units?: boolean | Prisma.MeassureUnitsDefaultArgs<ExtArgs>
@@ -847,11 +887,12 @@ export type IngredientsSelectScalar = {
   name?: boolean
   minimumStock?: boolean
   unit?: boolean
+  description?: boolean
   updatedAt?: boolean
   createdAt?: boolean
 }
 
-export type IngredientsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "category" | "currentStock" | "name" | "minimumStock" | "unit" | "updatedAt" | "createdAt", ExtArgs["result"]["ingredients"]>
+export type IngredientsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "category" | "currentStock" | "name" | "minimumStock" | "unit" | "description" | "updatedAt" | "createdAt", ExtArgs["result"]["ingredients"]>
 export type IngredientsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   units?: boolean | Prisma.MeassureUnitsDefaultArgs<ExtArgs>
   productsIngredients?: boolean | Prisma.Ingredients$productsIngredientsArgs<ExtArgs>
@@ -879,6 +920,7 @@ export type $IngredientsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     name: string
     minimumStock: runtime.Decimal
     unit: number
+    description: string
     updatedAt: Date
     createdAt: Date
   }, ExtArgs["result"]["ingredients"]>
@@ -1313,6 +1355,7 @@ export interface IngredientsFieldRefs {
   readonly name: Prisma.FieldRef<"Ingredients", 'String'>
   readonly minimumStock: Prisma.FieldRef<"Ingredients", 'Decimal'>
   readonly unit: Prisma.FieldRef<"Ingredients", 'Int'>
+  readonly description: Prisma.FieldRef<"Ingredients", 'String'>
   readonly updatedAt: Prisma.FieldRef<"Ingredients", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Ingredients", 'DateTime'>
 }
