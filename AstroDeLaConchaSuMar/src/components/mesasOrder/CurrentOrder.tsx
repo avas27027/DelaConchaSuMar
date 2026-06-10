@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { backendConection, verifySessionToken } from '../../controller/salesOrders.hook';
+import React, { useEffect, useState } from 'react';
+import { backendConection, verifySessionToken, type UserJSONInterface } from '../../controller/salesOrders.hook';
 
 export interface OrderItem {
     id: string;
@@ -20,6 +20,7 @@ interface CurrentOrderProps {
 
 export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, onSubmit }: CurrentOrderProps) {
     const [productObservations, setProductObservations] = useState<Record<string, string>>({});
+    const [userData, setUserData] = useState<UserJSONInterface | null>(null)
 
     const stateLabels: Record<string, string> = {
         pending: 'Pendiente',
@@ -36,6 +37,17 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
     const igv = total * 0.18;
     const subtotal = total - igv;
 
+    useEffect(() => {
+        verifySessionToken().then((res) => {
+            if (!res.success || !res.data) throw new Error("Error al cargar la sesion");
+            setUserData(res.data)
+        }).catch((error: any) => {
+            console.error(error.message);
+            alert("No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente");
+        });
+    }, [])
+
+
     const handleObservationChange = (productId: string, observation: string) => {
         setProductObservations((prev) => ({
             ...prev,
@@ -43,15 +55,11 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
         }));
     };
     const sendToKitchen = async () => {
-        const user = await verifySessionToken();
-        if (!user.success || !user.data) {
-            alert("No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente");
-            return;
-        }
+        if (!userData) return;
         const sendJson = {
             tableId: name,
             state: 'toCook',
-            user: user.data.uid,
+            user: userData.id,
             products: orders.map((order) => {
                 return {
                     productId: order.id,

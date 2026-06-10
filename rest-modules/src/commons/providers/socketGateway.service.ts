@@ -7,6 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Prisma, Tables } from '../../../generated/prisma/client';
 import { PostgresService } from './postgres.service';
+import { Logger } from '@nestjs/common';
 
 type SalesOrderWithRelations = Prisma.SalesOrdersGetPayload<{
     include: {
@@ -48,14 +49,15 @@ export class EventsGateway {
     @WebSocketServer()
     server: Server;
 
+    private readonly logger = new Logger(EventsGateway.name)
     constructor(private readonly db: PostgresService) { }
 
     handleConnection(client: Socket) {
-        console.log('Cliente conectado:', client.id);
+        this.logger.debug(`Cliente conectado: ${client.id}`);
     }
 
     handleDisconnect(client: Socket) {
-        console.log('Cliente desconectado:', client.id);
+        this.logger.debug(`Cliente desconectado: ${client.id}`);
     }
 
     @SubscribeMessage('order:subscribe')

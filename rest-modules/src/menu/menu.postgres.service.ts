@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PostgresService } from '@/commons/providers/postgres.service';
 import { Response } from '@/commons/interfaces';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,6 +22,7 @@ type ProductWithRelations = Prisma.ProductsGetPayload<{
 
 @Injectable()
 export class MenuPostgresService {
+    private readonly logger = new Logger(MenuPostgresService.name);
     private readonly bucket: Bucket;
     constructor(
         private readonly db: PostgresService,
@@ -116,6 +117,7 @@ export class MenuPostgresService {
             response.message = "Successful operation"
             response.success = true
             response.data = doc;
+            this.logger.debug(response)
         }
         catch (error: any) {
             response.message = error.message

@@ -12,7 +12,6 @@ export class AuthenticationService {
     constructor(
         private readonly firebase: FirebaseService,
         private readonly postgres: PostgresService,
-
     ) {
         this.auth = this.firebase.getAuth();
     }
@@ -23,7 +22,7 @@ export class AuthenticationService {
         try {
             sessionCookie = await this.auth.createSessionCookie(token, { expiresIn });
         } catch (error) {
-            console.error("Error creando session cookie:", error);
+            this.logger.error("Error creando session cookie:", error);
 
             return {
                 success: false,
@@ -43,7 +42,8 @@ export class AuthenticationService {
             const decodedClaims = await this.auth.verifySessionCookie(token, true);
             const uid = decodedClaims.uid;
 
-            const user = await this.postgres.users.findUnique({
+
+            let user = await this.postgres.users.findUnique({
                 where: { uid },
                 include: {
                     usersRoles: {
@@ -54,6 +54,35 @@ export class AuthenticationService {
                 }
             });
 
+            if (!user) {
+                const userEmail = (await this.auth.getUser(uid)).email;
+                if (!userEmail) throw new Error("Token sin email");
+
+                const userByEmail = await this.postgres.users.findFirst({
+                    where: {
+                        email: userEmail
+                    }
+                })
+                if (userByEmail) {
+                    user = await this.postgres.users.update({
+                        where: {
+                            id: userByEmail.id
+                        },
+                        data: {
+                            uid: uid,
+                        },
+                        include: {
+                            usersRoles: {
+                                include: {
+                                    roles: true
+                                }
+                            }
+                        }
+                    })
+                }
+                else throw new Error("Correo no registrado en BD")
+            }
+
             this.logger.debug("Token verified successfully", user)
             return {
                 success: true,
@@ -61,10 +90,10 @@ export class AuthenticationService {
                 data: user || {}
             };
         } catch (error) {
-            console.error("Error verifying session cookie:", error);
+            this.logger.error("Error verifying session cookie:", error);
             return {
                 success: false,
-                message: "Invalid token"
+                message: error.message
             };
         }
     }

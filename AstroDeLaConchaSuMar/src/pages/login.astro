@@ -445,7 +445,7 @@ import "../styles/global.css";
         if (res.ok) {
             const token = await res.json();
             document.cookie = `session=${token.data}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
-            window.location.assign("/mesas");
+            window.location.href = "/mesas";
         } else {
             alert("No se pudo crear la sesión. Intenta de nuevo.");
         }

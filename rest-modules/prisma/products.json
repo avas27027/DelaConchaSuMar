@@ -1,0 +1,658 @@
+[
+    {
+        "name": "ALITAS A LA BBQ",
+        "category": "Alitas y Broaster",
+        "description": "Crujientes alitas bañadas en salsa BBQ.",
+        "imageUrl": "",
+        "price": 22,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ALITAS EN SALSA DE MARACUYÁ",
+        "category": "Alitas y Broaster",
+        "description": "Alitas crocantes en salsa de maracuyá.",
+        "imageUrl": "",
+        "price": 22,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ALITAS ACEVICHADAS",
+        "category": "Alitas y Broaster",
+        "description": "Alitas crocantes con salsa acevichada.",
+        "imageUrl": "",
+        "price": 22,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ALITAS BROASTER",
+        "category": "Alitas y Broaster",
+        "description": "Alitas broaster doradas y crujientes.",
+        "imageUrl": "",
+        "price": 22,
+        "priceMeassure": 6
+    },
+    {
+        "name": "NUGGETS DE POLLO",
+        "category": "Alitas y Broaster",
+        "description": "Nuggets de pollo crocantes.",
+        "imageUrl": "",
+        "price": 19,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN DE POLLO",
+        "category": "Alitas y Broaster",
+        "description": "Trozos de pollo crocantes y dorados.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "RONDA DE ALITAS",
+        "category": "Alitas y Broaster",
+        "description": "Variedad de alitas con salsas.",
+        "imageUrl": "",
+        "price": 39,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ARROZ CON MARISCOS",
+        "category": "Arroces",
+        "description": "Arroz salteado con mariscos frescos.",
+        "imageUrl": "",
+        "price": 36,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ARROZ PIRATA",
+        "category": "Arroces",
+        "description": "Arroz marino especial de la casa.",
+        "imageUrl": "",
+        "price": 39,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ARROZ CHAUFA DE PESCADO",
+        "category": "Arroces",
+        "description": "Chaufa con pescado salteado.",
+        "imageUrl": "",
+        "price": 29,
+        "priceMeassure": 6
+    },
+    {
+        "name": "FILETE DE POLLO C/PAPAS FRITAS + ARROZ",
+        "category": "Aves",
+        "description": "Filete de pollo con papas y arroz.",
+        "imageUrl": "",
+        "price": 27,
+        "priceMeassure": 6
+    },
+    {
+        "name": "FILETE DE POLLO A LO POBRE",
+        "category": "Aves",
+        "description": "Pollo a lo pobre con acompañamientos.",
+        "imageUrl": "",
+        "price": 31,
+        "priceMeassure": 6
+    },
+    {
+        "name": "COCA COLA 500 ML",
+        "category": "Bebidas",
+        "description": "Gaseosa Coca Cola personal.",
+        "imageUrl": "",
+        "price": 5,
+        "priceMeassure": 6
+    },
+    {
+        "name": "INKA COLA 500 ML",
+        "category": "Bebidas",
+        "description": "Inka Cola personal.",
+        "imageUrl": "",
+        "price": 5,
+        "priceMeassure": 6
+    },
+    {
+        "name": "AGUA MINERAL SIN GAS",
+        "category": "Bebidas",
+        "description": "Agua mineral sin gas.",
+        "imageUrl": "",
+        "price": 3,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CAUSA ACEVICHADA",
+        "category": "Causas",
+        "description": "Causa limeña con salsa acevichada.",
+        "imageUrl": "",
+        "price": 28,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CAUSA PULPA DE CANGREJO",
+        "category": "Causas",
+        "description": "Causa rellena con pulpa de cangrejo.",
+        "imageUrl": "",
+        "price": 29,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PILSEN 305 ML",
+        "category": "Cervezas",
+        "description": "Cerveza Pilsen bien helada.",
+        "imageUrl": "",
+        "price": 7,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PILSEN 630 ML",
+        "category": "Cervezas",
+        "description": "Cerveza Pilsen botella grande.",
+        "imageUrl": "",
+        "price": 10,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CRISTAL 630 ML",
+        "category": "Cervezas",
+        "description": "Cerveza Cristal botella grande.",
+        "imageUrl": "",
+        "price": 10,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CUZQUEÑA TRIGO 630 ML",
+        "category": "Cervezas",
+        "description": "Cerveza Cuzqueña trigo.",
+        "imageUrl": "",
+        "price": 10,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CUZQUEÑA NEGRA 630 ML",
+        "category": "Cervezas",
+        "description": "Cerveza Cuzqueña negra.",
+        "imageUrl": "",
+        "price": 10,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TRES CRUCES LIGHT LATA 473 ML",
+        "category": "Cervezas",
+        "description": "Cerveza light en lata.",
+        "imageUrl": "",
+        "price": 7,
+        "priceMeassure": 6
+    },
+    {
+        "name": "BALDE X6 PILSEN 305ML",
+        "category": "Cervezas",
+        "description": "Balde con 6 Pilsen heladas.",
+        "imageUrl": "",
+        "price": 55,
+        "priceMeassure": 6
+    },
+    {
+        "name": "BALDE X6 CUZQUEÑA 305ML",
+        "category": "Cervezas",
+        "description": "Balde con 6 Cuzqueñas heladas.",
+        "imageUrl": "",
+        "price": 55,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE CLÁSICO",
+        "category": "Ceviches",
+        "description": "Ceviche clásico de pescado fresco.",
+        "imageUrl": "",
+        "price": 34,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE MIXTO",
+        "category": "Ceviches",
+        "description": "Ceviche con pescado y mariscos.",
+        "imageUrl": "",
+        "price": 42,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE PULPO",
+        "category": "Ceviches",
+        "description": "Ceviche preparado con pulpo fresco.",
+        "imageUrl": "",
+        "price": 42,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE CHANQUE",
+        "category": "Ceviches",
+        "description": "Ceviche de chanque al estilo norteño.",
+        "imageUrl": "",
+        "price": 42,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE LANGOSTINO",
+        "category": "Ceviches",
+        "description": "Langostinos frescos al limón.",
+        "imageUrl": "",
+        "price": 41,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE CONCHAS NEGRAS",
+        "category": "Ceviches",
+        "description": "Conchas negras en leche de tigre.",
+        "imageUrl": "",
+        "price": 48,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE LA CONCHA SU MAR",
+        "category": "Ceviches",
+        "description": "Ceviche especial de la casa.",
+        "imageUrl": "",
+        "price": 55,
+        "priceMeassure": 6
+    },
+    {
+        "name": "DUO CLASICO",
+        "category": "Combos/Rondas",
+        "description": "Combinación clásica marina.",
+        "imageUrl": "",
+        "price": 35,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TRIO CLASICO",
+        "category": "Combos/Rondas",
+        "description": "Tres clásicos marinos en uno.",
+        "imageUrl": "",
+        "price": 40,
+        "priceMeassure": 6
+    },
+    {
+        "name": "RONDA MARINA FRIA",
+        "category": "Combos/Rondas",
+        "description": "Selección marina fría para compartir.",
+        "imageUrl": "",
+        "price": 70,
+        "priceMeassure": 6
+    },
+    {
+        "name": "RONDA MARINA MIXTA",
+        "category": "Combos/Rondas",
+        "description": "Variedad marina fría y caliente.",
+        "imageUrl": "",
+        "price": 70,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHORITOS A LA CHALACA",
+        "category": "Entradas",
+        "description": "Choritos frescos a la chalaca.",
+        "imageUrl": "",
+        "price": 27,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TEQUEÑOS DE LANGOSTINOS 12 UND",
+        "category": "Entradas",
+        "description": "12 tequeños rellenos de langostino.",
+        "imageUrl": "",
+        "price": 22,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TEQUEÑOS DE LANGOSTINOS 6 UND",
+        "category": "Entradas",
+        "description": "6 tequeños rellenos de langostino.",
+        "imageUrl": "",
+        "price": 12,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CONCHITAS A LA CHALACA",
+        "category": "Entradas",
+        "description": "Conchitas frescas con chalaca.",
+        "imageUrl": "",
+        "price": 37,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN DE PESCADO",
+        "category": "Fritos y Jaleas",
+        "description": "Pescado crocante acompañado al estilo marino.",
+        "imageUrl": "",
+        "price": 35,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN MIXTO",
+        "category": "Fritos y Jaleas",
+        "description": "Selección crocante de pescado y mariscos.",
+        "imageUrl": "",
+        "price": 38,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN DE POTA",
+        "category": "Fritos y Jaleas",
+        "description": "Pota crocante recién frita.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN DE PULPO",
+        "category": "Fritos y Jaleas",
+        "description": "Pulpo crocante al punto.",
+        "imageUrl": "",
+        "price": 48,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHICHARRÓN DE LANGOSTINO",
+        "category": "Fritos y Jaleas",
+        "description": "Langostinos dorados y crocantes.",
+        "imageUrl": "",
+        "price": 43,
+        "priceMeassure": 6
+    },
+    {
+        "name": "JALEA DE PESCADO",
+        "category": "Fritos y Jaleas",
+        "description": "Jalea clásica de pescado.",
+        "imageUrl": "",
+        "price": 39,
+        "priceMeassure": 6
+    },
+    {
+        "name": "JALEA MIXTA",
+        "category": "Fritos y Jaleas",
+        "description": "Pescado y mariscos crocantes.",
+        "imageUrl": "",
+        "price": 43,
+        "priceMeassure": 6
+    },
+    {
+        "name": "ARROZ BLANCO",
+        "category": "Guarniciones",
+        "description": "Porción de arroz blanco.",
+        "imageUrl": "",
+        "price": 5,
+        "priceMeassure": 6
+    },
+    {
+        "name": "YUCA FRITA",
+        "category": "Guarniciones",
+        "description": "Yuca frita crocante.",
+        "imageUrl": "",
+        "price": 7,
+        "priceMeassure": 6
+    },
+    {
+        "name": "YUCA SANCOCHADA",
+        "category": "Guarniciones",
+        "description": "Yuca sancochada suave.",
+        "imageUrl": "",
+        "price": 5,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PAPAS FRITAS",
+        "category": "Guarniciones",
+        "description": "Papas fritas doradas.",
+        "imageUrl": "",
+        "price": 7,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CAMOTE GLASEADO",
+        "category": "Guarniciones",
+        "description": "Camote glaseado tradicional.",
+        "imageUrl": "",
+        "price": 8,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHOCLO",
+        "category": "Guarniciones",
+        "description": "Porción de choclo cocido.",
+        "imageUrl": "",
+        "price": 6,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CANCHA",
+        "category": "Guarniciones",
+        "description": "Cancha serrana tostada.",
+        "imageUrl": "",
+        "price": 5,
+        "priceMeassure": 6
+    },
+    {
+        "name": "LECHE DE TIGRE CLASICA",
+        "category": "Leches de Tigre",
+        "description": "Leche de tigre clásica y refrescante.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "LECHE DE TIGRE DE LA CONCHA SU MAR",
+        "category": "Leches de Tigre",
+        "description": "Especialidad de la casa.",
+        "imageUrl": "",
+        "price": 33,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CERVEZA HEINEKEN 640 ML",
+        "category": "Nuevas Bebidas",
+        "description": "Heineken botella grande.",
+        "imageUrl": "",
+        "price": 12,
+        "priceMeassure": 6
+    },
+    {
+        "name": "MIKE",
+        "category": "Nuevas Bebidas",
+        "description": "Bebida lista para disfrutar.",
+        "imageUrl": "",
+        "price": 10,
+        "priceMeassure": 6
+    },
+    {
+        "name": "FETUCCINI EN SALSA HUANCAÍNA C/LOMO",
+        "category": "Pastas",
+        "description": "Fetuccini en salsa huancaína con lomo salteado.",
+        "imageUrl": "",
+        "price": 39,
+        "priceMeassure": 6
+    },
+    {
+        "name": "FETUCCINI AL PESTO C/PECHUGA A LA PLANCHA",
+        "category": "Pastas",
+        "description": "Fetuccini al pesto con pechuga a la plancha.",
+        "imageUrl": "",
+        "price": 37,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PICANTE DE MARISCOS",
+        "category": "Platos Calientes Marinos",
+        "description": "Mariscos en salsa picante al estilo casero.",
+        "imageUrl": "",
+        "price": 35,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PICANTE DE LANGOSTINOS",
+        "category": "Platos Calientes Marinos",
+        "description": "Langostinos en salsa picante.",
+        "imageUrl": "",
+        "price": 38,
+        "priceMeassure": 6
+    },
+    {
+        "name": "PICANTE DE CAMARONES",
+        "category": "Platos Calientes Marinos",
+        "description": "Camarones en salsa picante tradicional.",
+        "imageUrl": "",
+        "price": 53,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CEVICHE DE PATO",
+        "category": "Platos de Fondo Criollos",
+        "description": "Especial criollo de pato.",
+        "imageUrl": "",
+        "price": 39,
+        "priceMeassure": 6
+    },
+    {
+        "name": "SECO DE CARNE C/FREJOLES",
+        "category": "Platos de Fondo Criollos",
+        "description": "Seco de carne acompañado con frejoles.",
+        "imageUrl": "",
+        "price": 35,
+        "priceMeassure": 6
+    },
+    {
+        "name": "LOMO SALTADO",
+        "category": "Platos de Fondo Criollos",
+        "description": "Clásico lomo salteado peruano.",
+        "imageUrl": "",
+        "price": 38,
+        "priceMeassure": 6
+    },
+    {
+        "name": "LOMO SALTADO MAR Y TIERRA",
+        "category": "Platos de Fondo Criollos",
+        "description": "Lomo salteado con toque marino.",
+        "imageUrl": "",
+        "price": 43,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CALDO DE GALLINA",
+        "category": "Platos de Fondo Criollos",
+        "description": "Caldo de gallina tradicional.",
+        "imageUrl": "",
+        "price": 19,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHURRASCO CLASICO",
+        "category": "Platos de Fondo Criollos",
+        "description": "Churrasco clásico con acompañamiento.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHURRASCO A LO POBRE",
+        "category": "Platos de Fondo Criollos",
+        "description": "Churrasco servido a lo pobre.",
+        "imageUrl": "",
+        "price": 30,
+        "priceMeassure": 6
+    },
+    {
+        "name": "SUDADO",
+        "category": "Sopas y Sudados",
+        "description": "Sudado de pescado al estilo casero.",
+        "imageUrl": "",
+        "price": 0,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHUPE DE PESCADO (FILETE CLÁSICO O CHUPE PESCADO ESPECIAL)",
+        "category": "Sopas y Sudados",
+        "description": "Chupe cremoso de pescado.",
+        "imageUrl": "",
+        "price": 35,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHUPE DE CAMARONES",
+        "category": "Sopas y Sudados",
+        "description": "Chupe tradicional de camarones.",
+        "imageUrl": "",
+        "price": 53,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHUPE DE MARISCOS",
+        "category": "Sopas y Sudados",
+        "description": "Chupe cremoso con mariscos.",
+        "imageUrl": "",
+        "price": 43,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHUPE DE LANGOSTINOS",
+        "category": "Sopas y Sudados",
+        "description": "Chupe con langostinos frescos.",
+        "imageUrl": "",
+        "price": 46,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CHILCANO DE PESCADO",
+        "category": "Sopas y Sudados",
+        "description": "Caldo ligero de pescado.",
+        "imageUrl": "",
+        "price": 23,
+        "priceMeassure": 6
+    },
+    {
+        "name": "CONCENTRADO DE MIXTURA",
+        "category": "Sopas y Sudados",
+        "description": "Concentrado marino especial.",
+        "imageUrl": "",
+        "price": 28,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TACU TACU EN SALSA DE MARISCOS A LO MACHO",
+        "category": "Tacu Tacus",
+        "description": "Tacu tacu con mariscos a lo macho.",
+        "imageUrl": "",
+        "price": 41,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TACU TACU CON LOMO SALTO DE RES",
+        "category": "Tacu Tacus",
+        "description": "Tacu tacu acompañado de lomo de res.",
+        "imageUrl": "",
+        "price": 41,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TIRADITO TRICOLOR",
+        "category": "Tiraditos",
+        "description": "Tiradito en tres salsas.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TIRADITO EN SALSA DE ROCOTO",
+        "category": "Tiraditos",
+        "description": "Tiradito con salsa de rocoto.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    },
+    {
+        "name": "TIRADITO CLASICO CON CREMA AMARILLA",
+        "category": "Tiraditos",
+        "description": "Tiradito clásico con crema amarilla.",
+        "imageUrl": "",
+        "price": 25,
+        "priceMeassure": 6
+    }
+]

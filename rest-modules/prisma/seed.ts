@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import fs from "node:fs";
+import path from "node:path";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL
@@ -17,29 +19,11 @@ async function main() {
             { name: "cashier" },
             { name: "cook" },
             { name: "barman" },
+            { name: "cookBar" },
             { name: "waiter" }
         ],
         skipDuplicates: true
     });
-
-    const admin = await prisma.roles.findFirst({
-        where: { name: "admin" }
-    });
-
-    const cook = await prisma.roles.findFirst({
-        where: { name: "cook" }
-    });
-
-    const barman = await prisma.roles.findFirst({
-        where: { name: "barman" }
-    });
-
-    const waiter = await prisma.roles.findFirst({
-        where: { name: "waiter" }
-    });
-
-
-
     /*
    * UNIDADES
    */
@@ -49,7 +33,8 @@ async function main() {
             { name: "Gramo", symbol: "g", longName: "Gramo" },
             { name: "Litro", symbol: "L", longName: "Litro" },
             { name: "Mililitro", symbol: "ml", longName: "Mililitro" },
-            { name: "Unidad", symbol: "u", longName: "Unidad" }
+            { name: "Unidad", symbol: "u", longName: "Unidad" },
+            { name: "Soles", symbol: "S/", longName: "Soles" }
         ],
         skipDuplicates: true
     });
@@ -60,6 +45,10 @@ async function main() {
 
     const unidad = await prisma.meassureUnits.findFirst({
         where: { symbol: "u" }
+    });
+
+    const sol = await prisma.meassureUnits.findFirst({
+        where: { symbol: "S/" }
     });
 
     /*
@@ -143,19 +132,19 @@ async function main() {
     await prisma.tables.createMany({
         data: [
             {
-                name: "Mesa 1",
+                name: "1",
                 place: "Terraza"
             },
             {
-                name: "Mesa 2",
+                name: "2",
                 place: "Salón principal"
             },
             {
-                name: "Mesa 3",
+                name: "3",
                 place: "Ventana"
             },
             {
-                name: "Mesa 4",
+                name: "4",
                 place: "VIP"
             }
         ],
@@ -165,6 +154,19 @@ async function main() {
     /*
      * PRODUCTOS
      */
+    const productsJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, "products.json"), "utf8"));
+    await prisma.products.createMany({
+        data: productsJSON.map((product: any) => ({
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            imageUrl: product.imageUrl,
+            price: product.price,
+            priceMeassure: sol!.id
+        })),
+        skipDuplicates: true
+    });
+
     const ceviche = await prisma.products.create({
         data: {
             name: "Ceviche clásico",

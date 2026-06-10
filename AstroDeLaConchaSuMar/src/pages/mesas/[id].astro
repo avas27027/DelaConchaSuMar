@@ -1,35 +1,9 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import MenuDetalle from "../../components/mesasOrder/MenuDetalle";
-import type { DishCardProps } from "../../components/mesasOrder/DishCard";
-import {
-  backendConection,
-  type ProductJSONInterface,
-} from "../../controller/salesOrders.hook";
 const { id } = Astro.params;
-const res = await backendConection("GET", "menu");
-const dishes1: DishCardProps[] =
-  res.data?.map(
-    ({
-      id,
-      name,
-      imageUrl,
-      description,
-      price,
-      category,
-    }: ProductJSONInterface) => {
-      return {
-        id,
-        image: imageUrl,
-        price,
-        title: name,
-        description,
-        category: category || "Sin categoría",
-      };
-    },
-  ) || [];
 ---
 
 <Layout title={`Mesa - De la Concha su Mar`}>
-  <MenuDetalle client:only="react" mesaName={`${id}`} initialDishes={dishes1} />
+  <MenuDetalle client:only="react" mesaName={`${id}`} />
 </Layout>

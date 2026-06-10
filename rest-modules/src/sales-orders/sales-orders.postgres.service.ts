@@ -1,9 +1,9 @@
 import { Response } from '@/commons/interfaces';
 import { PostgresService } from '@/commons/providers/postgres.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateSalesOrderDto } from './dto/create-sales-order.dto';
 import { UpdateSalesOrderDto } from './dto/update-sales-order.dto';
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma, SalesOrders } from '../../generated/prisma/client';
 import { EventsGateway } from '@/commons/providers/socketGateway.service';
 
 type SalesOrderWithRelations = Prisma.SalesOrdersGetPayload<{
@@ -19,9 +19,60 @@ type SalesOrderWithRelations = Prisma.SalesOrdersGetPayload<{
 
 @Injectable()
 export class SalesOrdersPostgresService {
+    private readonly logger = new Logger(SalesOrdersPostgresService.name)
     constructor(private readonly db: PostgresService,
         private readonly webSocket: EventsGateway,
     ) { }
+
+    async separateProducts(order: CreateSalesOrderDto): Promise<{ drinks: CreateSalesOrderDto["products"], foods: CreateSalesOrderDto["products"] }> {
+        const productIds = order.products.filter((product) => product.productId != undefined).map((product) => Number.parseInt(product.productId!))
+        const drinks = await this.db.products.findMany({
+            where: {
+                id: {
+                    in: productIds,
+                },
+                category: {
+                    in: ["Bebidas", "Cervezas"],
+                },
+            },
+            select: {
+                id: true,
+            }
+        })
+        const drinkIds = new Set(drinks.map((product) => product.id))
+        const drinksOrder = order.products.filter((product) => product.productId && drinkIds.has(Number.parseInt(product.productId)))
+        const foodsOrder = order.products.filter((product) => product.productId && !drinkIds.has(Number.parseInt(product.productId)))
+        return { drinks: drinksOrder, foods: foodsOrder }
+    }
+
+    async createOrderDB(createSalesOrderDto: CreateSalesOrderDto) {
+        const { tableId, state, products, user } = createSalesOrderDto;
+
+        return await this.db.salesOrders.create({
+            data: {
+                state: state ?? 'libre',
+                table: Number.parseInt(tableId),
+                user: user,
+                salesOrderProducts: {
+                    createMany: {
+                        data: products.map(({ productId, quantity, observations }: any) => ({
+                            quantity,
+                            observations,
+                            product: Number.parseInt(productId),
+                        })),
+                    },
+                },
+            },
+            include: {
+                tables: true,
+                salesOrderProducts: {
+                    include: {
+                        products: true,
+                    },
+                },
+            },
+        })
+    }
 
     async create(createSalesOrderDto: CreateSalesOrderDto): Promise<Response> {
         let response: Response = {
@@ -29,39 +80,26 @@ export class SalesOrdersPostgresService {
             message: "",
         }
         try {
-            const { tableId, state, products, user } = createSalesOrderDto;
+            const separateProducts = await this.separateProducts(createSalesOrderDto)
+            const newOrder: SalesOrders[] = [];
 
-            const newOrder = await this.db.salesOrders.create({
-                data: {
-                    state: state ?? 'libre',
-                    table: Number.parseInt(tableId),
-                    user: user,
-                    salesOrderProducts: {
-                        createMany: {
-                            data: products.map(({ productId, quantity, observations }: any) => ({
-                                quantity,
-                                observations,
-                                product: Number.parseInt(productId),
-                            })),
-                        },
-                    },
-                },
-                include: {
-                    tables: true,
-                    salesOrderProducts: {
-                        include: {
-                            products: true,
-                        },
-                    },
-                },
-            })
+            if (separateProducts.foods.length > 0) {
+                const nOrder = await this.createOrderDB({ ...createSalesOrderDto, products: separateProducts.foods });
+                newOrder.push(nOrder);
+            }
+            if (separateProducts.drinks.length > 0) {
+                const nOrder = await this.createOrderDB({ ...createSalesOrderDto, products: separateProducts.drinks });
+                newOrder.push(nOrder);
+            }
 
             const all = await this.findAll()
             all?.data && this.webSocket.emitSalesOrder(all.data)
             response.data = newOrder;
             response.message = "Orden creada";
             response.success = true;
+            this.logger.debug(`Orden creada: ${JSON.stringify(newOrder)}`)
         } catch (error: any) {
+            this.logger.error(error.message)
             response.message = error.message;
         }
         return response

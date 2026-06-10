@@ -2,13 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import MesasCard, { type MesasCardProps } from "./MesasCard";
 import Modal from "./Modal";
 import "./MesasGrid.css";
-import { getTableStatePriority, toTableVisualState, type TableVisualState, listenSocket } from "../../controller/salesOrders.hook";
+import { getTableStatePriority, toTableVisualState, type TableVisualState, listenSocket, verifySessionToken, type UserJSONInterface, type SalesOrderJSONInterface, beepAudio } from "../../controller/salesOrders.hook";
 
 export default function MesasGrid() {
 
     const [mesasCard, setMesasCard] = useState<MesasCardProps[]>([])
+    const [orders, setOrders] = useState<SalesOrderJSONInterface[]>([])
+    const [userData, setUserData] = useState<UserJSONInterface | null>(null);
 
     useEffect(() => {
+        verifySessionToken().then((res) => {
+            if (!res.success || !res.data) throw new Error("Error al cargar la sesion");
+            setUserData(res.data)
+        }).catch((error: any) => {
+            console.error(error.message);
+            alert("No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente");
+        });
+
         const unsubscribeTables = listenSocket("table", (snapshot) => {
             setMesasCard((prev) => {
                 return snapshot.map((table) => {
@@ -27,11 +37,10 @@ export default function MesasGrid() {
         const unsubscribeSalesOrders = listenSocket("order", (snapshot) => {
             const newOrderSalesMap = new Map<string, typeof snapshot>();
             const salesOrders = snapshot.filter((order) => order.state !== "paid")
+            setOrders(salesOrders); // Para validar que no haya una orden pendiente de entregar por el usuario
             salesOrders.forEach((order) => {
-                const tableId = order.table.id;
-                const ordersForTable = newOrderSalesMap.get(tableId) || [];
-                ordersForTable.push(order);
-                newOrderSalesMap.set(tableId, ordersForTable);
+                const ordersForTable = newOrderSalesMap.get(order.table.id) || [];
+                newOrderSalesMap.set(order.table.id, [...ordersForTable, order]);
             });
 
             setMesasCard((prevMesasCard) => prevMesasCard.map((mesa) => {
@@ -58,6 +67,15 @@ export default function MesasGrid() {
             unsubscribeSalesOrders();
         }
     }, []);
+
+    useEffect(() => {
+        const ordersToDeliver = orders.filter((order) => order.user == userData?.id && order.state === "cooked")
+        if (ordersToDeliver.length > 0) {
+            const mesaNames = ordersToDeliver.map((order) => order.table.name);
+            beepAudio();
+            alert(`Los pedidos de las mesas ${mesaNames.join(", ")} estan listos para ser entregados`);
+        }
+    }, [orders, userData]);
 
     const content = useMemo(() => {
         return mesasCard.map((mesa) => <MesasCard key={mesa.id} {...mesa} />);

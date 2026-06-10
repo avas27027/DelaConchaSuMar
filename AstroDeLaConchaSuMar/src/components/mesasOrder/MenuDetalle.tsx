@@ -3,20 +3,30 @@ import DishGrid from './DishGrid';
 import CurrentOrder, { type OrderItem } from './CurrentOrder';
 import type { DishCardProps } from './DishCard';
 import './MenuDetalle.css';
-import { listenSocket, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
+import { backendConection, listenSocket, verifySessionToken, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
 
 interface MenuDetalleProps {
     readonly mesaName: string;
-    readonly initialDishes: DishCardProps[];
 }
 
-export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProps) {
+export default function MenuDetalle({ mesaName }: MenuDetalleProps) {
     const [orders, setOrders] = useState<OrderItem[]>([]);
     const [products, setProducts] = useState<Map<string, ProductJSONInterface>>(new Map());
     const [tables, setTables] = useState<Map<string, TableJSONInterface>>(new Map());
     const [ordersJSON, setOrdersJSON] = useState<SalesOrderJSONInterface[]>([]);
+    const [initialDishes, setInitialDishes] = useState<DishCardProps[]>([])
 
     useEffect(() => {
+        backendConection("GET", "menu").then(res => {
+            if (!res.success || !res.data) return;
+            setInitialDishes(res.data.map((product) => ({
+                ...product,
+                title: product.name,
+                price: product.price,
+                image: product.imageUrl,
+                description: product.description,
+            })))
+        })
         const unsubscribeTables = listenSocket("table", (snapshot) => {
             setTables(new Map(snapshot.map((table) => [table.id, table])));
         })
@@ -24,7 +34,8 @@ export default function MenuDetalle({ mesaName, initialDishes }: MenuDetalleProp
             setProducts(new Map(snapshot.map((product) => [product.id, product])));
         })
         const unsubscribeOrders = listenSocket("order", (snapshot) => {
-            setOrdersJSON(snapshot.filter((order) => order.state === "pending" || order.state === "cooked" || order.state === "toCook"));
+            const filterOrders = snapshot.filter((order) => order.state === "pending" || order.state === "cooked" || order.state === "toCook")
+            setOrdersJSON(filterOrders);
         })
         return () => {
             unsubscribeOrders();

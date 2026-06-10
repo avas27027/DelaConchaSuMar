@@ -136,11 +136,10 @@ type BackendTypesMap = {
     meassures: PriceMeassureJSONInterface[];
     user: UserJSONInterface[];
 };
-const publicBackendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
-const serverBackendUrl = import.meta.env.BACKEND_URL || publicBackendUrl;
-const backendUrl = publicBackendUrl;
+const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
 
 export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
+    console.log("entro")
     return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
         method: method,
         ...(body && { body: JSON.stringify(body) }),
@@ -149,8 +148,12 @@ export async function backendConection<T extends BackendEndPoint>(method: Backen
         },
     })
         .then(res => res.json())
-        .then((data: Response<BackendTypesMap[T]>) => data)
+        .then((data: Response<BackendTypesMap[T]>) => {
+            console.debug(`%cBACKEND CONECTION -> ${method} ${endPoint} ${param ? '/' + param : ''} - ${JSON.stringify(data)}`, "color: green")
+            return data
+        })
         .catch((error) => {
+            console.debug(`%cBACKEND CONECTION -> ${method} ${endPoint} ${param ? '/' + param : ''} - ${JSON.stringify(error)}`, "color: red")
             return {
                 success: false,
                 message: error.message,
@@ -184,31 +187,49 @@ export function listenSocket<TEvent extends SocketEvent>(
     };
 }
 
+const getCookie = () => {
+    const cookies = document.cookie.split(';');
+    const sessionCookie = cookies.find((cookie) => cookie.trimStart().startsWith('session='))?.split('=')[1] ?? "";
+    return sessionCookie
+}
+
 export const verifySessionToken = async (sessionCookie?: string): Promise<Response<UserJSONInterface>> => {
-    if (!sessionCookie) {
-        const cookies = document.cookie.split(';');
-        sessionCookie = cookies.find((cookie) => cookie.startsWith('session='))?.split('=')[1];
-        if (!sessionCookie) {
-            return {
-                success: false,
-                message: "No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente",
-            };
-        }
-    }
-    const verifyBackendUrl = typeof document === "undefined" ? serverBackendUrl : publicBackendUrl;
+    if (!sessionCookie) sessionCookie = getCookie();
+    const verifyBackendUrl = typeof document === "undefined" && !process.env.PROD ? "http://backend:3001" : backendUrl;
     const endpoint = new URL("/authentication/verifyToken", verifyBackendUrl).toString();
-    const user: Response<UserJSONInterface> = await fetch(endpoint, {
+    return fetch(endpoint, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${sessionCookie}`,
         },
-    }).then(res => res).then(res => res.json())
+    }).then(res => res.json()).then((data: Response<UserJSONInterface>) => {
+        console.debug(`%cBACKEND CONECTION -> POST ${endpoint} - ${JSON.stringify(data)}`, "color: green")
+        return data
+    })
         .catch((error) => {
-            console.log("ERROR verify Session", error.message)
+            console.error(`ERROR verify Session: ${error.message}. Cookie: ${sessionCookie}`)
             return {
                 success: false,
                 message: error.message,
             }
         });
-    return user;
+}
+
+export function beepAudio() {
+    const audioContext = new AudioContext();
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+
+    oscillator.start();
+
+    setTimeout(() => {
+        oscillator.stop();
+    }, 200);
 }

@@ -1,14 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import KitchenTicket from './KitchenTicket';
 import './KitchenGrid.css';
-import { listenSocket, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface } from '../../controller/salesOrders.hook';
+import { listenSocket, verifySessionToken, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
 
 export default function KitchenGrid() {
     const [orders, setOrders] = useState<SalesOrderJSONInterface[]>([]);
     const [tables, setTables] = useState<Map<string, TableJSONInterface>>(new Map());
     const [products, setProducts] = useState<Map<string, ProductJSONInterface>>(new Map());
+    const [userData, setUserData] = useState<UserJSONInterface | null>(null);
 
     useEffect(() => {
+        verifySessionToken().then((res) => {
+            if (!res.success || !res.data) throw new Error("Error al cargar la sesion");
+            setUserData(res.data)
+        }).catch((error: any) => {
+            console.error(error.message);
+            alert("No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente");
+        });
+
         const unsubscribeTables = listenSocket("table", (snapshot) => {
             setTables(new Map(snapshot.map((table) => [table.id, table])));
         })
@@ -26,7 +35,17 @@ export default function KitchenGrid() {
     }, [])
 
     const kitchenOrders = useMemo(() => {
-        return orders.map((order, i) => {
+        let orderFiltered: SalesOrderJSONInterface[] = []
+        const orderBebidas = orders.filter((order) => order.products.some((product) => ["Bebidas", "Cervezas"].includes(product.product.category)))
+        const orderComidas = orders.filter((order) => order.products.some((product) => !["Bebidas", "Cervezas"].includes(product.product.category)))
+        const roleValidate = (role: string) => userData?.usersRoles.some((r) => r.roles.name === role)
+
+        if (!userData) return []
+        if (roleValidate("barman")) orderFiltered = orderBebidas
+        else if (roleValidate("cook")) orderFiltered = orderComidas
+        else if (roleValidate("admin") || roleValidate("cookBar")) orderFiltered = orders
+
+        return orderFiltered.map((order, i) => {
             const orderProducts = order.products.map(
                 ({ observations, product, quantity }) => ({
                     observations,
