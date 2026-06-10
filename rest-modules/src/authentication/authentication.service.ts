@@ -1,18 +1,20 @@
 import { Response } from '@/commons/interfaces';
 import { FirebaseService } from '@/commons/providers/firebase.service';
-import { Injectable } from '@nestjs/common';
+import { PostgresService } from '@/commons/providers/postgres.service';
+import { Injectable, Logger } from '@nestjs/common';
 import { Auth } from 'firebase-admin/auth';
 
 @Injectable()
 export class AuthenticationService {
     private readonly auth: Auth;
-    private readonly firestore: FirebaseFirestore.Firestore;
-    private readonly collectionName: string;
+    private readonly logger = new Logger(AuthenticationService.name);
 
-    constructor(private readonly firebase: FirebaseService) {
+    constructor(
+        private readonly firebase: FirebaseService,
+        private readonly postgres: PostgresService,
+
+    ) {
         this.auth = this.firebase.getAuth();
-        this.firestore = this.firebase.getFirestore();
-        this.collectionName = firebase.collectionNames[AuthenticationService.name]
     }
 
     async tokenCreate(token: string): Promise<Response> {
@@ -28,6 +30,7 @@ export class AuthenticationService {
                 message: "Error creating session cookie"
             };
         }
+        this.logger.debug("Session cookie created successfully", sessionCookie)
         return {
             success: true,
             message: "Session cookie created successfully",
@@ -39,15 +42,23 @@ export class AuthenticationService {
         try {
             const decodedClaims = await this.auth.verifySessionCookie(token, true);
             const uid = decodedClaims.uid;
-            
-            const usersSnapshot = await this.firestore.collection(this.collectionName).where('uid', '==', uid).get();
-            const userDoc = usersSnapshot.docs[0];
-            const userData = userDoc ? userDoc.data() : null;
-            
+
+            const user = await this.postgres.users.findUnique({
+                where: { uid },
+                include: {
+                    usersRoles: {
+                        include: {
+                            roles: true
+                        }
+                    }
+                }
+            });
+
+            this.logger.debug("Token verified successfully", user)
             return {
                 success: true,
                 message: "Token verified successfully",
-                data: userData || {}
+                data: user || {}
             };
         } catch (error) {
             console.error("Error verifying session cookie:", error);

@@ -85,6 +85,8 @@ export const SalesOrdersScalarFieldEnum = {
   id: 'id',
   state: 'state',
   table: 'table',
+  user: 'user',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
@@ -186,6 +188,7 @@ export type MeassureUnitsScalarFieldEnum = (typeof MeassureUnitsScalarFieldEnum)
 export const UsersScalarFieldEnum = {
   id: 'id',
   email: 'email',
+  uid: 'uid',
   updatedAt: 'updatedAt',
   createdAt: 'createdAt'
 } as const

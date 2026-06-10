@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { backendConection } from '../../controller/salesOrders.hook';
+import { backendConection, verifySessionToken } from '../../controller/salesOrders.hook';
 
 export interface OrderItem {
     id: string;
@@ -42,10 +42,16 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
             [productId]: observation,
         }));
     };
-    const sendToKitchen = () => {
+    const sendToKitchen = async () => {
+        const user = await verifySessionToken();
+        if (!user.success || !user.data) {
+            alert("No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente");
+            return;
+        }
         const sendJson = {
             tableId: name,
             state: 'toCook',
+            user: user.data.uid,
             products: orders.map((order) => {
                 return {
                     productId: order.id,

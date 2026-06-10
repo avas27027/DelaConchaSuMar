@@ -1,8 +1,9 @@
 import { defineMiddleware } from "astro:middleware";
+import { verifySessionToken } from "../controller/salesOrders.hook";
 
 export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, next) => {
     // Solo proteger rutas que empiecen con /admin
-    if (url.pathname.startsWith("/login")) {
+    if (!url.pathname.startsWith("/login")) {
         const sessionCookie = cookies.get("session")?.value;
 
         if (!sessionCookie) {
@@ -10,17 +11,8 @@ export const onRequest = defineMiddleware(async ({ cookies, url, redirect }, nex
         }
 
         try {
-            const backendUrl = process.env.BACKEND_URL ?? "http://backend:3001";
-            const endpoint = new URL("/authentication/verifyToken", backendUrl).toString();
-            const res = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${sessionCookie}`,
-                },
-            }).then(res => res).then(res => res.json());
-
-            const data = await res;
-            if (!data.success) {
+            const user = await verifySessionToken(sessionCookie);
+            if (!user.success) {
                 return redirect("/login");
             }
 

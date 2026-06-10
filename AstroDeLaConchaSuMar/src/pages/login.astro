@@ -270,7 +270,11 @@ import "../styles/global.css";
         padding: 16px;
         border-radius: 8px;
         border: none;
-        background: linear-gradient(180deg, var(--color-sea-cyan) 0%, #007791 100%);
+        background: linear-gradient(
+            180deg,
+            var(--color-sea-cyan) 0%,
+            #007791 100%
+        );
         color: white;
         font-family: var(--font-heading);
         font-size: 16px;
@@ -383,7 +387,7 @@ import "../styles/global.css";
     } from "firebase/auth";
     import app from "../controller/firebase";
 
-    const backendUrl = import.meta.env.BACKEND_URL ?? "http://backend:3001";
+    const backendUrl = import.meta.env.BACKEND_URL ?? "http://127.0.0.1:3001";
     const auth = getAuth(app);
     const form = document.getElementById(
         "login-form",

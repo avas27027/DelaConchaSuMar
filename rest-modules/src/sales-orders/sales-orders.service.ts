@@ -20,11 +20,10 @@ export class SalesOrdersService {
     try {
       this.logger.log(`Creando nueva orden para la mesa ID: ${createSalesOrderDto.tableId}`);
 
-      const { tableId, userId, salesId, state, products } = createSalesOrderDto;
+      const { tableId, salesId, state, products } = createSalesOrderDto;
 
       // Creamos las referencias a otros documentos
       const tableRef = this.firestore.doc(`${this.firebase.collectionNames.TablesService}/${tableId}`);
-      const userRef = this.firestore.doc(`${this.firebase.collectionNames.AuthenticationService}/${userId}`);
 
       productsRef = products.map(({ productId, quantity, observations }) => {
         return { quantity, observations, product: this.firestore.doc(`${this.firebase.collectionNames.MenuService}/${productId}`) }
@@ -34,7 +33,6 @@ export class SalesOrdersService {
         salesId: salesId ?? null,
         state: state ?? 'libre',
         table: tableId === '' ? null : tableRef,
-        user: userId === '' ? null : userRef,
         products: productsRef,
         createdAt: new Date().toISOString(),
       };

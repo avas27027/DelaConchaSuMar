@@ -38,62 +38,6 @@ async function main() {
         where: { name: "waiter" }
     });
 
-    /** 
-     * USUARIOS
-     */
-    await prisma.users.createMany({
-        data: [
-            {
-                email: "alvaro_10_12@hotmail.com",
-            },
-            {
-                email: "alvas27027@gmail.com",
-            }
-        ],
-        skipDuplicates: true
-    });
-
-    const correo1 = await prisma.users.findFirst({
-        where: { email: "alvaro_10_12@hotmail.com" }
-    });
-
-    const correo2 = await prisma.users.findFirst({
-        where: { email: "alvas27027@gmail.com" }
-    });
-
-    /**
-     * RELACION USERS ROLES
-     */
-    await prisma.usersRoles.createMany({
-        data: [
-            {
-                role: admin!.id,
-                user: correo1!.id
-            },
-            {
-                role: admin!.id,
-                user: correo2!.id
-            },
-            {
-                role: cook!.id,
-                user: correo1!.id
-            },
-            {
-                role: barman!.id,
-                user: correo2!.id
-            },
-            {
-                role: waiter!.id,
-                user: correo1!.id
-            },
-            {
-                role: waiter!.id,
-                user: correo2!.id
-            }
-        ],
-        skipDuplicates: true
-    });
-
 
 
     /*

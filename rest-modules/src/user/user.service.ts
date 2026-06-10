@@ -3,12 +3,31 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PostgresService } from '@/commons/providers/postgres.service';
 import { Response } from '@/commons/interfaces';
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma, Users } from '../../generated/prisma/client';
+import { FirebaseService } from '@/commons/providers/firebase.service';
+import { Auth, UserRecord } from 'firebase-admin/auth';
 
+
+type UsersWithRelations = Prisma.UsersGetPayload<{
+  include: {
+    usersRoles: {
+      include: {
+        roles: true
+      }
+    }
+  }
+}>;
 @Injectable()
 export class UserService {
 
-  constructor(private readonly db: PostgresService) { }
+  private readonly auth: Auth;
+
+  constructor(
+    private readonly db: PostgresService,
+    private readonly firebase: FirebaseService
+  ) {
+    this.auth = this.firebase.getAuth()
+  }
 
   async getUsers(limit = 10, cursor?: string): Promise<Response> {
     let response: Response = {
@@ -95,9 +114,23 @@ export class UserService {
       success: false,
       message: "",
     }
+    let createdFirebaseUserUid: string | null = null;
     try {
       const { email, roles } = createUserDto;
       const uniqueRoles = this.getUniqueRoleIds(roles);
+
+      const firebaseUser = await this.getOrCreateFirebaseUser(email);
+      if (firebaseUser.created) {
+        createdFirebaseUserUid = firebaseUser.user.uid;
+      }
+
+      const existingUser = await this.db.users.findUnique({
+        where: { uid: firebaseUser.user.uid },
+      });
+
+      if (existingUser) {
+        throw new Error("User already registered in Postgres");
+      }
 
       const doc = await this.db.$transaction(async (tx) => {
         await this.validateRoleIds(tx, uniqueRoles);
@@ -105,6 +138,7 @@ export class UserService {
         return tx.users.create({
           data: {
             email,
+            uid: firebaseUser.user.uid,
             ...(uniqueRoles.length > 0 && {
               usersRoles: {
                 createMany: {
@@ -129,15 +163,19 @@ export class UserService {
       response.success = true
       response.data = doc;
     } catch (error: any) {
+      if (createdFirebaseUserUid) {
+        await this.auth.deleteUser(createdFirebaseUserUid).catch(() => undefined);
+      }
       response.message = error.message
     }
     return response
   }
 
-  async findOne(id: number): Promise<Response> {
-    let response: Response = {
+  async findOne(id: number): Promise<Response<UsersWithRelations[]>> {
+    let response: Response<UsersWithRelations[]> = {
       success: false,
       message: "",
+      data: []
     }
     try {
       const doc = await this.db.users.findUnique({
@@ -225,6 +263,8 @@ export class UserService {
       message: "",
     }
     try {
+      const user = await this.findOne(id)
+      if (user.data) this.auth.deleteUser(user.data[0].uid)
       const doc = await this.db.$transaction(async (tx) => {
         const user = await tx.users.findUnique({
           where: { id },
@@ -263,6 +303,20 @@ export class UserService {
 
   private getUniqueRoleIds(roles: number[]) {
     return [...new Set(roles.map((role) => Number(role)))];
+  }
+
+  private async getOrCreateFirebaseUser(email: string): Promise<{ user: UserRecord; created: boolean }> {
+    try {
+      const user = await this.auth.createUser({ email });
+      return { user, created: true };
+    } catch (error: any) {
+      if (error?.code !== "auth/email-already-exists") {
+        throw error;
+      }
+
+      const user = await this.auth.getUserByEmail(email);
+      return { user, created: false };
+    }
   }
 
   private async validateRoleIds(

@@ -5,8 +5,7 @@ export class CreateSalesOrderDto {
     salesId?: string
     tableId: string = ''
     state: string = ''
-    @IsOptional()
-    userId?: string
+    user: number
     products: {
         productId?: string, //Para crear el producto con su referencia
         product?: string, //Para darle update al producto (ya viene como referencia)

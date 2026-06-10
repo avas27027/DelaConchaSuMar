@@ -29,12 +29,13 @@ export class SalesOrdersPostgresService {
             message: "",
         }
         try {
-            const { tableId, state, products } = createSalesOrderDto;
+            const { tableId, state, products, user } = createSalesOrderDto;
 
             const newOrder = await this.db.salesOrders.create({
                 data: {
                     state: state ?? 'libre',
                     table: Number.parseInt(tableId),
+                    user: user,
                     salesOrderProducts: {
                         createMany: {
                             data: products.map(({ productId, quantity, observations }: any) => ({

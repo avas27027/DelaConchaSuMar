@@ -23,6 +23,7 @@ export interface ProductJSONInterface {
 export type UserJSONInterface = {
     id: string;
     email: string;
+    uid: string;
     createdAt: string;
     updatedAt?: string;
     usersRoles: {
@@ -135,7 +136,9 @@ type BackendTypesMap = {
     meassures: PriceMeassureJSONInterface[];
     user: UserJSONInterface[];
 };
-const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://backend:3001";
+const publicBackendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
+const serverBackendUrl = import.meta.env.BACKEND_URL || publicBackendUrl;
+const backendUrl = publicBackendUrl;
 
 export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
     return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
@@ -181,5 +184,31 @@ export function listenSocket<TEvent extends SocketEvent>(
     };
 }
 
-
-
+export const verifySessionToken = async (sessionCookie?: string): Promise<Response<UserJSONInterface>> => {
+    if (!sessionCookie) {
+        const cookies = document.cookie.split(';');
+        sessionCookie = cookies.find((cookie) => cookie.startsWith('session='))?.split('=')[1];
+        if (!sessionCookie) {
+            return {
+                success: false,
+                message: "No se pudo obtener la sesion, por favor recargue la pagina o inicie sesion nuevamente",
+            };
+        }
+    }
+    const verifyBackendUrl = typeof document === "undefined" ? serverBackendUrl : publicBackendUrl;
+    const endpoint = new URL("/authentication/verifyToken", verifyBackendUrl).toString();
+    const user: Response<UserJSONInterface> = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${sessionCookie}`,
+        },
+    }).then(res => res).then(res => res.json())
+        .catch((error) => {
+            console.log("ERROR verify Session", error.message)
+            return {
+                success: false,
+                message: error.message,
+            }
+        });
+    return user;
+}

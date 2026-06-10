@@ -16,9 +16,12 @@ model SalesOrders {
   id        Int      @id @default(autoincrement())
   state     String
   table     Int
+  user      Int
+  createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
   tables             Tables               @relation(fields: [table], references: [id])
+  users              Users                @relation(fields: [user], references: [id])
   salesOrderProducts SalesOrderProducts[]
 
   @@map("sales_orders")
@@ -135,10 +138,12 @@ model MeassureUnits {
 model Users {
   id        Int      @id @default(autoincrement())
   email     String
+  uid       String   @unique
   updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 
-  usersRoles UsersRoles[]
+  usersRoles  UsersRoles[]
+  salesOrders SalesOrders[]
 
   @@map("users")
 }
