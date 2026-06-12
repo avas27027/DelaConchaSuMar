@@ -215,21 +215,8 @@ export const verifySessionToken = async (sessionCookie?: string): Promise<Respon
         });
 }
 
-export function beepAudio() {
-    const audioContext = new AudioContext();
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-
-    oscillator.start();
-
-    setTimeout(() => {
-        oscillator.stop();
-    }, 200);
-}
+export const beepAudio = () => {
+    const audio = new Audio('/notificationSound.wav');
+    audio.currentTime = 0;
+    audio.play();
+};
