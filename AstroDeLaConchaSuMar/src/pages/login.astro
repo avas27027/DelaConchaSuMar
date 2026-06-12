@@ -387,7 +387,7 @@ import "../styles/global.css";
     } from "firebase/auth";
     import app from "../controller/firebase";
 
-    const backendUrl = import.meta.env.BACKEND_URL ?? "http://127.0.0.1:3001";
+    const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
     const auth = getAuth(app);
     const form = document.getElementById(
         "login-form",
