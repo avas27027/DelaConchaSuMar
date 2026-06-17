@@ -37,6 +37,7 @@ export class UserService {
     try {
       const parsedLimit = Number.isNaN(limit) || limit < 1 ? 10 : limit
       const users = await this.db.users.findMany({
+        where: { state: true },
         take: parsedLimit + 1,
         ...(cursor && {
           cursor: { id: Number.parseInt(cursor) },
@@ -58,7 +59,9 @@ export class UserService {
       response.data = data
       response.nextCursor = hasMore && lastUser ? String(lastUser.id) : null
       response.hasMore = hasMore
-      response.total = await this.db.users.count()
+      response.total = await this.db.users.count({
+        where: { state: true },
+      })
       response.message = "Successful operation"
       response.success = true
     } catch (error: any) {
@@ -74,6 +77,7 @@ export class UserService {
     }
     try {
       const doc = await this.db.users.findMany({
+        where: { state: true },
         include: {
           usersRoles: {
             include: {
@@ -114,9 +118,10 @@ export class UserService {
       success: false,
       message: "",
     }
+    // Permite revertir Firebase si falla la creación/reactivación en Postgres.
     let createdFirebaseUserUid: string | null = null;
     try {
-      const { email, roles } = createUserDto;
+      const { email, roles, state } = createUserDto;
       const uniqueRoles = this.getUniqueRoleIds(roles);
 
       const firebaseUser = await this.getOrCreateFirebaseUser(email);
@@ -124,21 +129,64 @@ export class UserService {
         createdFirebaseUserUid = firebaseUser.user.uid;
       }
 
-      const existingUser = await this.db.users.findUnique({
-        where: { uid: firebaseUser.user.uid },
-      });
-
-      if (existingUser) {
-        throw new Error("User already registered in Postgres");
-      }
-
       const doc = await this.db.$transaction(async (tx) => {
         await this.validateRoleIds(tx, uniqueRoles);
+
+        const existingUserByEmail = await tx.users.findUnique({
+          where: { email },
+        });
+
+        if (existingUserByEmail?.state) {
+          throw new Error("User already registered in Postgres");
+        }
+
+        const existingUserByUid = await tx.users.findFirst({
+          where: { uid: firebaseUser.user.uid },
+        });
+
+        if (existingUserByUid && existingUserByUid.id !== existingUserByEmail?.id) {
+          throw new Error("Firebase user already registered in Postgres");
+        }
+
+        // Si el correo pertenece a un usuario inactivo, reutiliza esa fila
+        // porque el email es único en Postgres.
+        if (existingUserByEmail) {
+          // Reemplaza los roles antiguos por los seleccionados en el formulario.
+          await tx.usersRoles.deleteMany({
+            where: { user: existingUserByEmail.id },
+          });
+
+          if (uniqueRoles.length > 0) {
+            await tx.usersRoles.createMany({
+              data: uniqueRoles.map((roleId) => ({
+                user: existingUserByEmail.id,
+                role: roleId,
+              })),
+            });
+          }
+
+          return tx.users.update({
+            where: { id: existingUserByEmail.id },
+            data: {
+              uid: firebaseUser.user.uid,
+              state: state ?? true,
+              updatedAt: new Date(),
+            },
+            include: {
+              usersRoles: {
+                include: {
+                  roles: true
+                }
+              }
+            },
+          });
+        }
 
         return tx.users.create({
           data: {
             email,
             uid: firebaseUser.user.uid,
+            state: state ?? true,
             ...(uniqueRoles.length > 0 && {
               usersRoles: {
                 createMany: {
@@ -161,7 +209,7 @@ export class UserService {
 
       response.message = "Successful operation"
       response.success = true
-      response.data = doc;
+      response.data = [doc];
     } catch (error: any) {
       if (createdFirebaseUserUid) {
         await this.auth.deleteUser(createdFirebaseUserUid).catch(() => undefined);
@@ -179,7 +227,7 @@ export class UserService {
     }
     try {
       const doc = await this.db.users.findUnique({
-        where: { id },
+        where: { id, state: true },
         include: {
           usersRoles: {
             include: {
@@ -207,7 +255,7 @@ export class UserService {
       const { email, roles } = updateUserDto;
       const doc = await this.db.$transaction(async (tx) => {
         const user = await tx.users.findUnique({
-          where: { id },
+          where: { id, state: true },
         });
 
         if (!user) {
@@ -263,11 +311,9 @@ export class UserService {
       message: "",
     }
     try {
-      const user = await this.findOne(id)
-      if (user.data) this.auth.deleteUser(user.data[0].uid)
-      const doc = await this.db.$transaction(async (tx) => {
+      const { doc, uidToDelete } = await this.db.$transaction(async (tx) => {
         const user = await tx.users.findUnique({
-          where: { id },
+          where: { id, state: true },
           include: {
             usersRoles: {
               include: {
@@ -281,24 +327,45 @@ export class UserService {
           throw new Error("User not found");
         }
 
-        await tx.usersRoles.deleteMany({
-          where: { user: id },
-        });
-
-        await tx.users.delete({
+        // Soft delete: conserva la fila por historial de ventas, marca al usuario
+        // como inactivo y libera el UID de Firebase para poder registrarlo otra vez.
+        const updatedUser = await tx.users.update({
           where: { id },
+          data: {
+            state: false,
+            uid: this.getDeletedUid(user.id, user.uid),
+            updatedAt: new Date(),
+          },
+          include: {
+            usersRoles: {
+              include: {
+                roles: true
+              }
+            }
+          },
         });
 
-        return user;
+        return {
+          doc: updatedUser,
+          uidToDelete: user.uid,
+        };
       });
+
+      // Firebase se elimina después de que Postgres termina bien para evitar
+      // perder el acceso mientras la base de datos aún lo considera activo.
+      await this.auth.deleteUser(uidToDelete).catch(() => undefined);
 
       response.message = "Successful operation"
       response.success = true
-      response.data = doc;
+      response.data = [doc];
     } catch (error: any) {
       response.message = error.message
     }
     return response
+  }
+
+  private getDeletedUid(id: number, uid: string) {
+    return `deleted:${id}:${uid}`;
   }
 
   private getUniqueRoleIds(roles: number[]) {

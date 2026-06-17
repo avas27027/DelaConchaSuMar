@@ -137,8 +137,9 @@ model MeassureUnits {
 
 model Users {
   id        Int      @id @default(autoincrement())
-  email     String
-  uid       String   @unique
+  email     String   @unique
+  uid       String
+  state     Boolean
   updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 

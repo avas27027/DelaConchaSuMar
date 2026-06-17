@@ -43,7 +43,7 @@ export class AuthenticationService {
             const uid = decodedClaims.uid;
 
 
-            let user = await this.postgres.users.findUnique({
+            let user = await this.postgres.users.findFirst({
                 where: { uid },
                 include: {
                     usersRoles: {
@@ -58,7 +58,7 @@ export class AuthenticationService {
                 const userEmail = (await this.auth.getUser(uid)).email;
                 if (!userEmail) throw new Error("Token sin email");
 
-                const userByEmail = await this.postgres.users.findFirst({
+                const userByEmail = await this.postgres.users.findUnique({
                     where: {
                         email: userEmail
                     }
