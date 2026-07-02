@@ -138,6 +138,8 @@ type BackendTypesMap = {
     user: UserJSONInterface[];
 };
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
+const erpUrl = import.meta.env.ERP_URL ?? "https://facttor.providevcloud.com";
+
 
 export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
     console.log("entro")
@@ -188,14 +190,16 @@ export function listenSocket<TEvent extends SocketEvent>(
     };
 }
 
-const getCookie = () => {
+export const getCookie = (cookieProvider: "backend" | "erp") => {
     const cookies = document.cookie.split(';');
-    const sessionCookie = cookies.find((cookie) => cookie.trimStart().startsWith('session='))?.split('=')[1] ?? "";
-    return sessionCookie
+    if (cookieProvider === "backend") {
+        return cookies.find((cookie) => cookie.trimStart().startsWith('session='))?.split('=')[1] ?? "";
+    }
+    return cookies.find((cookie) => cookie.trimStart().startsWith('erp_session='))?.split('=')[1] ?? "";
 }
 
 export const verifySessionToken = async (sessionCookie?: string): Promise<Response<UserJSONInterface>> => {
-    if (!sessionCookie) sessionCookie = getCookie();
+    if (!sessionCookie) sessionCookie = getCookie("backend");
     const verifyBackendUrl = typeof document === "undefined" && !process.env.PROD ? "http://backend:3001" : backendUrl;
     const endpoint = new URL("/authentication/verifyToken", verifyBackendUrl).toString();
     return fetch(endpoint, {

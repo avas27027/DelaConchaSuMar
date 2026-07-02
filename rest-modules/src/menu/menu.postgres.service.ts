@@ -263,4 +263,73 @@ export class MenuPostgresService {
         return response
     }
 
+    async mergeProducts(menuList: CreateMenuDto[]) {
+        let response: Response = {
+            success: false,
+            message: "",
+        }
+        try {
+            await this.db.$transaction(async (tx) => {
+                // Eliminar los que no existen en el arreglo
+                await tx.products.deleteMany({
+                    where: {
+                        id: {
+                            notIn: menuList.map((p) => p.id!),
+                        },
+                    },
+                });
+
+                await tx.productsIngredients.deleteMany();
+
+                // Insertar o actualizar
+                for (const product of menuList) {
+                    await tx.products.upsert({
+                        where: {
+                            id: product.id,
+                        },
+                        create: {
+                            ...product,
+                            priceMeassure: Number.parseInt(product.priceMeassure ?? '6'),
+                            productsIngredients: {
+                                createMany: {
+                                    data: product.ingredients?.map(ingredient => ({
+                                        ingredient: Number.parseInt(ingredient.ingredient ?? '0'),
+                                        quantity: ingredient.quantity
+                                    })) ?? []
+                                }
+                            }
+                        },
+                        update: {
+                            ...product,
+                            priceMeassure: Number.parseInt(product.priceMeassure ?? '6'),
+                            productsIngredients: {
+                                createMany: {
+                                    data: product.ingredients?.map(ingredient => ({
+                                        ingredient: Number.parseInt(ingredient.ingredient ?? '0'),
+                                        quantity: ingredient.quantity
+                                    })) ?? []
+                                }
+                            }
+                        },
+                    });
+                }
+                await tx.$executeRaw`
+                    SELECT setval(
+                    pg_get_serial_sequence('products', 'id'),
+                    COALESCE((SELECT MAX(id) FROM products), 1)
+                    );
+                    SELECT setval(
+                    pg_get_serial_sequence('productsIngredients', 'id'),
+                    COALESCE((SELECT MAX(id) FROM productsIngredients), 1)
+                    );
+                `;
+            })
+            response.message = "Successful operation"
+            response.success = true
+        } catch (error: any) {
+            response.message = error.message
+        }
+        return response
+    }
+
 }

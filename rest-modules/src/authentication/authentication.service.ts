@@ -19,8 +19,12 @@ export class AuthenticationService {
     async tokenCreate(token: string): Promise<Response> {
         const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 días
         let sessionCookie: string | null = null;
+        let user: any = null;
         try {
             sessionCookie = await this.auth.createSessionCookie(token, { expiresIn });
+            user = (await this.tokenVerify(sessionCookie)).data;
+
+
         } catch (error) {
             this.logger.error("Error creando session cookie:", error);
 
@@ -29,11 +33,11 @@ export class AuthenticationService {
                 message: "Error creating session cookie"
             };
         }
-        this.logger.debug("Session cookie created successfully", sessionCookie)
+        this.logger.debug("Session cookie created successfully", sessionCookie, user)
         return {
             success: true,
             message: "Session cookie created successfully",
-            data: sessionCookie ?? {}
+            data: { sessionCookie, user }
         };
     }
 

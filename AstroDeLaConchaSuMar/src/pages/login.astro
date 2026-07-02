@@ -417,8 +417,9 @@ import "../styles/global.css";
                 email,
                 password,
             );
-            await createSession(userCredential.user);
-            await createErpSession({ email, password });
+            const user = await createSession(userCredential.user);
+            await createErpSession({ user: user.username, password });
+            window.location.href = "/mesas";
         } catch (error) {
             alert("Error al iniciar sesión.");
             console.error(error);
@@ -448,18 +449,18 @@ import "../styles/global.css";
 
         if (res.ok) {
             const token = await res.json();
-            document.cookie = `session=${token.data}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
-            window.location.href = "/mesas";
+            document.cookie = `session=${token.data.sessionCookie}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
+            return token.data.user;
         } else {
             alert("No se pudo crear la sesión. Intenta de nuevo.");
         }
     }
 
     async function createErpSession({
-        email,
+        user,
         password,
     }: {
-        email: string;
+        user: string;
         password: string;
     }) {
         const res = await fetch(`${erpUrl}/api/mobile/v1/auth/login`, {
@@ -469,16 +470,17 @@ import "../styles/global.css";
             },
             body: JSON.stringify({
                 client_id: "facttor_mobile_external",
-                usuario: email,
+                usuario: user,
                 password: password,
                 device_id: "postman-demo-001",
                 device_name: "Postman",
                 app_version: "1.0.0",
             }),
         });
+        console.log(res);
         if (res.ok) {
             const token = await res.json();
-            document.cookie = `erp_session=${token.data.access_token}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
+            document.cookie = `erp_session=${token.data.refresh_token}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
         } else {
             console.error(
                 "No se pudo crear la sesión de ERP. Intenta de nuevo.",

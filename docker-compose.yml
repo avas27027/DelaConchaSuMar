@@ -18,6 +18,7 @@ services:
       - TSC_WATCHFILE=DynamicPriorityPolling
       - WATCHPACK_POLLING=true
       - DATABASE_URL=postgresql://neondb_owner:npg_SRCfydYv8lT7@ep-restless-field-apo093l8.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require
+      - ERP_URL=https://facttor.providevcloud.com
     networks:
       - dev-network
 
