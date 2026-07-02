@@ -3,12 +3,16 @@ import "./CreateUser.css";
 import { backendConection, type Response, type RoleJSONInterface } from "../../controller/salesOrders.hook";
 
 type UserFormState = {
+    username: string;
     email: string;
     roles: number[];
+    password: string;
 };
 
 const initialFormState: UserFormState = {
+    username: "",
     email: "",
+    password: "",
     roles: [],
 };
 
@@ -36,8 +40,10 @@ export default function CreateUser(props: { id?: string }) {
                 if (!user) return;
 
                 setFormState({
+                    username: user.username,
                     email: user.email,
                     roles: user.usersRoles.map((userRole) => Number(userRole.roles.id)),
+                    password: "",
                 });
             });
     }, [id, isEditing]);
@@ -59,8 +65,11 @@ export default function CreateUser(props: { id?: string }) {
         event.preventDefault();
         setIsSaving(true);
 
+        const password = formState.password.trim();
         const payload = {
+            username: formState.username.trim(),
             email: formState.email.trim(),
+            ...(!isEditing || password ? { password } : {}),
             roles: formState.roles,
         };
 
@@ -106,6 +115,19 @@ export default function CreateUser(props: { id?: string }) {
                     </div>
 
                     <div className="field">
+                        <label htmlFor="username">Nombre de usuario</label>
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            placeholder="j.perez"
+                            value={formState.username}
+                            onChange={(event) => setFormState((currentForm) => ({ ...currentForm, username: event.target.value }))}
+                            required
+                        />
+                    </div>
+
+                    <div className="field">
                         <label htmlFor="email">Correo electronico</label>
                         <input
                             id="email"
@@ -115,6 +137,19 @@ export default function CreateUser(props: { id?: string }) {
                             value={formState.email}
                             onChange={(event) => setFormState((currentForm) => ({ ...currentForm, email: event.target.value }))}
                             required
+                        />
+                    </div>
+
+                    <div className="field">
+                        <label htmlFor="password">Contraseña</label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={formState.password}
+                            onChange={(event) => setFormState((currentForm) => ({ ...currentForm, password: event.target.value }))}
+                            required={!isEditing}
                         />
                     </div>
                 </section>

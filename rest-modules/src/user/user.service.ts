@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PostgresService } from '@/commons/providers/postgres.service';
 import { Response } from '@/commons/interfaces';
-import { Prisma, Users } from '../../generated/prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import { FirebaseService } from '@/commons/providers/firebase.service';
 import { Auth, UserRecord } from 'firebase-admin/auth';
 
@@ -121,33 +121,49 @@ export class UserService {
     // Permite revertir Firebase si falla la creación/reactivación en Postgres.
     let createdFirebaseUserUid: string | null = null;
     try {
-      const { email, roles, state } = createUserDto;
-      const uniqueRoles = this.getUniqueRoleIds(roles);
+      const { username, email, password, roles, state } = createUserDto;
+      const uniqueRoles = this.getUniqueRoleIds(roles ?? []);
 
-      const firebaseUser = await this.getOrCreateFirebaseUser(email);
-      if (firebaseUser.created) {
-        createdFirebaseUserUid = firebaseUser.user.uid;
+      if (!password) {
+        throw new Error("Password is required for email login");
       }
 
-      const doc = await this.db.$transaction(async (tx) => {
-        await this.validateRoleIds(tx, uniqueRoles);
+      await this.validateRoleIds(this.db, uniqueRoles);
 
-        const existingUserByEmail = await tx.users.findUnique({
-          where: { email },
-        });
+      const existingUserByEmail = await this.db.users.findUnique({
+        where: { email },
+      });
 
-        if (existingUserByEmail?.state) {
-          throw new Error("User already registered in Postgres");
-        }
+      if (existingUserByEmail?.state) {
+        throw new Error("User already registered in Postgres");
+      }
 
-        const existingUserByUid = await tx.users.findFirst({
-          where: { uid: firebaseUser.user.uid },
+      const existingUserByUsername = await this.db.users.findUnique({
+        where: { username },
+      });
+
+      if (existingUserByUsername && existingUserByUsername.id !== existingUserByEmail?.id) {
+        throw new Error("Username already registered in Postgres");
+      }
+
+      const existingFirebaseUser = await this.getFirebaseUserByEmail(email);
+
+      if (existingFirebaseUser) {
+        const existingUserByUid = await this.db.users.findFirst({
+          where: { uid: existingFirebaseUser.uid },
         });
 
         if (existingUserByUid && existingUserByUid.id !== existingUserByEmail?.id) {
           throw new Error("Firebase user already registered in Postgres");
         }
+      }
 
+      const firebaseUser = await this.getOrCreateFirebaseUser(email, password);
+      if (firebaseUser.created) {
+        createdFirebaseUserUid = firebaseUser.user.uid;
+      }
+
+      const doc = await this.db.$transaction(async (tx) => {
         // Si el correo pertenece a un usuario inactivo, reutiliza esa fila
         // porque el email es único en Postgres.
         if (existingUserByEmail) {
@@ -168,6 +184,7 @@ export class UserService {
           return tx.users.update({
             where: { id: existingUserByEmail.id },
             data: {
+              username,
               uid: firebaseUser.user.uid,
               state: state ?? true,
               updatedAt: new Date(),
@@ -184,6 +201,7 @@ export class UserService {
 
         return tx.users.create({
           data: {
+            username,
             email,
             uid: firebaseUser.user.uid,
             state: state ?? true,
@@ -252,7 +270,7 @@ export class UserService {
       message: "",
     }
     try {
-      const { email, roles } = updateUserDto;
+      const { username, email, password, roles } = updateUserDto;
       const doc = await this.db.$transaction(async (tx) => {
         const user = await tx.users.findUnique({
           where: { id, state: true },
@@ -260,6 +278,33 @@ export class UserService {
 
         if (!user) {
           throw new Error("User not found");
+        }
+
+        if (username && username !== user.username) {
+          const existingUserByUsername = await tx.users.findUnique({
+            where: { username },
+          });
+
+          if (existingUserByUsername && existingUserByUsername.id !== id) {
+            throw new Error("Username already registered in Postgres");
+          }
+        }
+
+        if (email && email !== user.email) {
+          const existingUserByEmail = await tx.users.findUnique({
+            where: { email },
+          });
+
+          if (existingUserByEmail && existingUserByEmail.id !== id) {
+            throw new Error("Email already registered in Postgres");
+          }
+        }
+
+        if (email || password) {
+          await this.auth.updateUser(user.uid, {
+            ...(email && { email }),
+            ...(password && { password }),
+          });
         }
 
         if (roles) {
@@ -283,6 +328,7 @@ export class UserService {
         return tx.users.update({
           where: { id },
           data: {
+            ...(username && { username }),
             ...(email && { email }),
             updatedAt: new Date(),
           },
@@ -372,9 +418,12 @@ export class UserService {
     return [...new Set(roles.map((role) => Number(role)))];
   }
 
-  private async getOrCreateFirebaseUser(email: string): Promise<{ user: UserRecord; created: boolean }> {
+  private async getOrCreateFirebaseUser(
+    email: string,
+    password: string,
+  ): Promise<{ user: UserRecord; created: boolean }> {
     try {
-      const user = await this.auth.createUser({ email });
+      const user = await this.auth.createUser({ email, password });
       return { user, created: true };
     } catch (error: any) {
       if (error?.code !== "auth/email-already-exists") {
@@ -382,12 +431,25 @@ export class UserService {
       }
 
       const user = await this.auth.getUserByEmail(email);
+      await this.auth.updateUser(user.uid, { password });
       return { user, created: false };
     }
   }
 
+  private async getFirebaseUserByEmail(email: string): Promise<UserRecord | null> {
+    try {
+      return await this.auth.getUserByEmail(email);
+    } catch (error: any) {
+      if (error?.code === "auth/user-not-found") {
+        return null;
+      }
+
+      throw error;
+    }
+  }
+
   private async validateRoleIds(
-    tx: Prisma.TransactionClient,
+    tx: Prisma.TransactionClient | PostgresService,
     roleIds: number[],
   ) {
     const invalidRoles = roleIds.filter((roleId) => Number.isNaN(roleId));

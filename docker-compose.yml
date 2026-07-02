@@ -35,6 +35,7 @@ services:
       - PORT=3000
       - BACKEND_URL=http://backend:3001
       - PUBLIC_BACKEND_URL=http://127.0.0.1:3001
+      - ERP_URL=https://facttor.providevcloud.com
       - CHOKIDAR_USEPOLLING=true
       - CHOKIDAR_INTERVAL=500
       - WATCHPACK_POLLING=true

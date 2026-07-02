@@ -78,6 +78,10 @@
   gap: 8px;
 }
 
+.field + .field {
+  margin-top: 16px;
+}
+
 .field label {
   color: var(--color-deep-cyan);
   font-size: 13px;

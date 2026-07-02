@@ -387,7 +387,10 @@ import "../styles/global.css";
     } from "firebase/auth";
     import app from "../controller/firebase";
 
-    const backendUrl = import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
+    const backendUrl =
+        import.meta.env.PUBLIC_BACKEND_URL ?? "http://127.0.0.1:3001";
+    const erpUrl =
+        import.meta.env.ERP_URL ?? "https://facttor.providevcloud.com";
     const auth = getAuth(app);
     const form = document.getElementById(
         "login-form",
@@ -415,6 +418,7 @@ import "../styles/global.css";
                 password,
             );
             await createSession(userCredential.user);
+            await createErpSession({ email, password });
         } catch (error) {
             alert("Error al iniciar sesión.");
             console.error(error);
@@ -448,6 +452,37 @@ import "../styles/global.css";
             window.location.href = "/mesas";
         } else {
             alert("No se pudo crear la sesión. Intenta de nuevo.");
+        }
+    }
+
+    async function createErpSession({
+        email,
+        password,
+    }: {
+        email: string;
+        password: string;
+    }) {
+        const res = await fetch(`${erpUrl}/api/mobile/v1/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                client_id: "facttor_mobile_external",
+                usuario: email,
+                password: password,
+                device_id: "postman-demo-001",
+                device_name: "Postman",
+                app_version: "1.0.0",
+            }),
+        });
+        if (res.ok) {
+            const token = await res.json();
+            document.cookie = `erp_session=${token.data.access_token}; path=/; ${import.meta.env.PROD ? "secure;" : ""} samesite=lax`;
+        } else {
+            console.error(
+                "No se pudo crear la sesión de ERP. Intenta de nuevo.",
+            );
         }
     }
 </script>

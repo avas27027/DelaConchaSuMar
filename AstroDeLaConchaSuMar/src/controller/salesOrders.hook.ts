@@ -22,6 +22,7 @@ export interface ProductJSONInterface {
 
 export type UserJSONInterface = {
     id: string;
+    username: string;
     email: string;
     uid: string;
     createdAt: string;

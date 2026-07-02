@@ -187,6 +187,7 @@ export type MeassureUnitsScalarFieldEnum = (typeof MeassureUnitsScalarFieldEnum)
 
 export const UsersScalarFieldEnum = {
   id: 'id',
+  username: 'username',
   email: 'email',
   uid: 'uid',
   state: 'state',
