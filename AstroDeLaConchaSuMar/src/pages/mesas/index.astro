@@ -1,20 +1,66 @@
 ---
-import MesasGrid from "../../components/mesas/MesasGrid";
+import MesasSessionGate from "../../components/mesas/MesasSessionGate";
 import MesasHeader from "../../components/mesas/MesasHeader.astro";
 import Layout from "../../layouts/Layout.astro";
+import CreateSession from "../../components/mesasOrder/CreateSession.astro";
 ---
 
 <Layout title="Mesas - De la Concha su Mar">
     <div class="tables-page">
-        <MesasHeader />
-        <MesasGrid client:only="react" />
+        <div class="session-loader" id="session-loader">
+            Validando sesion de caja...
+        </div>
+
+        <section class="session-content" id="session-active" hidden>
+            <MesasHeader />
+            <MesasSessionGate client:only="react" />
+        </section>
+
+        <section class="session-content" id="session-create" hidden>
+            <CreateSession />
+        </section>
     </div>
+
+    <script>
+        const loader = document.querySelector<HTMLElement>("#session-loader");
+        const activeSection = document.querySelector<HTMLElement>("#session-active");
+        const createSection = document.querySelector<HTMLElement>("#session-create");
+
+        function showSessionState(hasActiveSession: boolean) {
+            if (loader) loader.hidden = true;
+            if (activeSection) activeSection.hidden = !hasActiveSession;
+            if (createSection) createSection.hidden = hasActiveSession;
+        }
+
+        document.addEventListener("erp-session-active", () => {
+            showSessionState(true);
+        });
+
+        document.addEventListener("erp-session-missing", () => {
+            showSessionState(false);
+        });
+    </script>
 
     <style>
         .tables-page {
             width: 100%;
             height: 100%;
             padding: 12px;
+        }
+
+        .session-loader {
+            min-height: calc(100vh - var(--spacing-header) - 24px);
+            display: grid;
+            place-items: center;
+            color: var(--color-text-secondary);
+            font-family: "Manrope", sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .session-content[hidden],
+        .session-loader[hidden] {
+            display: none;
         }
     </style>
 </Layout>

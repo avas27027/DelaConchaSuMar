@@ -23,15 +23,16 @@ export class ErpProviderService {
         catalogo: { url: "/api/facturacion/v1/items", method: "GET" },
         sessionActive: { url: "/api/mobile/v1/pos/sesiones/activa", method: "GET" },
         sessionOpen: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
-        sessionClose: { url: "/api/mobile/v1/pos/sesiones", method: "POST" }
+        sessionClose: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
+        catalogoPos: { url: "/api/mobile/v1/pos/1/catalogo", method: "GET" }
     }
-    async erpConection<T extends EndPoint>(endPoint: T, refresh_token: string, options?: { param?: string, body: ErpTypesMap[T]["IN"] }): Promise<ErpTypesMap[T]["OUT"] | null> {
+    async erpConection<T extends EndPoint>(endPoint: T, refresh_token: string, body?: ErpTypesMap[T]["IN"], param?: string): Promise<ErpTypesMap[T]["OUT"] | null> {
         const token = await this.refreshToken(refresh_token)
         if (!token) throw new Error("No existe token");
         try {
-            const response = await fetch(this.erpUrl + this.endPointMap[endPoint].url + (options?.param ? "/" + options.param : ""), {
+            const response = await fetch(this.erpUrl + this.endPointMap[endPoint].url + (param ? "/" + param : ""), {
                 method: this.endPointMap[endPoint].method,
-                ...(options?.body && { body: JSON.stringify(options.body) }),
+                ...(body && { body: JSON.stringify(body) }),
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ export class ErpProviderService {
 
             if (response.ok) {
                 const responseOk = response
-                this.logger.log(`ERP Connection -> ${this.endPointMap[endPoint].method} ${endPoint} ${options?.param ? '/' + options.param : ''} - ${JSON.stringify(responseOk)}`)
+                this.logger.log(`ERP Connection -> ${this.endPointMap[endPoint].method} ${endPoint} ${param ? '/' + param : ''} - ${JSON.stringify(responseOk)}`)
                 return responseOk
             } else {
                 const responseError = response as { ok: boolean, message: string }
@@ -94,10 +95,9 @@ export class ErpProviderService {
         }
     }
 
-    convertErpItemToMenuItem(erpItems: CatalogoOUT[]): CreateMenuDto[] {
+    convertErpItemToMenuItem(erpItems: CatalogoOUT["data"]): CreateMenuDto[] {
         let list: CreateMenuDto[] = [];
-        const items = erpItems.map(item => item.data)
-        for (const item of items) {
+        for (const item of erpItems) {
             list.push({
                 name: item.descripcion,
                 imageUrl: item.imagen || "",
@@ -112,5 +112,29 @@ export class ErpProviderService {
         }
 
         return list
+    }
+
+    async getFormatedItems(refresh_token: string): Promise<CreateMenuDto[]> {
+        const catalogo = await this.erpConection("catalogo", refresh_token)
+        const catalogoPos = await this.erpConection("catalogoPos", refresh_token)
+
+        const items = catalogo?.data.map(item => {
+            const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
+            return {
+                name: item.descripcion,
+                imageUrl: item.imagen || "",
+                description: item.descripcion_adicional || "",
+                category: itemPos?.categoria_nombre ?? "",
+                price: item.precio1 || item.precio2 || 0,
+                priceMeassure: item.tipo_unidad || "",
+                ingredients: item.ingredientes.map(ingredient => ({
+                    ingredient: ingredient.id_insumo.toString(),
+                    quantity: ingredient.cantidad,
+                })) || []
+            }
+        })
+
+        return items ?? []
+
     }
 }

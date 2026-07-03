@@ -15,7 +15,7 @@ type ErpTypesMap = {
 const endPointMap: Record<EndPoint, { url: string, method: Method }> = {
     auth: { url: "/api/mobile/v1/auth/login", method: "POST" },
     catalogo: { url: "/api/facturacion/v1/items", method: "GET" },
-    sessionActive: { url: "/api/mobile/v1/pos/sesiones/activa", method: "GET" },
+    sessionActive: { url: "/api/mobile/v1/pos/sesiones/activa/1", method: "GET" },
     sessionOpen: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
     sessionClose: { url: "/api/mobile/v1/pos/sesiones", method: "POST" }
 }

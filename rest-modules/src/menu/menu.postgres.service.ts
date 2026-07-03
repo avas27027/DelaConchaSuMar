@@ -8,6 +8,7 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { EventsGateway } from '@/commons/providers/socketGateway.service';
 import { Prisma } from '../../generated/prisma/client';
+import { ErpProviderService } from '@/commons/providers/erp.provider.service';
 
 type ProductWithRelations = Prisma.ProductsGetPayload<{
     include: {
@@ -27,7 +28,8 @@ export class MenuPostgresService {
     constructor(
         private readonly db: PostgresService,
         private readonly firebase: FirebaseService,
-        private readonly websocket: EventsGateway
+        private readonly websocket: EventsGateway,
+        private readonly erpService: ErpProviderService,
     ) {
         this.bucket = firebase.getBucket();
     }
@@ -261,6 +263,15 @@ export class MenuPostgresService {
             response.message = error.message;
         }
         return response
+    }
+
+    async safeMergeProducts(refresh_token?: string) {
+        if (!refresh_token) return;
+        const items = await this.erpService.getFormatedItems(refresh_token)
+        const count = await this.db.products.count()
+        if (count !== items.length) {
+            await this.mergeProducts(items)
+        }
     }
 
     async mergeProducts(menuList: CreateMenuDto[]) {

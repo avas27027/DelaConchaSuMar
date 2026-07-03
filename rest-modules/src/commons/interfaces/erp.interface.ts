@@ -40,6 +40,35 @@ type AuthRefreshIN = {
 
 type AuthRefreshOUT = AuthLoginOUT;
 
+type CatalogoPOSOUT = {
+    ok: boolean,
+    data: {
+        id: string,
+        codigo: string,
+        descripcion: string,
+        precio1: string,
+        tipo_unidad: string,
+        tipo: string,
+        is_purchased: number,
+        has_recipe: number,
+        stock: string,
+        stock_pos: string,
+        disponible_pos: number,
+        pos_activo: number,
+        categoria_pos_id: number,
+        nombre_pos: string,
+        descripcion_pos: string,
+        imagen_pos_url: string | null,
+        es_kit: number,
+        categoria_nombre: string,
+        categoria_orden: number,
+        categoria_color: string,
+        pantalla_kds_id: string | null,
+        pantalla_kds_nombre: string | null,
+        pantalla_kds_color: string | null
+    }[],
+}
+
 type CatalogoOUT = {
     ok: boolean,
     data: {
@@ -72,7 +101,7 @@ type CatalogoOUT = {
             tipo_unidad: string,
             notas: string
         }[]
-    },
+    }[],
     meta: any[]
 }
 
@@ -113,11 +142,14 @@ type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type EndPoint = keyof ErpTypesMap;
 type ErpTypesMap = {
     auth: { IN: AuthLoginIN, OUT: AuthLoginOUT },
-    catalogo: { IN: null, OUT: CatalogoOUT },
-    sessionActive: { IN: null, OUT: SessionActiveOUT },
+    catalogo: { IN: undefined, OUT: CatalogoOUT },
+    sessionActive: { IN: undefined, OUT: SessionActiveOUT },
     sessionOpen: { IN: SessionOpenIN, OUT: { ok: boolean } },
-    sessionClose: { IN: SessionCloseIN, OUT: { ok: boolean } }
+    sessionClose: { IN: SessionCloseIN, OUT: { ok: boolean } },
+    catalogoPos: { IN: undefined, OUT: CatalogoPOSOUT }
 };
+
+type Options<T extends EndPoint> = { param?: string, body: ErpTypesMap[T]["IN"] }
 
 export type {
     AuthLoginIN,
@@ -130,5 +162,6 @@ export type {
     SessionCloseIN,
     Method,
     EndPoint,
-    ErpTypesMap
+    ErpTypesMap,
+    Options
 }

@@ -1,0 +1,232 @@
+---
+interface Props {
+    posId?: number;
+}
+
+const { posId = 1 } = Astro.props;
+---
+
+<section class="create-session" data-pos-id={posId}>
+    <div class="create-session__content">
+        <div class="create-session__eyebrow">Caja sin sesion activa</div>
+        <h2>Abre una sesion para empezar a atender mesas</h2>
+        <p>
+            Registra el fondo inicial de caja para habilitar el panel de mesas y
+            comenzar a tomar pedidos.
+        </p>
+
+        <form class="create-session__form" id="create-session-form">
+            <label class="amount-field" for="fondo-inicial">
+                <span>Fondo inicial</span>
+                <div class="amount-field__input">
+                    <span>S/</span>
+                    <input
+                        id="fondo-inicial"
+                        name="fondo_inicial"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        value="500.00"
+                        required
+                    />
+                </div>
+            </label>
+
+            <p class="create-session__message" id="create-session-message" role="status">
+            </p>
+
+            <button class="create-session__button" type="submit">
+                Abrir sesion
+            </button>
+        </form>
+    </div>
+</section>
+
+<script>
+    import { erpConection } from "../../controller/erp.hook";
+
+    const container = document.querySelector<HTMLElement>(".create-session");
+    const form = document.querySelector<HTMLFormElement>("#create-session-form");
+    const message = document.querySelector<HTMLElement>("#create-session-message");
+    const button = form?.querySelector<HTMLButtonElement>("button[type='submit']");
+
+    form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const fondoInicial = Number(formData.get("fondo_inicial"));
+        const posId = Number(container?.dataset.posId ?? 1);
+
+        if (!Number.isFinite(fondoInicial) || fondoInicial < 0) {
+            if (message) message.textContent = "Ingresa un fondo inicial valido.";
+            return;
+        }
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Abriendo...";
+        }
+        if (message) message.textContent = "";
+
+        const sessionOpen = await erpConection("sessionOpen", {
+            body: { pos_id: posId, fondo_inicial: fondoInicial },
+        });
+
+        if (sessionOpen?.ok) {
+            if (message) message.textContent = "Sesion creada correctamente.";
+            document.dispatchEvent(new CustomEvent("erp-session-created"));
+            return;
+        }
+
+        if (message) {
+            message.textContent = "No se pudo abrir la sesion. Intentalo nuevamente.";
+        }
+        if (button) {
+            button.disabled = false;
+            button.textContent = "Abrir sesion";
+        }
+    });
+</script>
+
+<style>
+    .create-session {
+        min-height: calc(100vh - var(--spacing-header) - 24px);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+    }
+
+    .create-session__content {
+        width: min(100%, 520px);
+        background: var(--color-white);
+        border: 1px solid #bec8cd33;
+        border-radius: 8px;
+        padding: 32px;
+        box-shadow: 0 20px 45px rgba(21, 29, 34, 0.08);
+    }
+
+    .create-session__eyebrow {
+        width: fit-content;
+        margin-bottom: 16px;
+        border-radius: 9999px;
+        background: #edf5fc;
+        color: var(--color-deep-cyan);
+        font-family: "Manrope", sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        padding: 8px 12px;
+        text-transform: uppercase;
+    }
+
+    .create-session h2 {
+        margin: 0;
+        color: var(--color-text-primary);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .create-session p {
+        margin: 12px 0 0;
+        color: var(--color-text-secondary);
+        font-family: "Manrope", sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .create-session__form {
+        display: grid;
+        gap: 18px;
+        margin-top: 28px;
+    }
+
+    .amount-field {
+        display: grid;
+        gap: 8px;
+        color: var(--color-text-primary);
+        font-family: "Manrope", sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .amount-field__input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid #bec8cd80;
+        border-radius: 8px;
+        background: var(--color-bg);
+        padding: 0 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .amount-field__input:focus-within {
+        border-color: var(--color-sea-cyan);
+        box-shadow: 0 0 0 4px rgba(0, 119, 145, 0.1);
+    }
+
+    .amount-field__input span {
+        color: var(--color-deep-cyan);
+        font-weight: 800;
+    }
+
+    .amount-field input {
+        width: 100%;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        color: var(--color-text-primary);
+        font-family: "Manrope", sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        outline: none;
+        padding: 14px 0;
+    }
+
+    .create-session__message {
+        min-height: 22px;
+        margin: 0;
+        color: var(--color-text-secondary);
+        font-size: 14px;
+    }
+
+    .create-session__button {
+        border: none;
+        border-radius: 8px;
+        background: var(--color-sea-cyan);
+        color: var(--color-white);
+        cursor: pointer;
+        font-family: "Manrope", sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        padding: 14px 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .create-session__button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgb(var(--color-sea-cyan-rgb) / 20%);
+    }
+
+    .create-session__button:disabled {
+        cursor: wait;
+        opacity: 0.72;
+    }
+
+    @media (max-width: 640px) {
+        .create-session {
+            padding: 12px;
+        }
+
+        .create-session__content {
+            padding: 24px;
+        }
+
+        .create-session h2 {
+            font-size: 24px;
+        }
+    }
+</style>
