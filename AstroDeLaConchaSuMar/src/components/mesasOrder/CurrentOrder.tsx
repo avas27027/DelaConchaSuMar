@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { backendConection, verifySessionToken, type UserJSONInterface } from '../../controller/salesOrders.hook';
+import { erpConection } from '../../controller/erp.hook';
 
 export interface OrderItem {
     id: string;
@@ -79,8 +80,21 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
     };
 
     const confirmOrder = () => {
+        let items: {
+            producto_id: number,
+            cantidad: number,
+            precio_unitario: number,
+        }[] = []
+
         prevOrders.forEach((prevOrder) => {
             if (prevOrder.state != 'cooked') return;
+            prevOrder.products.forEach((product) => {
+                items.push({
+                    producto_id: Number(product.id) || 0,
+                    cantidad: product.quantity,
+                    precio_unitario: product.price,
+                })
+            })
             backendConection("PATCH", "sales-orders", prevOrder.orderId, { state: 'paid' })
                 .then((res) => {
                     if (res.success) {
@@ -88,6 +102,18 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                     }
                 })
         });
+        erpConection("ventaDirecta", {
+            body: {
+                pos_id: 1,
+                cliente_id: 3,
+                items: items,
+                pagos: [{
+                    metodo_pago_id: 1,
+                    monto: items.reduce((acc, item) => acc + item.precio_unitario * item.cantidad, 0),
+                    monto_recibido: items.reduce((acc, item) => acc + item.precio_unitario * item.cantidad, 0),
+                }],
+            },
+        })
     };
 
     return (
