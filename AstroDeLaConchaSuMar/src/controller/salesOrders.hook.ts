@@ -136,18 +136,17 @@ type BackendTypesMap = {
     ingredients: IngredientsJSONInterface[];
     meassures: PriceMeassureJSONInterface[];
     user: UserJSONInterface[];
+    "menu/sync": any;
 };
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
-const erpUrl = import.meta.env.ERP_URL ?? "https://facttor.providevcloud.com";
 
-
-export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any): Promise<Response<BackendTypesMap[T]>> {
-    console.log("entro")
+export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any, token?: string): Promise<Response<BackendTypesMap[T]>> {
     return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
         method: method,
         ...(body && { body: JSON.stringify(body) }),
         headers: {
             "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
         },
     })
         .then(res => res.json())

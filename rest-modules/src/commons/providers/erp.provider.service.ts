@@ -13,6 +13,15 @@ type CreateMenuDto = {
         quantity: number;
     }[];
 }
+export class CreateIngredientDto {
+    name: string = "";
+    description: string = "";
+    category: string = "";
+    currentStock: string = "";
+    unit: number = 0;
+    minimumStock: number = 0;
+}
+
 
 @Injectable()
 export class ErpProviderService {
@@ -26,9 +35,7 @@ export class ErpProviderService {
         sessionClose: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
         catalogoPos: { url: "/api/mobile/v1/pos/1/catalogo", method: "GET" }
     }
-    async erpConection<T extends EndPoint>(endPoint: T, refresh_token: string, body?: ErpTypesMap[T]["IN"], param?: string): Promise<ErpTypesMap[T]["OUT"] | null> {
-        const token = await this.refreshToken(refresh_token)
-        if (!token) throw new Error("No existe token");
+    async erpConection<T extends EndPoint>(endPoint: T, token: string, body?: ErpTypesMap[T]["IN"], param?: string): Promise<ErpTypesMap[T]["OUT"] | null> {
         try {
             const response = await fetch(this.erpUrl + this.endPointMap[endPoint].url + (param ? "/" + param : ""), {
                 method: this.endPointMap[endPoint].method,
@@ -114,27 +121,41 @@ export class ErpProviderService {
         return list
     }
 
-    async getFormatedItems(refresh_token: string): Promise<CreateMenuDto[]> {
+    async getFormatedItems(refresh_token: string): Promise<{ products: CreateMenuDto[], ingredients: CreateIngredientDto[] }> {
         const catalogo = await this.erpConection("catalogo", refresh_token)
         const catalogoPos = await this.erpConection("catalogoPos", refresh_token)
 
-        const items = catalogo?.data.map(item => {
+        const products = catalogo?.data.filter(item => item.tipo === "retail").map(item => {
             const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
             return {
+                id: item.id,
                 name: item.descripcion,
                 imageUrl: item.imagen || "",
                 description: item.descripcion_adicional || "",
                 category: itemPos?.categoria_nombre ?? "",
                 price: item.precio1 || item.precio2 || 0,
-                priceMeassure: item.tipo_unidad || "",
+                priceMeassure: "6",
                 ingredients: item.ingredientes.map(ingredient => ({
                     ingredient: ingredient.id_insumo.toString(),
                     quantity: ingredient.cantidad,
                 })) || []
             }
-        })
+        }) || []
 
-        return items ?? []
+        const ingredients = catalogo?.data.filter(item => item.tipo === "insumo").map(item => {
+            const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
+            return {
+                id: item.id,
+                name: item.descripcion,
+                description: item.descripcion_adicional || "",
+                category: itemPos?.categoria_nombre ?? "",
+                currentStock: item.stock?.toString() || "",
+                unit: 1,
+                minimumStock: item.stock_minimo || 0,
+            }
+        }) || []
+
+        return { products, ingredients }
 
     }
 }

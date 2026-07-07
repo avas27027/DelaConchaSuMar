@@ -1,6 +1,6 @@
 ---
 import MesasSessionGate from "../../components/mesas/MesasSessionGate";
-import MesasHeader from "../../components/mesas/MesasHeader.astro";
+import MesasHeader from "../../components/mesas/MesasHeader";
 import Layout from "../../layouts/Layout.astro";
 import CreateSession from "../../components/mesasOrder/CreateSession.astro";
 ---
@@ -12,7 +12,7 @@ import CreateSession from "../../components/mesasOrder/CreateSession.astro";
         </div>
 
         <section class="session-content" id="session-active" hidden>
-            <MesasHeader />
+            <MesasHeader client:load />
             <MesasSessionGate client:only="react" />
         </section>
 

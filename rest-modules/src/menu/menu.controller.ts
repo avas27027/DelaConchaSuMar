@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Query, Req } from '@nestjs/common';
 import { MenuPostgresService } from './menu.postgres.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateIngredientDto } from '@/ingredients/dto/create-ingredient.dto';
 
 @Controller('menu')
 export class MenuController {
@@ -45,5 +46,10 @@ export class MenuController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.menuService.remove(id);
+  }
+
+  @Post('sync')
+  syncMenu(@Body() { products, ingredients }: { products: CreateMenuDto[], ingredients: CreateIngredientDto[] }) {
+    return this.menuService.safeSync(products, ingredients);
   }
 }

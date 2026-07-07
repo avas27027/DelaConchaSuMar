@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { erpConection } from "../../controller/erp.hook";
+import { erpConection, getFormatedItems } from "../../controller/erp.hook";
 import MesasGrid from "./MesasGrid";
+import { backendConection } from "../../controller/salesOrders.hook";
 
 export default function MesasSessionGate() {
     const [hasActiveSession, setHasActiveSession] = useState(false);
@@ -10,7 +11,8 @@ export default function MesasSessionGate() {
 
         async function validateActiveSession() {
             const sesionActiva = await erpConection("sessionActive");
-
+            const { products, ingredients } = await getFormatedItems()
+            backendConection("POST", "menu/sync", undefined, { products, ingredients })
             if (!mounted) return;
 
             if (sesionActiva?.ok) {

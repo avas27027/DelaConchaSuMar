@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../../generated/prisma/client';
 import { ErpProviderService } from '@/commons/providers/erp.provider.service';
@@ -29,6 +29,7 @@ type CreateIngredientDto = {
 
 @Injectable()
 export class PostgresService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(PostgresService.name);
   constructor(private readonly erpService: ErpProviderService) {
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL,
@@ -60,6 +61,8 @@ export class PostgresService extends PrismaClient implements OnModuleInit, OnMod
           .map((ingredient) => ingredient.id)
           .filter((id): id is number => typeof id === "number");
 
+        console.log(productIds, ingredientIds);
+        await tx.ingredientsSuppliers.deleteMany()
         await tx.productsIngredients.deleteMany();
 
         await tx.products.deleteMany({
@@ -104,7 +107,7 @@ export class PostgresService extends PrismaClient implements OnModuleInit, OnMod
             create: {
               id,
               ...productData,
-              priceMeassure: Number.parseInt(product.priceMeassure ?? '6'),
+              priceMeassure: 6,
               productsIngredients: {
                 createMany: {
                   data: productIngredients?.map(ingredient => ({
@@ -116,7 +119,7 @@ export class PostgresService extends PrismaClient implements OnModuleInit, OnMod
             },
             update: {
               ...productData,
-              priceMeassure: Number.parseInt(priceMeassure ?? '6'),
+              priceMeassure: 6,
               updatedAt: new Date(),
               productsIngredients: {
                 createMany: {
@@ -150,10 +153,15 @@ export class PostgresService extends PrismaClient implements OnModuleInit, OnMod
             (SELECT MAX(id) FROM products_ingredients) IS NOT NULL
           )
         `;
-      })
+      },
+        {
+          maxWait: 10000,
+          timeout: 30000,
+        })
       response.message = "Successful operation"
       response.success = true
     } catch (error: any) {
+      this.logger.error(`Error syncing ERP products and ingredients: ${error.message}`, error.stack);
       response.message = error.message
     }
     return response

@@ -9,6 +9,7 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { EventsGateway } from '@/commons/providers/socketGateway.service';
 import { Prisma } from '../../generated/prisma/client';
 import { ErpProviderService } from '@/commons/providers/erp.provider.service';
+import { CreateIngredientDto } from '@/ingredients/dto/create-ingredient.dto';
 
 type ProductWithRelations = Prisma.ProductsGetPayload<{
     include: {
@@ -265,78 +266,23 @@ export class MenuPostgresService {
         return response
     }
 
-    async safeMergeProducts(refresh_token?: string) {
-        if (!refresh_token) return;
-        const items = await this.erpService.getFormatedItems(refresh_token)
-        const count = await this.db.products.count()
-        if (count !== items.length) {
-            await this.mergeProducts(items)
-        }
-    }
-
-    async mergeProducts(menuList: CreateMenuDto[]) {
+    async safeSync(products: CreateMenuDto[], ingredients: CreateIngredientDto[]): Promise<Response> {
         let response: Response = {
             success: false,
             message: "",
         }
+
         try {
-            await this.db.$transaction(async (tx) => {
-                // Eliminar los que no existen en el arreglo
-                await tx.products.deleteMany({
-                    where: {
-                        id: {
-                            notIn: menuList.map((p) => p.id!),
-                        },
-                    },
-                });
+            const syncResponse = await this.db.mergeProductsIngredients(products, ingredients)
+            if (!syncResponse.success) {
+                throw new Error(syncResponse.message)
+            }
 
-                await tx.productsIngredients.deleteMany();
-
-                // Insertar o actualizar
-                for (const product of menuList) {
-                    await tx.products.upsert({
-                        where: {
-                            id: product.id,
-                        },
-                        create: {
-                            ...product,
-                            priceMeassure: Number.parseInt(product.priceMeassure ?? '6'),
-                            productsIngredients: {
-                                createMany: {
-                                    data: product.ingredients?.map(ingredient => ({
-                                        ingredient: Number.parseInt(ingredient.ingredient ?? '0'),
-                                        quantity: ingredient.quantity
-                                    })) ?? []
-                                }
-                            }
-                        },
-                        update: {
-                            ...product,
-                            priceMeassure: Number.parseInt(product.priceMeassure ?? '6'),
-                            productsIngredients: {
-                                createMany: {
-                                    data: product.ingredients?.map(ingredient => ({
-                                        ingredient: Number.parseInt(ingredient.ingredient ?? '0'),
-                                        quantity: ingredient.quantity
-                                    })) ?? []
-                                }
-                            }
-                        },
-                    });
-                }
-                await tx.$executeRaw`
-                    SELECT setval(
-                    pg_get_serial_sequence('products', 'id'),
-                    COALESCE((SELECT MAX(id) FROM products), 1)
-                    );
-                    SELECT setval(
-                    pg_get_serial_sequence('productsIngredients', 'id'),
-                    COALESCE((SELECT MAX(id) FROM productsIngredients), 1)
-                    );
-                `;
-            })
+            const allProducts = await this.findAll()
+            allProducts.data && this.websocket.emitMenu(allProducts.data);
             response.message = "Successful operation"
             response.success = true
+            response.data = allProducts.data
         } catch (error: any) {
             response.message = error.message
         }
