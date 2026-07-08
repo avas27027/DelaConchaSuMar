@@ -32,7 +32,7 @@ export default function MesasHeader() {
 
         const sessionActive = await erpConection("sessionActive");
         const sessionClose = await erpConection("sessionClose", {
-            param: `${sessionActive?.data?.id || '1'}/cerrar`,
+            param: `/${sessionActive?.data?.id || '1'}/cerrar`,
             body: {
                 fondo_cierre: fondoCierre,
                 comentario_diferencia: comentarioDiferencia || "Sin diferencia",

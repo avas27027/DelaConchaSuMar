@@ -26,7 +26,7 @@ const endPointMap: Record<EndPoint, { url: string, method: Method }> = {
 export async function erpConection<T extends EndPoint>(endPoint: T, options?: { param?: string, body: ErpTypesMap[T]["IN"] }): Promise<ErpTypesMap[T]["OUT"] | null> {
     const token = await refreshToken()
     if (!token) return null;
-    const response = await fetch(erpUrl + endPointMap[endPoint].url + (options?.param ? "/" + options.param : ""), {
+    const response = await fetch(erpUrl + endPointMap[endPoint].url + (options?.param ? options.param : ""), {
         method: endPointMap[endPoint].method,
         ...(options?.body && { body: JSON.stringify(options.body) }),
         headers: {
@@ -87,8 +87,8 @@ export async function refreshToken() {
 }
 
 export async function getFormatedItems(): Promise<{ products: CreateMenuDto[], ingredients: CreateIngredientDto[] }> {
-    const catalogo = await erpConection("catalogo")
-    const catalogoPos = await erpConection("catalogoPos")
+    const catalogo = await erpConection("catalogo", { param: "?per_page=all", body: null })
+    const catalogoPos = await erpConection("catalogoPos", { param: "?per_page=all", body: null })
 
     const products = catalogo?.data.filter(item => item.tipo === "retail").map(item => {
         const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
