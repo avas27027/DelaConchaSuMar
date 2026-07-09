@@ -1,4 +1,4 @@
-import type { AuthLoginIN, AuthLoginOUT, AuthRefreshIN, AuthRefreshOUT, CatalogoOUT, CatalogoPOSOUT, CreateIngredientDto, CreateMenuDto, SessionActiveOUT, SessionCloseIN, SessionOpenIN, VentaDirectaIN, VentaDirectaOUT } from "./erp.interface";
+import type { AuthLoginIN, AuthLoginOUT, AuthRefreshIN, AuthRefreshOUT, CatalogoOUT, CatalogoPOSOUT, CreateIngredientDto, CreateMenuDto, OrdenAbiertaIN, OrdenAbiertaOUT, SessionActiveOUT, SessionCloseIN, SessionOpenIN, VentaDirectaIN, VentaDirectaOUT } from "./erp.interface";
 import { getCookie } from "./salesOrders.hook";
 
 const erpUrl = import.meta.env.ERP_URL ?? "https://facttor.providevcloud.com";
@@ -12,7 +12,8 @@ type ErpTypesMap = {
     sessionActive: { IN: null, OUT: SessionActiveOUT },
     sessionOpen: { IN: SessionOpenIN, OUT: { ok: boolean } },
     sessionClose: { IN: SessionCloseIN, OUT: { ok: boolean } },
-    ventaDirecta: { IN: VentaDirectaIN, OUT: VentaDirectaOUT }
+    ventaDirecta: { IN: VentaDirectaIN, OUT: VentaDirectaOUT },
+    ordenAbierta: { IN: OrdenAbiertaIN, OUT: OrdenAbiertaOUT }
 };
 const endPointMap: Record<EndPoint, { url: string, method: Method }> = {
     auth: { url: "/api/mobile/v1/auth/login", method: "POST" },
@@ -21,7 +22,8 @@ const endPointMap: Record<EndPoint, { url: string, method: Method }> = {
     sessionActive: { url: "/api/mobile/v1/pos/sesiones/activa/1", method: "GET" },
     sessionOpen: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
     sessionClose: { url: "/api/mobile/v1/pos/sesiones", method: "POST" },
-    ventaDirecta: { url: "/api/facturacion/v1/ordenes", method: "POST" }
+    ventaDirecta: { url: "/api/facturacion/v1/ordenes", method: "POST" },
+    ordenAbierta: { url: "/api/facturacion/v1/ordenes", method: "POST" }
 }
 export async function erpConection<T extends EndPoint>(endPoint: T, options?: { param?: string, body: ErpTypesMap[T]["IN"] }): Promise<ErpTypesMap[T]["OUT"] | null> {
     const token = await refreshToken()
@@ -90,7 +92,7 @@ export async function getFormatedItems(): Promise<{ products: CreateMenuDto[], i
     const catalogo = await erpConection("catalogo", { param: "?per_page=all", body: null })
     const catalogoPos = await erpConection("catalogoPos", { param: "?per_page=all", body: null })
 
-    const products = catalogo?.data.filter(item => item.tipo === "retail").map(item => {
+    const products = catalogo?.data.filter(item => item.is_sold).map(item => {
         const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
         return {
             id: item.id,
@@ -107,7 +109,7 @@ export async function getFormatedItems(): Promise<{ products: CreateMenuDto[], i
         }
     }) || []
 
-    const ingredients = catalogo?.data.filter(item => item.tipo === "insumo").map(item => {
+    const ingredients = catalogo?.data.filter(item => !item.is_sold).map(item => {
         const itemPos = catalogoPos?.data.find(itemPos => itemPos.id === item.id)
         return {
             id: item.id,

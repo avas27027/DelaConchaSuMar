@@ -206,6 +206,73 @@ type VentaDirectaOUT = {
     itmes: any[]
 }
 
+type OrdenAbiertaIN = {
+    pos_id: number,
+    mesa_id?: number,
+    notas?: string,
+    items: {
+        producto_id: number,
+        cantidad: number,
+        nota_preparacion?: string
+    }[]
+}
+type OrdenAbiertaOUT = {
+    ok: true,
+    data: {
+        id: number,
+        numero: string,
+        sesion_id: number,
+        id_empresa: number,
+        mesa_id: number | null,
+        cliente_id: number | null,
+        lista_precio_id: string | null,
+        cajero_id: number,
+        canal_origen: string,
+        estado: string,
+        subtotal: string,
+        descuento_total: string,
+        total: string,
+        notas: string | null,
+        cotizacion_id: string | null,
+        comprobante_id: string | null,
+        tipo_division: string | null,
+        created_at: string,
+        updated_at: string,
+        pagada_en: string | null,
+        comentario: string | null,
+        pos_id: number,
+        almacen_id: number,
+        mesa_nombre: string | null,
+        cajero_nombre: string | null,
+        cliente_nombre: string | null,
+        cliente_documento: string | null,
+        items: {
+            id: number,
+            orden_id: number,
+            producto_id: number,
+            nombre_snapshot: string,
+            precio_unitario: string,
+            cantidad: string,
+            costo_extra: string,
+            subtotal: string,
+            nota_preparacion: string | null,
+            es_componente_kit: number,
+            kit_item_id: number | null,
+            estado_kds: string,
+            item_tipo: string,
+            kds_enviado: number,
+            kds_estado_real: string,
+            kds_comanda_estado: string | null,
+            kds_pantalla_nombre: string | null,
+            kds_pantalla_color: string | null,
+            kds_timer_ts: number | null,
+            kds_ambar_min: number | null,
+            kds_rojo_min: number | null,
+            kds_mostrar_tiempo_mesero: number | null
+        }[],
+    }
+}
+
 export type {
     AuthLoginIN,
     AuthLoginOUT,
@@ -217,5 +284,7 @@ export type {
     SessionOpenIN,
     SessionCloseIN,
     VentaDirectaIN,
-    VentaDirectaOUT
+    VentaDirectaOUT,
+    OrdenAbiertaIN,
+    OrdenAbiertaOUT
 }

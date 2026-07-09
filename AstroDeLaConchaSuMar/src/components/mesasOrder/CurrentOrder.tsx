@@ -84,6 +84,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
             producto_id: number,
             cantidad: number,
             precio_unitario: number,
+            nota_preparacion?: string
         }[] = []
 
         prevOrders.forEach((prevOrder) => {
@@ -93,6 +94,7 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                     producto_id: Number(product.id) || 0,
                     cantidad: product.quantity,
                     precio_unitario: product.price,
+                    nota_preparacion: product.observations
                 })
             })
             backendConection("PATCH", "sales-orders", prevOrder.orderId, { state: 'paid' })
@@ -102,17 +104,16 @@ export default function CurrentOrder({ name, orders, prevOrders, onRemoveOrder, 
                     }
                 })
         });
-        erpConection("ventaDirecta", {
+        erpConection("ordenAbierta", {
             body: {
                 pos_id: 1,
-                cliente_id: 3,
+                notas: `Mesa ${name}`,
                 items: items,
-                pagos: [{
-                    metodo_pago_id: 1,
-                    monto: items.reduce((acc, item) => acc + item.precio_unitario * item.cantidad, 0),
-                    monto_recibido: items.reduce((acc, item) => acc + item.precio_unitario * item.cantidad, 0),
-                }],
             },
+        }).then((res) => {
+            if (!res?.ok) {
+                alert("Error al enviar pedido al ERP")
+            }
         })
     };
 
