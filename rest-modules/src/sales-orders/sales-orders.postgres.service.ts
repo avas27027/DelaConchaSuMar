@@ -31,9 +31,12 @@ export class SalesOrdersPostgresService {
                 id: {
                     in: productIds,
                 },
-                category: {
-                    in: ["Bebidas", "Cervezas"],
-                },
+                OR: [
+                    { category: { equals: "Bebidas", mode: "insensitive" } },
+                    { category: { equals: "Cervezas", mode: "insensitive" } },
+                    { category: { equals: "Nuevas Bebidas", mode: "insensitive" } },
+
+                ],
             },
             select: {
                 id: true,

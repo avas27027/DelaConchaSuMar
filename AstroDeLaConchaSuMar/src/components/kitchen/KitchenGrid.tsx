@@ -36,14 +36,13 @@ export default function KitchenGrid() {
 
     const kitchenOrders = useMemo(() => {
         let orderFiltered: SalesOrderJSONInterface[] = []
-        const orderBebidas = orders.filter((order) => order.products.some((product) => ["Bebidas", "Cervezas"].includes(product.product.category)))
-        const orderComidas = orders.filter((order) => order.products.some((product) => !["Bebidas", "Cervezas"].includes(product.product.category)))
+        const orderBebidas = orders.filter((order) => order.products.some((product) => ["bebidas", "cervezas", "nuevas bebidas"].includes(product.product.category.toLowerCase())))
+        const orderComidas = orders.filter((order) => order.products.some((product) => !["bebidas", "cervezas", "nuevas bebidas"].includes(product.product.category.toLowerCase())))
         const roleValidate = (role: string) => userData?.usersRoles.some((r) => r.roles.name === role)
 
         if (!userData) return []
-        if (roleValidate("barman")) orderFiltered = orderBebidas
-        else if (roleValidate("cook")) orderFiltered = orderComidas
-        else if (roleValidate("admin") || roleValidate("cookBar")) orderFiltered = orders
+        if (roleValidate("barman") || roleValidate("admin") || roleValidate("cookBar")) orderFiltered = orderFiltered.concat(orderBebidas)
+        if (roleValidate("cook") || roleValidate("admin") || roleValidate("cookBar")) orderFiltered = orderFiltered.concat(orderComidas)
 
         return orderFiltered.map((order, i) => {
             const orderProducts = order.products.map(
