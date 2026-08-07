@@ -10,6 +10,7 @@ import { SalesOrdersModule } from './sales-orders/sales-orders.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { MeassuresModule } from './meassures/meassures.module';
 import { UserModule } from './user/user.module';
+import { IngredientAjustmentModule } from './ingredient-ajustment/ingredient-ajustment.module';
 
 @Module({
   imports: [CommonsModule,
@@ -20,7 +21,8 @@ import { UserModule } from './user/user.module';
     SalesOrdersModule,
     IngredientsModule,
     MeassuresModule,
-    UserModule],
+    UserModule,
+    IngredientAjustmentModule],
   controllers: [AppController],
   providers: [AppService],
 })

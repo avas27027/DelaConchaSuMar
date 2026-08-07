@@ -84,6 +84,7 @@ model Ingredients {
   units                MeassureUnits          @relation(fields: [unit], references: [id])
   productsIngredients  ProductsIngredients[]
   ingredientsSuppliers IngredientsSuppliers[]
+  ingredientsAjustment IngredientsAjustment[]
 
   @@map("ingredients")
 }
@@ -120,6 +121,22 @@ model Suppliers {
   ingredientsSuppliers IngredientsSuppliers[]
 
   @@map("suppliers")
+}
+
+model IngredientsAjustment {
+  id            Int      @id @default(autoincrement())
+  ingredient    Int
+  previousStock Decimal
+  quantity      Decimal
+  newStock      Decimal
+  reason        String
+  observations  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  ingredients Ingredients @relation(fields: [ingredient], references: [id])
+
+  @@map("ingredients_ajustments")
 }
 
 model MeassureUnits {

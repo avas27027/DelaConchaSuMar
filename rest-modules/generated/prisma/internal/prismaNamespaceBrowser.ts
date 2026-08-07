@@ -59,6 +59,7 @@ export const ModelName = {
   Tables: 'Tables',
   IngredientsSuppliers: 'IngredientsSuppliers',
   Suppliers: 'Suppliers',
+  IngredientsAjustment: 'IngredientsAjustment',
   MeassureUnits: 'MeassureUnits',
   Users: 'Users',
   UsersRoles: 'UsersRoles',
@@ -172,6 +173,21 @@ export const SuppliersScalarFieldEnum = {
 } as const
 
 export type SuppliersScalarFieldEnum = (typeof SuppliersScalarFieldEnum)[keyof typeof SuppliersScalarFieldEnum]
+
+
+export const IngredientsAjustmentScalarFieldEnum = {
+  id: 'id',
+  ingredient: 'ingredient',
+  previousStock: 'previousStock',
+  quantity: 'quantity',
+  newStock: 'newStock',
+  reason: 'reason',
+  observations: 'observations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IngredientsAjustmentScalarFieldEnum = (typeof IngredientsAjustmentScalarFieldEnum)[keyof typeof IngredientsAjustmentScalarFieldEnum]
 
 
 export const MeassureUnitsScalarFieldEnum = {

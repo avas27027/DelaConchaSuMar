@@ -1,0 +1,14 @@
+---
+import InventoryAdjustment from "../../../components/ingredients/InventoryAdjustment";
+import Layout from "../../../layouts/Layout.astro";
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/insumos");
+}
+---
+
+<Layout title="Ajuste de Inventario">
+  <InventoryAdjustment client:only="react" id={id} />
+</Layout>

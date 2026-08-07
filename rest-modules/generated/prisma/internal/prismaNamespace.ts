@@ -392,6 +392,7 @@ export const ModelName = {
   Tables: 'Tables',
   IngredientsSuppliers: 'IngredientsSuppliers',
   Suppliers: 'Suppliers',
+  IngredientsAjustment: 'IngredientsAjustment',
   MeassureUnits: 'MeassureUnits',
   Users: 'Users',
   UsersRoles: 'UsersRoles',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "salesOrders" | "salesOrderProducts" | "products" | "productsIngredients" | "ingredients" | "tables" | "ingredientsSuppliers" | "suppliers" | "meassureUnits" | "users" | "usersRoles" | "roles"
+    modelProps: "salesOrders" | "salesOrderProducts" | "products" | "productsIngredients" | "ingredients" | "tables" | "ingredientsSuppliers" | "suppliers" | "ingredientsAjustment" | "meassureUnits" | "users" | "usersRoles" | "roles"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1007,6 +1008,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    IngredientsAjustment: {
+      payload: Prisma.$IngredientsAjustmentPayload<ExtArgs>
+      fields: Prisma.IngredientsAjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IngredientsAjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IngredientsAjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.IngredientsAjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IngredientsAjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.IngredientsAjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.IngredientsAjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.IngredientsAjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IngredientsAjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.IngredientsAjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        update: {
+          args: Prisma.IngredientsAjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.IngredientsAjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IngredientsAjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IngredientsAjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.IngredientsAjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IngredientsAjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.IngredientsAjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIngredientsAjustment>
+        }
+        groupBy: {
+          args: Prisma.IngredientsAjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IngredientsAjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IngredientsAjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IngredientsAjustmentCountAggregateOutputType> | number
+        }
+      }
+    }
     MeassureUnits: {
       payload: Prisma.$MeassureUnitsPayload<ExtArgs>
       fields: Prisma.MeassureUnitsFieldRefs
@@ -1435,6 +1510,21 @@ export const SuppliersScalarFieldEnum = {
 export type SuppliersScalarFieldEnum = (typeof SuppliersScalarFieldEnum)[keyof typeof SuppliersScalarFieldEnum]
 
 
+export const IngredientsAjustmentScalarFieldEnum = {
+  id: 'id',
+  ingredient: 'ingredient',
+  previousStock: 'previousStock',
+  quantity: 'quantity',
+  newStock: 'newStock',
+  reason: 'reason',
+  observations: 'observations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IngredientsAjustmentScalarFieldEnum = (typeof IngredientsAjustmentScalarFieldEnum)[keyof typeof IngredientsAjustmentScalarFieldEnum]
+
+
 export const MeassureUnitsScalarFieldEnum = {
   id: 'id',
   longName: 'longName',
@@ -1696,6 +1786,7 @@ export type GlobalOmitConfig = {
   tables?: Prisma.TablesOmit
   ingredientsSuppliers?: Prisma.IngredientsSuppliersOmit
   suppliers?: Prisma.SuppliersOmit
+  ingredientsAjustment?: Prisma.IngredientsAjustmentOmit
   meassureUnits?: Prisma.MeassureUnitsOmit
   users?: Prisma.UsersOmit
   usersRoles?: Prisma.UsersRolesOmit

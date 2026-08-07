@@ -102,6 +102,28 @@ export default function IngredientsTable() {
                     >
                       <a
                         className="icon-button"
+                        href={`/insumos/ajuste/${ingredient.id}`}
+                        aria-label="Registrar ajuste de inventario"
+                        title="Registrar ajuste de inventario"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </a>
+
+                      <a
+                        className="icon-button"
                         href={`/insumos/${ingredient.id}`}
                         aria-label="Editar insumo"
                       >

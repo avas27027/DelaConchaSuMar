@@ -20,6 +20,19 @@ export interface ProductJSONInterface {
     priceMeassures?: PriceMeassureJSONInterface
 }
 
+export type IngredientAjustmentJSONInterface = {
+    id: string;
+    ingredient: string;
+    previousStock: number;
+    newStock: number;
+    quantity: number;
+    reason: string;
+    observations: string;
+    createdAt: string;
+    updatedAt?: string;
+    ingredients?: IngredientsJSONInterface;
+}
+
 export type UserJSONInterface = {
     id: string;
     username: string;
@@ -130,17 +143,18 @@ type BackendMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export type Response<T> = { success: boolean, message: string, data?: T } & Pagination;
 type BackendEndPoint = keyof BackendTypesMap;
 type BackendTypesMap = {
-    "sales-orders": SalesOrderJSONInterface[];
-    tables: TableJSONInterface[];
-    menu: ProductJSONInterface[];
-    ingredients: IngredientsJSONInterface[];
-    meassures: PriceMeassureJSONInterface[];
-    user: UserJSONInterface[];
+    "sales-orders": SalesOrderJSONInterface;
+    tables: TableJSONInterface;
+    menu: ProductJSONInterface;
+    ingredients: IngredientsJSONInterface;
+    meassures: PriceMeassureJSONInterface;
+    user: UserJSONInterface;
+    "ingredient-ajustment": IngredientAjustmentJSONInterface;
     "menu/sync": any;
 };
 const backendUrl = import.meta.env.PUBLIC_BACKEND_URL || "http://127.0.0.1:3001";
 
-export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: any, token?: string): Promise<Response<BackendTypesMap[T]>> {
+export async function backendConection<T extends BackendEndPoint>(method: BackendMethod, endPoint: T, param?: string, body?: Partial<BackendTypesMap[T]>, token?: string): Promise<Response<BackendTypesMap[T][]>> {
     return fetch(backendUrl + "/" + endPoint + (param ? "/" + param : ""), {
         method: method,
         ...(body && { body: JSON.stringify(body) }),

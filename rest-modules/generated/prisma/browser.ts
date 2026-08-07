@@ -58,6 +58,11 @@ export type IngredientsSuppliers = Prisma.IngredientsSuppliersModel
  */
 export type Suppliers = Prisma.SuppliersModel
 /**
+ * Model IngredientsAjustment
+ * 
+ */
+export type IngredientsAjustment = Prisma.IngredientsAjustmentModel
+/**
  * Model MeassureUnits
  * 
  */
