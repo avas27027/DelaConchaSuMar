@@ -21,8 +21,8 @@ export interface ProductJSONInterface {
 }
 
 export type IngredientAjustmentJSONInterface = {
-    id: string;
-    ingredient: string;
+    id: number;
+    ingredient: number;
     previousStock: number;
     newStock: number;
     quantity: number;

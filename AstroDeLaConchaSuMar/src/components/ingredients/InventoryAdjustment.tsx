@@ -65,7 +65,7 @@ export default function InventoryAdjustment({ id }: { id: string }) {
     setSaving(true);
     setMessage("");
     const response = await backendConection("POST", "ingredient-ajustment", undefined, {
-      ingredient: id,
+      ingredient: Number(id),
       previousStock: currentStock,
       newStock: newTotal,
       quantity: quantity,
