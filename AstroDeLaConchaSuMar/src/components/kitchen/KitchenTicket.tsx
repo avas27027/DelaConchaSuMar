@@ -12,9 +12,10 @@ export interface KitchenTicketProps {
         readonly name: string;
         readonly note?: string;
     }[];
+    readonly inventoryUpdate: (orderId: string) => Promise<{ enoughIngredients: boolean, ingredientsUpdate: { id: string; currentStock: number }[] }>;
 }
 
-export default function KitchenTicket({ id, orderNumber, customerName, time, items }: KitchenTicketProps) {
+export default function KitchenTicket({ id, orderNumber, customerName, time, items, inventoryUpdate }: KitchenTicketProps) {
     const [tiempo, setTiempo] = useState('');
     const [urgency, setUrgency] = useState('new');
     const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
@@ -67,6 +68,15 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
     const handleReady = () => {
         if (!allItemsChecked) return;
         backendConection("PATCH", "sales-orders", id, { state: 'cooked' })
+        inventoryUpdate(id).then(({ enoughIngredients, ingredientsUpdate }) => {
+            if (!enoughIngredients) {
+                alert("No hay suficiente stock para preparar este pedido por favor actualizar cardex");
+                return;
+            }
+            ingredientsUpdate.forEach(ingredient => {
+                backendConection("PATCH", "ingredients", ingredient.id, { currentStock: ingredient.currentStock })
+            })
+        })
     }
 
     useEffect(() => {

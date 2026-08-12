@@ -61,7 +61,7 @@ type Pagination = {
 type IngredientsJSONInterface = {
     id: string;
     category: string;
-    currentStock: string;
+    currentStock: number;
     name: string;
     description: string;
     minimumStock: string;

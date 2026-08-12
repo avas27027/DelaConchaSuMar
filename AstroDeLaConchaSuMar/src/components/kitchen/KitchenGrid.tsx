@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import KitchenTicket from './KitchenTicket';
 import './KitchenGrid.css';
-import { listenSocket, verifySessionToken, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
+import { backendConection, listenSocket, verifySessionToken, type IngredientAjustmentJSONInterface, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
 
 export default function KitchenGrid() {
     const [orders, setOrders] = useState<SalesOrderJSONInterface[]>([]);
@@ -33,6 +33,23 @@ export default function KitchenGrid() {
             unsubscribeTables();
         }
     }, [])
+
+    const inventoryUpdate = async (orderId: string): Promise<{ enoughIngredients: boolean, ingredientsUpdate: { id: string; currentStock: number }[] }> => {
+        let enoughIngredients = true;
+        const bkIngredients = new Map((await backendConection("GET", "ingredients"))?.data?.map(i => [i.id, i]))
+        orders.find(o => o.id === orderId)?.products.forEach(product => {
+            products.get(product.product.id)?.productsIngredients?.forEach(ingredient => {
+                const delta = (ingredient.quantity * product.quantity)
+                const stock = (bkIngredients.get(ingredient.id)?.currentStock ?? 0) - delta
+                if (stock < 0) enoughIngredients = false
+                bkIngredients.set(ingredient.id, { ...bkIngredients.get(ingredient.id)!, currentStock: Math.max(stock, 0) })
+            })
+        })
+        const ingredientsUpdate = Object.values(Object.fromEntries(bkIngredients)).map((ingredient) => {
+            return { id: ingredient.id, currentStock: ingredient.currentStock }
+        })
+        return { enoughIngredients, ingredientsUpdate }
+    }
 
     const kitchenOrders = useMemo(() => {
         let orderFiltered: SalesOrderJSONInterface[] = []
@@ -66,7 +83,7 @@ export default function KitchenGrid() {
     return (
         <div className="kitchen-grid">
             {kitchenOrders.map((order) => (
-                <KitchenTicket key={order.id} {...order} />
+                <KitchenTicket key={order.id} {...order} inventoryUpdate={inventoryUpdate} />
             ))}
 
             <div className="empty-state-filler">
