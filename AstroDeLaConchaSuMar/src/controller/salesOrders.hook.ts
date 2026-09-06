@@ -102,7 +102,8 @@ export interface SalesOrderJSONInterface {
     table: TableJSONInterface;
     user: string;
     products: {
-        product: ProductJSONInterface;
+        product?: ProductJSONInterface | string;
+        productId?: string;
         quantity: number;
         observations: string;
     }[];
