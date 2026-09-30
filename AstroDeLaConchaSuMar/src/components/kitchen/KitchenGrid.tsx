@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import KitchenTicket from './KitchenTicket';
 import './KitchenGrid.css';
-import { backendConection, listenSocket, verifySessionToken, type IngredientAjustmentJSONInterface, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
+import { backendConection, listenSocket, verifySessionToken, type ProductJSONInterface, type SalesOrderJSONInterface, type TableJSONInterface, type UserJSONInterface } from '../../controller/salesOrders.hook';
 
 export default function KitchenGrid() {
     const [orders, setOrders] = useState<SalesOrderJSONInterface[]>([]);
@@ -40,9 +40,10 @@ export default function KitchenGrid() {
         const bkproducts = new Map((await backendConection("GET", "menu"))?.data?.map(i => [i.id, i]))
         const ingredientsUpdate: { id: string; currentStock: number }[] = []
         orders.find(o => o.id === orderId)?.products.forEach(product => {
+            if (!product?.product) return
             bkproducts.get(product.product.id)?.productsIngredients?.forEach(ingredient => {
                 const delta = (ingredient.quantity * product.quantity)
-                const stock = (bkIngredients.get(ingredient.ingredient)?.currentStock ?? 0) - delta
+                const stock = Number(bkIngredients.get(ingredient.ingredient)?.currentStock || 0) - delta
                 if (stock < 0) enoughIngredients = false
                 ingredientsUpdate.push({ id: ingredient.ingredient, currentStock: Math.max(stock, 0) })
             })
@@ -52,8 +53,8 @@ export default function KitchenGrid() {
 
     const kitchenOrders = useMemo(() => {
         let orderFiltered: SalesOrderJSONInterface[] = []
-        const orderBebidas = orders.filter((order) => order.products.some((product) => ["bebidas", "cervezas", "nuevas bebidas"].includes(product.product.category.toLowerCase())))
-        const orderComidas = orders.filter((order) => order.products.some((product) => !["bebidas", "cervezas", "nuevas bebidas"].includes(product.product.category.toLowerCase())))
+        const orderBebidas = orders.filter((order) => order.products.some((product) => ["bebidas", "cervezas", "nuevas bebidas"].includes(product?.product?.category?.toLowerCase() ?? "")))
+        const orderComidas = orders.filter((order) => order.products.some((product) => !["bebidas", "cervezas", "nuevas bebidas"].includes(product?.product?.category?.toLowerCase() ?? "")))
         const roleValidate = (role: string) => userData?.usersRoles.some((r) => r.roles.name === role)
 
         if (!userData) return []
@@ -64,7 +65,7 @@ export default function KitchenGrid() {
             const orderProducts = order.products.map(
                 ({ observations, product, quantity }) => ({
                     observations,
-                    name: products.get(product.id)?.name || "",
+                    name: products.get(product?.id ?? "")?.name || "",
                     quantity,
                 })
             );

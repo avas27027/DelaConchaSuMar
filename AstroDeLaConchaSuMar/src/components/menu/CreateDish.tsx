@@ -66,7 +66,7 @@ export default function CreateDish(props?: { id?: string }) {
                         image: null,
                         previewImageUrl: product.imageUrl,
                         ingredients: product.productsIngredients?.map(i => ({
-                            ingredient: i.ingredients?.name ?? "",
+                            ingredient: i.ingredients?.id ?? "",
                             quantity: Number(i.quantity),
                         })) ?? [],
                     });

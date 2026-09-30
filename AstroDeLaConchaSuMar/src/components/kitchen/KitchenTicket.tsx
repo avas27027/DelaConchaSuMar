@@ -74,7 +74,7 @@ export default function KitchenTicket({ id, orderNumber, customerName, time, ite
                 return;
             }
             ingredientsUpdate.forEach(ingredient => {
-                backendConection("PATCH", "ingredients", ingredient.id, { currentStock: ingredient.currentStock })
+                backendConection("PATCH", "ingredients", ingredient.id, { currentStock: ingredient.currentStock.toString() })
             })
         })
     }

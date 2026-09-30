@@ -61,7 +61,7 @@ type Pagination = {
 type IngredientsJSONInterface = {
     id: string;
     category: string;
-    currentStock: number;
+    currentStock: string;
     name: string;
     description: string;
     minimumStock: string;
@@ -102,7 +102,7 @@ export interface SalesOrderJSONInterface {
     table: TableJSONInterface;
     user: string;
     products: {
-        product?: ProductJSONInterface | string;
+        product?: ProductJSONInterface;
         productId?: string;
         quantity: number;
         observations: string;

@@ -94,14 +94,14 @@ export default function IngredientsForm(props: { id: string }) {
     const payload = {
       ...formState,
       unit: formState.unitId.split("-")[0],
-      minimumStock: Number(formState.minimumStock || 0),
-      currentStock: Number(formState.currentStock || 0),
+      minimumStock: formState.minimumStock,
+      currentStock: formState.currentStock,
       suppliers,
     };
 
     console.log("Insumo:", payload);
 
-    backendConection("POST", "ingredients", undefined, JSON.stringify(payload))
+    backendConection("POST", "ingredients", undefined, payload)
       .then((data) => {
         console.log(data);
         if (data.success) alert("Insumo guardado correctamente")
