@@ -1,6 +1,6 @@
 import { Response } from '@/commons/interfaces';
 import { PostgresService } from '@/commons/providers/postgres.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 import { Prisma } from '../../generated/prisma/client';
@@ -16,6 +16,7 @@ type IngredientsWithRelations = Prisma.IngredientsGetPayload<{
 
 @Injectable()
 export class IngredientsPostgresService {
+    private readonly logger = new Logger(IngredientsPostgresService.name)
     constructor(private readonly db: PostgresService) { }
 
     async count(): Promise<number> {
@@ -163,9 +164,11 @@ export class IngredientsPostgresService {
                 response.message = "Ingredient not found"
             }
             response.success = true
+            this.logger.log(`Ingredient with ID ${id} updated successfully`)
         }
         catch (error: any) {
             response.message = error.message
+            this.logger.error(`Error updating ingredient with ID ${id}: ${error.message}`)
         }
         return response
     }

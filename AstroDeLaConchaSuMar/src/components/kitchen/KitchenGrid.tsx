@@ -37,16 +37,15 @@ export default function KitchenGrid() {
     const inventoryUpdate = async (orderId: string): Promise<{ enoughIngredients: boolean, ingredientsUpdate: { id: string; currentStock: number }[] }> => {
         let enoughIngredients = true;
         const bkIngredients = new Map((await backendConection("GET", "ingredients"))?.data?.map(i => [i.id, i]))
+        const bkproducts = new Map((await backendConection("GET", "menu"))?.data?.map(i => [i.id, i]))
+        const ingredientsUpdate: { id: string; currentStock: number }[] = []
         orders.find(o => o.id === orderId)?.products.forEach(product => {
-            products.get(product.product.id)?.productsIngredients?.forEach(ingredient => {
+            bkproducts.get(product.product.id)?.productsIngredients?.forEach(ingredient => {
                 const delta = (ingredient.quantity * product.quantity)
-                const stock = (bkIngredients.get(ingredient.id)?.currentStock ?? 0) - delta
+                const stock = (bkIngredients.get(ingredient.ingredient)?.currentStock ?? 0) - delta
                 if (stock < 0) enoughIngredients = false
-                bkIngredients.set(ingredient.id, { ...bkIngredients.get(ingredient.id)!, currentStock: Math.max(stock, 0) })
+                ingredientsUpdate.push({ id: ingredient.ingredient, currentStock: Math.max(stock, 0) })
             })
-        })
-        const ingredientsUpdate = Object.values(Object.fromEntries(bkIngredients)).map((ingredient) => {
-            return { id: ingredient.id, currentStock: ingredient.currentStock }
         })
         return { enoughIngredients, ingredientsUpdate }
     }
